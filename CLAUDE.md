@@ -12,15 +12,18 @@ la-casa-del-terror/
 │           ├── lina.png
 │           ├── rose.png
 │           └── donbu.png
+├── js/
+│   ├── entidades.js          # Clases base: Entidad, Personaje, Enemigo
+│   ├── personajes.js         # Definición de personajes jugables (datos/stats)
+│   └── juego.js              # Lógica del juego, UI y game loop
 ├── index.html                # Estructura de las pantallas del juego
 ├── estilos.css               # Estilos visuales y animaciones
-├── juego.js                  # Lógica e interactividad
 └── CLAUDE.md
 ```
 
 ## Stack
 
-- HTML, CSS y JavaScript puro (sin frameworks ni bundlers)
+- HTML, CSS y JavaScript puro (ES modules, sin frameworks ni bundlers)
 - Servidor de desarrollo: `npx live-server`
 
 ## Personajes

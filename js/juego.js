@@ -1,9 +1,12 @@
 // Código de La Casa del Terror
+import { PERSONAJES } from "./personajes.js";
+
 console.log("¡La Casa del Terror está cargando!");
 
 // --- Selección de personaje ---
 
-let personajeElegido = null;
+let personajeElegido = null;   // nombre del personaje (string)
+let jugadorActual = null;      // instancia de Personaje
 
 const personajes = document.querySelectorAll(".personaje");
 const btnJugar = document.getElementById("btn-jugar");
@@ -26,13 +29,6 @@ personajes.forEach(function (personaje) {
 const pasillo = document.getElementById("pasillo");
 const personajeJugador = document.getElementById("personaje-jugador");
 const imgJugador = document.getElementById("img-jugador");
-
-// Mapa de personaje a imagen y clase CSS
-const datosPersonajes = {
-    Lina:  { img: "assets/img/personajes/lina.png",  clase: "jugador-lina" },
-    "Rosé": { img: "assets/img/personajes/rose.png",  clase: "jugador-rose" },
-    DonBu: { img: "assets/img/personajes/donbu.png", clase: "jugador-donbu" }
-};
 
 // Posición y movimiento
 let posX = 0;
@@ -57,14 +53,14 @@ btnJugar.addEventListener("click", function () {
     document.getElementById("seleccion-personaje").classList.add("oculto");
     document.getElementById("pantalla-juego").classList.remove("oculto");
 
-    // Configurar imagen y estilo del personaje
-    const datos = datosPersonajes[personajeElegido];
-    imgJugador.src = datos.img;
+    // Configurar personaje actual
+    jugadorActual = PERSONAJES[personajeElegido];
+    imgJugador.src = jugadorActual.img;
     imgJugador.alt = personajeElegido;
 
     // Quitar clases de personaje anteriores y poner la nueva
     personajeJugador.classList.remove("jugador-lina", "jugador-rose", "jugador-donbu");
-    personajeJugador.classList.add(datos.clase);
+    personajeJugador.classList.add(jugadorActual.clase);
 
     // Calcular límites del pasillo
     limiteDerecho = pasillo.clientWidth - tamPersonaje;
@@ -93,6 +89,7 @@ document.getElementById("btn-volver").addEventListener("click", function () {
 
     // Limpiar selección
     personajeElegido = null;
+    jugadorActual = null;
     personajes.forEach(function (p) {
         p.classList.remove("seleccionado");
     });
