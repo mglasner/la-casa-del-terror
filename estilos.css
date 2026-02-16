@@ -258,6 +258,40 @@ h1 {
     100% { color: #fcca6b; text-shadow: none; }
 }
 
+/* Kira - paleta teal/púrpura */
+.personaje-kira {
+    border-color: #1a5a5a;
+    background-color: #0a2020;
+}
+
+.personaje-kira:hover {
+    border-color: #2ec4b6;
+}
+
+.personaje-kira h3 {
+    color: #5eeadb;
+}
+
+.personaje-kira .avatar img {
+    border-color: #2ec4b6;
+}
+
+.personaje-kira.seleccionado {
+    border-color: #5eeadb;
+    box-shadow: 0 0 30px rgba(94, 234, 219, 0.7), 0 0 60px rgba(46, 196, 182, 0.3);
+    background-color: #102a2a;
+}
+
+.personaje-kira.seleccionado h3 {
+    animation: neon-kira 1.5s ease-in-out infinite;
+}
+
+@keyframes neon-kira {
+    0% { color: #5eeadb; text-shadow: none; }
+    50% { color: #a0fff0; text-shadow: 0 0 10px #2ec4b6, 0 0 20px #2ec4b6; }
+    100% { color: #5eeadb; text-shadow: none; }
+}
+
 /* PandaJuro - paleta azul con rojo */
 .personaje-pandajuro {
     border-color: #1a3a6b;
@@ -408,6 +442,15 @@ h1 {
 .personaje-hana .ataque-dano {
     color: #fc86d4;
     background-color: rgba(233, 30, 144, 0.15);
+}
+
+.personaje-kira .barra-vida-relleno {
+    background: linear-gradient(90deg, #2ec4b6, #5eeadb);
+}
+
+.personaje-kira .ataque-dano {
+    color: #5eeadb;
+    background-color: rgba(46, 196, 182, 0.15);
 }
 
 .personaje-donbu .barra-vida-relleno {
@@ -878,6 +921,11 @@ h1 {
     box-shadow: 0 0 12px rgba(233, 30, 144, 0.5);
 }
 
+#personaje-jugador.jugador-kira img {
+    border-color: #2ec4b6;
+    box-shadow: 0 0 12px rgba(46, 196, 182, 0.5);
+}
+
 #personaje-jugador.jugador-donbu img {
     border-color: #d4a052;
     box-shadow: 0 0 12px rgba(212, 160, 82, 0.5);
@@ -1119,6 +1167,13 @@ h1 {
 }
 .barra-hana .barra-vida-relleno {
     background: linear-gradient(90deg, #e91e90, #fc86d4);
+}
+
+.barra-kira .barra-jugador img {
+    border-color: #2ec4b6;
+}
+.barra-kira .barra-vida-relleno {
+    background: linear-gradient(90deg, #2ec4b6, #5eeadb);
 }
 
 .barra-donbu .barra-jugador img {
@@ -1402,6 +1457,11 @@ h1 {
 .jugador-laberinto.jugador-hana img {
     border-color: #e91e90;
     box-shadow: 0 0 10px rgba(233, 30, 144, 0.5);
+}
+
+.jugador-laberinto.jugador-kira img {
+    border-color: #2ec4b6;
+    box-shadow: 0 0 10px rgba(46, 196, 182, 0.5);
 }
 
 .jugador-laberinto.jugador-donbu img {

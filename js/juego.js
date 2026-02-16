@@ -169,7 +169,7 @@ function iniciarJuego() {
     imgJugador.alt = personajeElegido;
 
     // Quitar clases de personaje anteriores y poner la nueva
-    personajeJugador.classList.remove("jugador-lina", "jugador-rose", "jugador-pandajuro", "jugador-hana", "jugador-donbu");
+    personajeJugador.classList.remove("jugador-lina", "jugador-rose", "jugador-pandajuro", "jugador-hana", "jugador-kira", "jugador-donbu");
     personajeJugador.classList.add(jugadorActual.clase);
 
     // Calcular límites del pasillo

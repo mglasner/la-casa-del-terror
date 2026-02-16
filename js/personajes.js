@@ -38,6 +38,15 @@ const PERSONAJES = {
         descripcion: "16 años. Idol de K-pop. Lucha con música."
     }),
 
+    Kira: new Personaje("Kira", 95, [
+        { nombre: "Disparo certero", dano: 28, descripcion: "Un tiro preciso que no falla" },
+        { nombre: "Trampa de luz", dano: 18, descripcion: "Destello que ciega y daña" }
+    ], {
+        img: "assets/img/personajes/kira.png",
+        clase: "jugador-kira",
+        descripcion: "14 años. Investigadora paranormal. Nada se le escapa."
+    }),
+
     DonBu: new Personaje("DonBu", 140, [
         { nombre: "Patada de mula", dano: 35, descripcion: "Una coz devastadora" },
         { nombre: "Cabezazo terco", dano: 20, descripcion: "Embiste con toda su terquedad" }
