@@ -21,6 +21,7 @@ import { iniciarTrasgo, actualizarTrasgo, renderizarTrasgo } from './trasgo.js';
 function crearPantalla() {
     est.pantalla = document.createElement('div');
     est.pantalla.id = 'pantalla-habitacion1';
+    est.pantalla.className = 'habitacion-1';
 
     const titulo = document.createElement('h2');
     titulo.className = 'titulo-habitacion';

@@ -19,6 +19,21 @@ const FILAS = 13;
 const COLS = 13;
 const ATAJOS = 6;
 
+// Paleta de colores (verde bosque encantado)
+const COLORES = {
+    // Paredes 3D (RGB base, se escalan por brillo/distancia)
+    paredNS: { r: 26, g: 62, b: 30 }, // caras N/S más oscuras
+    paredEO: { r: 37, g: 85, b: 42 }, // caras E/O más claras
+    // Gradientes cielo y suelo
+    cieloArriba: '#050f05',
+    cieloAbajo: '#0a1a0f',
+    sueloArriba: '#0d240d',
+    sueloAbajo: '#050a05',
+    // Minimapa
+    minimapaFondo: '#0d1a0d',
+    minimapaParedes: '#1a3e1a',
+};
+
 // Movimiento del jugador
 const VELOCIDAD_MOV = 0.06;
 const VELOCIDAD_GIRO = 0.04;
@@ -60,6 +75,7 @@ let mensajeExito = null;
 function crearPantalla() {
     pantalla = document.createElement('div');
     pantalla.id = 'pantalla-habitacion2';
+    pantalla.className = 'habitacion-2';
 
     const titulo = document.createElement('h2');
     titulo.className = 'titulo-habitacion';
@@ -89,12 +105,12 @@ function crearPantalla() {
 
     // Pre-crear gradientes (no cambian entre frames)
     gradCielo = ctx3D.createLinearGradient(0, 0, 0, ALTO_CANVAS / 2);
-    gradCielo.addColorStop(0, '#050510');
-    gradCielo.addColorStop(1, '#0f0a1a');
+    gradCielo.addColorStop(0, COLORES.cieloArriba);
+    gradCielo.addColorStop(1, COLORES.cieloAbajo);
 
     gradSuelo = ctx3D.createLinearGradient(0, ALTO_CANVAS / 2, 0, ALTO_CANVAS);
-    gradSuelo.addColorStop(0, '#150d24');
-    gradSuelo.addColorStop(1, '#0a0510');
+    gradSuelo.addColorStop(0, COLORES.sueloArriba);
+    gradSuelo.addColorStop(1, COLORES.sueloAbajo);
 
     mensajeExito = document.createElement('p');
     mensajeExito.id = 'laberinto3d-mensaje';
@@ -215,18 +231,10 @@ function renderizar3D() {
 
         // Color con efecto de profundidad (más lejos = más oscuro)
         const brillo = Math.min(1, 1.5 / distPerp);
-        let r, g, b;
-        if (lado === 1) {
-            // Paredes N/S más oscuras
-            r = Math.floor(42 * brillo);
-            g = Math.floor(26 * brillo);
-            b = Math.floor(62 * brillo);
-        } else {
-            // Paredes E/O más claras
-            r = Math.floor(61 * brillo);
-            g = Math.floor(37 * brillo);
-            b = Math.floor(85 * brillo);
-        }
+        const color = lado === 1 ? COLORES.paredNS : COLORES.paredEO;
+        const r = Math.floor(color.r * brillo);
+        const g = Math.floor(color.g * brillo);
+        const b = Math.floor(color.b * brillo);
 
         ctx3D.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
         ctx3D.fillRect(i * ANCHO_FRANJA, inicioY, ANCHO_FRANJA, finY - inicioY);
@@ -323,11 +331,11 @@ function crearMinimapBase() {
     const tamCelda = ANCHO_MINIMAPA / COLS;
 
     // Fondo
-    ctx.fillStyle = '#0d0d1a';
+    ctx.fillStyle = COLORES.minimapaFondo;
     ctx.fillRect(0, 0, ANCHO_MINIMAPA, ALTO_MINIMAPA);
 
     // Paredes
-    ctx.fillStyle = '#2a1a3e';
+    ctx.fillStyle = COLORES.minimapaParedes;
     for (let f = 0; f < FILAS; f++) {
         for (let c = 0; c < COLS; c++) {
             if (mapa[f][c] === 1) {
