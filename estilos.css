@@ -1,10 +1,31 @@
 /* Estilos de La Casa del Terror */
 
+:root {
+    /* Tema base */
+    --color-fondo: #1a1a2e;
+    --color-superficie: #16213e;
+    --color-oscuro: #0d0d1a;
+    --color-accent: #e94560;
+    --color-accent-hover: #c73652;
+    --color-texto: #e0e0e0;
+    --color-texto-secundario: #a0a0b0;
+    --color-texto-tenue: #888;
+    --color-texto-apagado: #666;
+    --color-texto-muy-apagado: #555;
+    --color-borde: #333;
+    --color-borde-claro: #444;
+    --color-dorado: #ffd700;
+
+    /* Radios */
+    --radio-tarjeta: 15px;
+    --radio-boton: 8px;
+}
+
 body {
     margin: 0;
     padding: 0;
-    background-color: #1a1a2e;
-    color: #e0e0e0;
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
     font-family: Arial, sans-serif;
 }
 
@@ -32,9 +53,9 @@ h1 {
 
 .personaje {
     position: relative;
-    background-color: #16213e;
+    background-color: var(--color-superficie);
     border: 3px solid #0f3460;
-    border-radius: 15px;
+    border-radius: var(--radio-tarjeta);
     padding: 20px;
     width: 200px;
     cursor: pointer;
@@ -43,7 +64,7 @@ h1 {
 
 .personaje:hover {
     transform: scale(1.05);
-    border-color: #e94560;
+    border-color: var(--color-accent);
 }
 
 /* Foco de teclado (navegación con flechas) */
@@ -117,7 +138,7 @@ h1 {
     height: 100px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid #555;
+    border: 3px solid var(--color-texto-muy-apagado);
 }
 
 /* --- Colores por personaje --- */
@@ -327,14 +348,14 @@ h1 {
 }
 
 .personaje h3 {
-    color: #e94560;
+    color: var(--color-accent);
     margin: 5px 0;
     font-size: 1.3rem;
 }
 
 .descripcion {
     font-size: 0.85rem;
-    color: #a0a0b0;
+    color: var(--color-texto-secundario);
     margin-bottom: 10px;
 }
 
@@ -352,7 +373,7 @@ h1 {
     font-size: 0.65rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #666;
+    color: var(--color-texto-apagado);
     margin-bottom: 4px;
 }
 
@@ -410,10 +431,10 @@ h1 {
 .ataque-dano {
     font-size: 0.75rem;
     font-weight: bold;
-    color: #e94560;
+    color: var(--color-accent);
     background-color: rgba(233, 69, 96, 0.12);
     padding: 1px 6px;
-    border-radius: 8px;
+    border-radius: var(--radio-boton);
 }
 
 /* Colores de barra de vida por personaje */
@@ -474,7 +495,7 @@ h1 {
 /* --- Sección de villanos --- */
 
 .titulo-villanos {
-    color: #e94560;
+    color: var(--color-accent);
     font-size: 1.4rem;
     margin-top: 40px;
     margin-bottom: 5px;
@@ -490,9 +511,9 @@ h1 {
 }
 
 .villano {
-    background-color: #16213e;
-    border: 3px solid #333;
-    border-radius: 15px;
+    background-color: var(--color-superficie);
+    border: 3px solid var(--color-borde);
+    border-radius: var(--radio-tarjeta);
     padding: 20px;
     width: 200px;
     cursor: default;
@@ -644,7 +665,7 @@ h1 {
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    background-color: #e94560;
+    background-color: var(--color-accent);
     color: white;
     box-shadow: 0 0 20px rgba(233, 69, 96, 0.6);
     animation: pulso-empezar 1.5s ease-in-out infinite;
@@ -652,7 +673,7 @@ h1 {
 }
 
 .btn-empezar:hover {
-    background-color: #c73652;
+    background-color: var(--color-accent-hover);
     box-shadow: 0 0 30px rgba(233, 69, 96, 0.8);
 }
 
@@ -678,7 +699,7 @@ h1 {
         repeating-conic-gradient(#1a1a28 0% 25%, #15152a 0% 50%) 0 0 / 50px 50px,
         /* Luz tenue central */
         radial-gradient(ellipse at 50% 60%, rgba(80, 50, 20, 0.3) 0%, transparent 60%),
-        #0d0d1a;
+        var(--color-oscuro);
     border-left: 18px solid transparent;
     border-right: 18px solid transparent;
     border-image: repeating-linear-gradient(
@@ -936,7 +957,7 @@ h1 {
 #controles-hint {
     margin-top: 15px;
     font-size: 0.9rem;
-    color: #666;
+    color: var(--color-texto-apagado);
     animation: parpadeo-hint 2s ease-in-out infinite;
 }
 
@@ -951,8 +972,8 @@ h1 {
     margin-top: 10px;
     padding: 10px 25px;
     font-size: 0.95rem;
-    border: 2px solid #444;
-    border-radius: 8px;
+    border: 2px solid var(--color-borde-claro);
+    border-radius: var(--radio-boton);
     cursor: pointer;
     background-color: transparent;
     color: #888;
@@ -960,8 +981,8 @@ h1 {
 }
 
 #btn-volver:hover {
-    border-color: #e94560;
-    color: #e94560;
+    border-color: var(--color-accent);
+    color: var(--color-accent);
 }
 
 /* --- Modal de confirmación --- */
@@ -983,8 +1004,8 @@ h1 {
 
 .modal-contenido {
     position: relative;
-    background-color: #16213e;
-    border: 3px solid #e94560;
+    background-color: var(--color-superficie);
+    border: 3px solid var(--color-accent);
     border-radius: 15px;
     padding: 30px 40px;
     text-align: center;
@@ -999,7 +1020,7 @@ h1 {
 }
 
 .modal-contenido h2 {
-    color: #e94560;
+    color: var(--color-accent);
     margin: 0 0 10px;
     text-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
 }
@@ -1019,22 +1040,22 @@ h1 {
     padding: 10px 30px;
     font-size: 1rem;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radio-boton);
     cursor: pointer;
-    background-color: #e94560;
+    background-color: var(--color-accent);
     color: white;
     transition: background-color 0.2s;
 }
 
 #btn-entrar:hover {
-    background-color: #c73652;
+    background-color: var(--color-accent-hover);
 }
 
 #btn-cancelar {
     padding: 10px 30px;
     font-size: 1rem;
-    border: 2px solid #444;
-    border-radius: 8px;
+    border: 2px solid var(--color-borde-claro);
+    border-radius: var(--radio-boton);
     cursor: pointer;
     background-color: transparent;
     color: #888;
@@ -1042,8 +1063,8 @@ h1 {
 }
 
 #btn-cancelar:hover {
-    border-color: #e94560;
-    color: #e94560;
+    border-color: var(--color-accent);
+    color: var(--color-accent);
 }
 
 /* Foco de navegación con flechas */
@@ -1156,7 +1177,7 @@ h1 {
     align-items: center;
     gap: 15px;
     background-color: rgba(15, 15, 30, 0.95);
-    border: 2px solid #333;
+    border: 2px solid var(--color-borde);
     border-radius: 10px;
     padding: 8px 15px;
     margin-bottom: 15px;
@@ -1180,7 +1201,7 @@ h1 {
 .barra-jugador span {
     font-size: 0.9rem;
     font-weight: bold;
-    color: #e0e0e0;
+    color: var(--color-texto);
 }
 
 .barra-vida-jugador {
@@ -1212,7 +1233,7 @@ h1 {
 
 .barra-inventario-label {
     font-size: 0.7rem;
-    color: #666;
+    color: var(--color-texto-apagado);
     text-transform: uppercase;
 }
 
@@ -1284,7 +1305,7 @@ h1 {
 }
 
 .titulo-habitacion {
-    color: #e94560;
+    color: var(--color-accent);
     font-size: 1.3rem;
     margin: 0 0 2px;
     text-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
@@ -1300,7 +1321,7 @@ h1 {
 
 #laberinto-indicador.llave-obtenida,
 #laberinto3d-indicador.llave-obtenida {
-    color: #ffd700;
+    color: var(--color-dorado);
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
     animation: brillo-llave 1.5s ease-in-out infinite;
 }
@@ -1313,8 +1334,8 @@ h1 {
 /* Contenedor del laberinto (dimensiones se setean desde JS) */
 #laberinto {
     position: relative;
-    background-color: #0d0d1a;
-    border: 3px solid #333;
+    background-color: var(--color-oscuro);
+    border: 3px solid var(--color-borde);
     border-radius: 8px;
     overflow: hidden;
     box-shadow:
@@ -1582,7 +1603,7 @@ h1 {
 .laberinto-hint {
     margin-top: 4px;
     font-size: 0.85rem;
-    color: #555;
+    color: var(--color-texto-muy-apagado);
     animation: parpadeo-hint 2s ease-in-out infinite;
 }
 
@@ -1592,8 +1613,8 @@ h1 {
     margin-top: 4px;
     padding: 6px 18px;
     font-size: 0.9rem;
-    border: 2px solid #444;
-    border-radius: 8px;
+    border: 2px solid var(--color-borde-claro);
+    border-radius: var(--radio-boton);
     cursor: pointer;
     background-color: transparent;
     color: #888;
@@ -1602,8 +1623,8 @@ h1 {
 
 #btn-huir:hover,
 #btn-huir-3d:hover {
-    border-color: #e94560;
-    color: #e94560;
+    border-color: var(--color-accent);
+    color: var(--color-accent);
 }
 
 /* --- Habitación 2: El Laberinto 3D --- */
@@ -1617,7 +1638,7 @@ h1 {
 
 #contenedor-3d {
     position: relative;
-    border: 3px solid #333;
+    border: 3px solid var(--color-borde);
     border-radius: 8px;
     overflow: hidden;
     box-shadow:
