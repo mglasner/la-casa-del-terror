@@ -1,0 +1,375 @@
+// Habitación 1 — El Laberinto
+// El jugador debe encontrar la llave y volver a la salida
+// El laberinto se genera aleatoriamente cada vez
+
+import { generarMapa, encontrarPuntoLejano } from '../../laberinto.js';
+import { CONFIG, est } from './estado.js';
+import {
+    colocarTrampas,
+    actualizarTrampas,
+    detectarTrampas,
+    renderizarTrampas,
+    colocarTrampasLentas,
+    actualizarTrampasLentas,
+    detectarTrampasLentas,
+    renderizarTrampasLentas,
+} from './trampas.js';
+import { iniciarTrasgo, actualizarTrasgo, renderizarTrasgo } from './trasgo.js';
+
+// --- Crear pantalla HTML ---
+
+function crearPantalla() {
+    est.pantalla = document.createElement('div');
+    est.pantalla.id = 'pantalla-habitacion1';
+
+    const titulo = document.createElement('h2');
+    titulo.className = 'titulo-habitacion';
+    titulo.textContent = 'Habitación 1 — El Laberinto';
+
+    est.indicador = document.createElement('p');
+    est.indicador.id = 'laberinto-indicador';
+
+    est.contenedorLaberinto = document.createElement('div');
+    est.contenedorLaberinto.id = 'laberinto';
+    est.contenedorLaberinto.style.width = CONFIG.COLS * CONFIG.TAM_CELDA + 'px';
+    est.contenedorLaberinto.style.height = CONFIG.FILAS * CONFIG.TAM_CELDA + 'px';
+
+    // Jugador dentro del laberinto
+    est.elementoJugador = document.createElement('div');
+    est.elementoJugador.className = 'jugador-laberinto';
+    const img = document.createElement('img');
+    img.src = est.jugador.img;
+    img.alt = est.jugador.nombre;
+    est.elementoJugador.appendChild(img);
+    est.elementoJugador.classList.add(est.jugador.clase);
+
+    est.mensajeExito = document.createElement('p');
+    est.mensajeExito.id = 'laberinto-mensaje';
+    est.mensajeExito.classList.add('oculto');
+
+    const hint = document.createElement('p');
+    hint.className = 'laberinto-hint';
+    hint.textContent = 'Usa las flechas ← ↑ ↓ → para moverte';
+
+    const btnHuir = document.createElement('button');
+    btnHuir.id = 'btn-huir';
+    btnHuir.textContent = '← Huir al pasillo';
+    btnHuir.addEventListener('click', function () {
+        limpiarHabitacion1();
+        est.callbackSalir();
+    });
+
+    est.pantalla.appendChild(titulo);
+    est.pantalla.appendChild(est.indicador);
+    est.pantalla.appendChild(est.contenedorLaberinto);
+    est.pantalla.appendChild(est.mensajeExito);
+    est.pantalla.appendChild(hint);
+    est.pantalla.appendChild(btnHuir);
+
+    document.getElementById('juego').appendChild(est.pantalla);
+}
+
+// --- Funciones principales ---
+
+export function iniciarHabitacion1(jugadorRef, callback) {
+    est.jugador = jugadorRef;
+    est.callbackSalir = callback;
+    est.tieneLlave = false;
+    est.activo = true;
+
+    // Generar laberinto aleatorio
+    est.mapa = generarMapa(CONFIG.FILAS, CONFIG.COLS, CONFIG.ATAJOS);
+
+    // Entrada en la esquina inferior izquierda
+    est.entradaFila = CONFIG.FILAS - 2;
+    est.entradaCol = 1;
+
+    // Colocar la llave en el punto más lejano de la entrada
+    const puntoLlave = encontrarPuntoLejano(
+        est.mapa,
+        CONFIG.FILAS,
+        CONFIG.COLS,
+        est.entradaFila,
+        est.entradaCol
+    );
+    est.llaveFila = puntoLlave[0];
+    est.llaveCol = puntoLlave[1];
+
+    // Colocar trampas aleatorias
+    colocarTrampas();
+    colocarTrampasLentas();
+
+    // Resetear velocidad
+    est.velocidadActual = CONFIG.VELOCIDAD;
+    if (est.timerLentitud) {
+        clearTimeout(est.timerLentitud);
+        est.timerLentitud = null;
+    }
+
+    // Colocar al Trasgo
+    iniciarTrasgo();
+
+    // Crear e insertar la pantalla
+    crearPantalla();
+
+    // Renderizar el laberinto
+    renderizarLaberinto();
+
+    // Posicionar jugador en la entrada
+    est.posX = est.entradaCol * CONFIG.TAM_CELDA + (CONFIG.TAM_CELDA - CONFIG.TAM_JUGADOR) / 2;
+    est.posY = est.entradaFila * CONFIG.TAM_CELDA + (CONFIG.TAM_CELDA - CONFIG.TAM_JUGADOR) / 2;
+    actualizarPosicion();
+
+    // Resetear indicador
+    est.indicador.textContent = '🔑 Encuentra la llave';
+    est.indicador.classList.remove('llave-obtenida');
+    est.mensajeExito.classList.add('oculto');
+
+    // Registrar controles
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
+
+    // Iniciar game loop
+    est.animacionId = requestAnimationFrame(loopLaberinto);
+}
+
+// --- Renderizado ---
+
+function renderizarLaberinto() {
+    // Paredes
+    for (let fila = 0; fila < est.mapa.length; fila++) {
+        for (let col = 0; col < est.mapa[fila].length; col++) {
+            if (est.mapa[fila][col] === 1) {
+                const pared = document.createElement('div');
+                pared.className = 'laberinto-pared';
+                pared.style.left = col * CONFIG.TAM_CELDA + 'px';
+                pared.style.top = fila * CONFIG.TAM_CELDA + 'px';
+                pared.style.width = CONFIG.TAM_CELDA + 'px';
+                pared.style.height = CONFIG.TAM_CELDA + 'px';
+                est.contenedorLaberinto.appendChild(pared);
+            }
+        }
+    }
+
+    // Trampas y trasgo (delegados a submódulos)
+    renderizarTrampas();
+    renderizarTrampasLentas();
+    renderizarTrasgo();
+
+    // Llave
+    est.elementoLlave = document.createElement('div');
+    est.elementoLlave.className = 'laberinto-llave';
+    est.elementoLlave.textContent = '🔑';
+    est.elementoLlave.style.left = est.llaveCol * CONFIG.TAM_CELDA + 'px';
+    est.elementoLlave.style.top = est.llaveFila * CONFIG.TAM_CELDA + 'px';
+    est.elementoLlave.style.width = CONFIG.TAM_CELDA + 'px';
+    est.elementoLlave.style.height = CONFIG.TAM_CELDA + 'px';
+    est.contenedorLaberinto.appendChild(est.elementoLlave);
+
+    // Salida
+    const salida = document.createElement('div');
+    salida.className = 'laberinto-salida';
+    salida.textContent = '🚪';
+    salida.style.left = est.entradaCol * CONFIG.TAM_CELDA + 'px';
+    salida.style.top = est.entradaFila * CONFIG.TAM_CELDA + 'px';
+    salida.style.width = CONFIG.TAM_CELDA + 'px';
+    salida.style.height = CONFIG.TAM_CELDA + 'px';
+    est.contenedorLaberinto.appendChild(salida);
+
+    // Jugador (siempre al final para que quede encima)
+    est.contenedorLaberinto.appendChild(est.elementoJugador);
+}
+
+// --- Movimiento con colisiones y corner sliding ---
+
+function esPared(pixelX, pixelY) {
+    const col = Math.floor(pixelX / CONFIG.TAM_CELDA);
+    const fila = Math.floor(pixelY / CONFIG.TAM_CELDA);
+
+    if (fila < 0 || fila >= CONFIG.FILAS || col < 0 || col >= CONFIG.COLS) {
+        return true;
+    }
+    return est.mapa[fila][col] === 1;
+}
+
+function hayColision(x, y) {
+    return (
+        esPared(x + CONFIG.MARGEN_COLISION, y + CONFIG.MARGEN_COLISION) ||
+        esPared(x + CONFIG.TAM_JUGADOR - CONFIG.MARGEN_COLISION, y + CONFIG.MARGEN_COLISION) ||
+        esPared(x + CONFIG.MARGEN_COLISION, y + CONFIG.TAM_JUGADOR - CONFIG.MARGEN_COLISION) ||
+        esPared(
+            x + CONFIG.TAM_JUGADOR - CONFIG.MARGEN_COLISION,
+            y + CONFIG.TAM_JUGADOR - CONFIG.MARGEN_COLISION
+        )
+    );
+}
+
+function moverEnLaberinto(dx, dy) {
+    // Mover por eje X
+    if (dx !== 0) {
+        const nuevaX = est.posX + dx;
+        if (!hayColision(nuevaX, est.posY)) {
+            est.posX = nuevaX;
+        } else {
+            for (let i = 1; i <= CONFIG.TOLERANCIA_ESQUINA; i++) {
+                if (!hayColision(nuevaX, est.posY - i)) {
+                    est.posY -= i;
+                    est.posX = nuevaX;
+                    break;
+                }
+                if (!hayColision(nuevaX, est.posY + i)) {
+                    est.posY += i;
+                    est.posX = nuevaX;
+                    break;
+                }
+            }
+        }
+    }
+
+    // Mover por eje Y
+    if (dy !== 0) {
+        const nuevaY = est.posY + dy;
+        if (!hayColision(est.posX, nuevaY)) {
+            est.posY = nuevaY;
+        } else {
+            for (let i = 1; i <= CONFIG.TOLERANCIA_ESQUINA; i++) {
+                if (!hayColision(est.posX - i, nuevaY)) {
+                    est.posX -= i;
+                    est.posY = nuevaY;
+                    break;
+                }
+                if (!hayColision(est.posX + i, nuevaY)) {
+                    est.posX += i;
+                    est.posY = nuevaY;
+                    break;
+                }
+            }
+        }
+    }
+
+    actualizarPosicion();
+}
+
+function actualizarPosicion() {
+    est.elementoJugador.style.left = est.posX + 'px';
+    est.elementoJugador.style.top = est.posY + 'px';
+}
+
+// --- Detección de llave y salida ---
+
+function detectarLlave() {
+    if (est.tieneLlave) return;
+
+    const centroX = est.posX + CONFIG.TAM_JUGADOR / 2;
+    const centroY = est.posY + CONFIG.TAM_JUGADOR / 2;
+    const celda = {
+        fila: Math.floor(centroY / CONFIG.TAM_CELDA),
+        col: Math.floor(centroX / CONFIG.TAM_CELDA),
+    };
+
+    if (celda.fila === est.llaveFila && celda.col === est.llaveCol) {
+        est.tieneLlave = true;
+
+        est.elementoLlave.classList.add('llave-recogida');
+
+        est.indicador.textContent = '🔑 ¡Llave obtenida! Vuelve a la salida';
+        est.indicador.classList.add('llave-obtenida');
+
+        est.jugador.inventario.push('llave-habitacion-2');
+        document.dispatchEvent(new Event('inventario-cambio'));
+    }
+}
+
+function detectarSalida() {
+    if (!est.tieneLlave) return;
+
+    const centroX = est.posX + CONFIG.TAM_JUGADOR / 2;
+    const centroY = est.posY + CONFIG.TAM_JUGADOR / 2;
+    const celda = {
+        fila: Math.floor(centroY / CONFIG.TAM_CELDA),
+        col: Math.floor(centroX / CONFIG.TAM_CELDA),
+    };
+
+    if (celda.fila === est.entradaFila && celda.col === est.entradaCol) {
+        est.activo = false;
+        est.mensajeExito.textContent = '¡Escapaste con la llave!';
+        est.mensajeExito.classList.remove('oculto');
+
+        setTimeout(function () {
+            limpiarHabitacion1();
+            est.callbackSalir();
+        }, 1500);
+    }
+}
+
+// --- Game loop ---
+
+function loopLaberinto() {
+    if (!est.activo) return;
+
+    let dx = 0;
+    let dy = 0;
+
+    if (est.teclas['ArrowUp']) dy -= est.velocidadActual;
+    if (est.teclas['ArrowDown']) dy += est.velocidadActual;
+    if (est.teclas['ArrowLeft']) dx -= est.velocidadActual;
+    if (est.teclas['ArrowRight']) dx += est.velocidadActual;
+
+    if (dx !== 0 || dy !== 0) {
+        moverEnLaberinto(dx, dy);
+    }
+
+    actualizarTrampas();
+    detectarTrampas();
+    actualizarTrampasLentas();
+    detectarTrampasLentas();
+    actualizarTrasgo();
+    detectarLlave();
+    detectarSalida();
+
+    est.animacionId = requestAnimationFrame(loopLaberinto);
+}
+
+// --- Handlers de teclado ---
+
+function onKeyDown(e) {
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        e.preventDefault();
+        est.teclas[e.key] = true;
+    }
+}
+
+function onKeyUp(e) {
+    delete est.teclas[e.key];
+}
+
+// --- Limpieza ---
+
+export function limpiarHabitacion1() {
+    est.activo = false;
+    est.trampas = [];
+    est.trampasLentas = [];
+    est.trasgo = null;
+    est.velocidadActual = CONFIG.VELOCIDAD;
+    if (est.timerLentitud) {
+        clearTimeout(est.timerLentitud);
+        est.timerLentitud = null;
+    }
+
+    if (est.animacionId) {
+        cancelAnimationFrame(est.animacionId);
+        est.animacionId = null;
+    }
+
+    document.removeEventListener('keydown', onKeyDown);
+    document.removeEventListener('keyup', onKeyUp);
+
+    Object.keys(est.teclas).forEach(function (k) {
+        delete est.teclas[k];
+    });
+
+    if (est.pantalla && est.pantalla.parentNode) {
+        est.pantalla.parentNode.removeChild(est.pantalla);
+        est.pantalla = null;
+    }
+}

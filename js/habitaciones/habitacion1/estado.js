@@ -1,0 +1,91 @@
+// Estado compartido y utilidades de la Habitación 1
+// Todos los submódulos (trampas, trasgo) acceden a este estado
+
+// --- Constantes ---
+
+export const CONFIG = {
+    TAM_CELDA: 30,
+    TAM_JUGADOR: 22,
+    VELOCIDAD: 3,
+    MARGEN_COLISION: 2,
+    TOLERANCIA_ESQUINA: 8,
+    FILAS: 17,
+    COLS: 17,
+    ATAJOS: 8,
+    COOLDOWN_TRAMPA: 1000,
+    COOLDOWN_TRAMPA_LENTA: 500,
+    TAM_TRASGO: 20,
+    VELOCIDAD_TRASGO: 2,
+    COOLDOWN_TRASGO: 1500,
+    INTERVALO_PATHFINDING: 500,
+};
+
+// --- Estado mutable ---
+
+export const est = {
+    mapa: null,
+    llaveFila: 0,
+    llaveCol: 0,
+    entradaFila: 0,
+    entradaCol: 0,
+    trampas: [],
+    trampasLentas: [],
+    trasgo: null,
+    velocidadActual: CONFIG.VELOCIDAD,
+    timerLentitud: null,
+    jugador: null,
+    callbackSalir: null,
+    posX: 0,
+    posY: 0,
+    tieneLlave: false,
+    animacionId: null,
+    activo: false,
+    teclas: {},
+    // Referencias DOM (se crean dinámicamente)
+    pantalla: null,
+    contenedorLaberinto: null,
+    elementoJugador: null,
+    elementoLlave: null,
+    indicador: null,
+    mensajeExito: null,
+};
+
+// --- Utilidades compartidas ---
+
+// Obtiene la celda lógica donde está el centro del jugador
+export function getCeldaJugador() {
+    const centroX = est.posX + CONFIG.TAM_JUGADOR / 2;
+    const centroY = est.posY + CONFIG.TAM_JUGADOR / 2;
+    return {
+        fila: Math.floor(centroY / CONFIG.TAM_CELDA),
+        col: Math.floor(centroX / CONFIG.TAM_CELDA),
+    };
+}
+
+// Aplica daño al jugador con feedback visual y verifica muerte
+export function aplicarDanoJugador(dano) {
+    est.jugador.recibirDano(dano);
+    document.dispatchEvent(new Event('vida-cambio'));
+
+    // Número de daño flotante
+    const elem = document.createElement('div');
+    elem.className = 'dano-flotante';
+    elem.textContent = '-' + dano;
+    elem.style.left = est.posX + 'px';
+    elem.style.top = est.posY - 5 + 'px';
+    est.contenedorLaberinto.appendChild(elem);
+    setTimeout(function () {
+        if (elem.parentNode) elem.parentNode.removeChild(elem);
+    }, 800);
+
+    // Flash visual
+    est.elementoJugador.classList.add('jugador-golpeado');
+    setTimeout(function () {
+        est.elementoJugador.classList.remove('jugador-golpeado');
+    }, 300);
+
+    if (!est.jugador.estaVivo()) {
+        est.activo = false;
+        document.dispatchEvent(new Event('jugador-muerto'));
+    }
+}
