@@ -1,6 +1,28 @@
 /* Estilos de La Casa del Terror */
 
+/* --- Fuentes locales --- */
+
+@font-face {
+    font-family: Creepster;
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('assets/fonts/creepster-400-latin.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: Quicksand;
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('assets/fonts/quicksand-variable-latin.woff2') format('woff2');
+}
+
 :root {
+    /* Fuentes */
+    --font-display: creepster, cursive;
+    --font-body: quicksand, sans-serif;
+
     /* Tema base */
     --color-fondo: #1a1a2e;
     --color-superficie: #16213e;
@@ -26,7 +48,7 @@ body {
     padding: 0;
     background-color: var(--color-fondo);
     color: var(--color-texto);
-    font-family: Arial, sans-serif;
+    font-family: var(--font-body);
 }
 
 #juego {
@@ -37,8 +59,10 @@ body {
 }
 
 h1 {
+    font-family: var(--font-display);
     font-size: 2.5rem;
     color: white;
+    letter-spacing: 0.04em;
 }
 
 /* --- Selección de personaje --- */
@@ -506,6 +530,7 @@ h1 {
 }
 
 .personaje h3 {
+    font-family: var(--font-display);
     color: var(--color-accent);
     margin: 5px 0;
     font-size: 1.3rem;
@@ -653,6 +678,7 @@ h1 {
 /* --- Sección de villanos --- */
 
 .titulo-villanos {
+    font-family: var(--font-display);
     color: var(--color-accent);
     font-size: 1.4rem;
     margin-top: 40px;
@@ -684,6 +710,7 @@ h1 {
 }
 
 .villano h3 {
+    font-family: var(--font-display);
     color: #999;
     margin: 5px 0;
     font-size: 1.3rem;
@@ -824,6 +851,7 @@ h1 {
 }
 
 .btn-empezar {
+    font-family: var(--font-display);
     padding: 12px 30px;
     font-size: 1.1rem;
     font-weight: bold;
@@ -1065,6 +1093,7 @@ h1 {
 }
 
 .puerta-numero {
+    font-family: var(--font-display);
     font-size: 1.4rem;
     font-weight: bold;
     color: rgb(200 180 150 / 60%);
@@ -1242,6 +1271,7 @@ h1 {
 }
 
 .modal-contenido h2 {
+    font-family: var(--font-display);
     color: var(--color-accent);
     margin: 0 0 10px;
     text-shadow: 0 0 10px rgb(233 69 96 / 50%);
@@ -1364,6 +1394,7 @@ h1 {
 }
 
 .modal-derrota-caja h2 {
+    font-family: var(--font-display);
     color: #c33;
     font-size: 1.2rem;
     margin: 0 0 6px;
@@ -1569,6 +1600,7 @@ h1 {
 }
 
 .titulo-habitacion {
+    font-family: var(--font-display);
     color: var(--color-accent);
     font-size: 1.3rem;
     margin: 0 0 2px;
@@ -1767,6 +1799,7 @@ h1 {
 /* Número de daño flotante */
 .dano-flotante {
     position: absolute;
+    font-family: var(--font-display);
     color: #f44;
     font-weight: bold;
     font-size: 1rem;
@@ -1924,6 +1957,7 @@ h1 {
 /* Mensaje de éxito */
 #laberinto-mensaje,
 #laberinto3d-mensaje {
+    font-family: var(--font-display);
     font-size: 1.3rem;
     color: #4cff4c;
     margin: 4px 0;
