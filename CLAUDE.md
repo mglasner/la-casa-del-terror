@@ -86,6 +86,13 @@ Primero los linters (que pueden cambiar lógica como `let` → `const`), luego P
 - `.prettierrc` — 4 espacios, single quotes, printWidth 100
 - `.stylelintrc.json` — extiende `stylelint-config-standard`
 
+## Deployment
+
+- **Hosting**: GitHub Pages desde la rama `main` (se actualiza automáticamente en cada push)
+- **URL**: https://mglasner.github.io/la-casa-del-terror/
+- **Redirect**: `mglasner.github.io` redirige al juego (repo `mglasner.github.io` con meta refresh)
+- **Repo público**: requerido por GitHub Pages en plan gratuito
+
 ## Convenciones
 
 - Archivos e IDs en español (ej: `estilos.css`, `#seleccion-personaje`, `#btn-jugar`)
