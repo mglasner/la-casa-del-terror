@@ -9,10 +9,10 @@ import { crearModalDerrota } from "./componentes/modalDerrota.js";
 
 console.log("¡La Casa del Terror está cargando!");
 
-// --- Llenar tarjetas desde el modelo ---
+// --- Generación dinámica de tarjetas ---
 
 function crearElemento(tag, clase, texto) {
-    var el = document.createElement(tag);
+    let el = document.createElement(tag);
     if (clase) el.className = clase;
     if (texto) el.textContent = texto;
     return el;
@@ -22,13 +22,13 @@ function crearElemento(tag, clase, texto) {
 function llenarStats(tarjeta, datos) {
     tarjeta.querySelector(".descripcion").textContent = datos.descripcion;
 
-    var stats = tarjeta.querySelector(".stats");
+    let stats = tarjeta.querySelector(".stats");
 
     // Barra de vida (escala: 150 = 100%)
-    var statVida = crearElemento("div", "stat-vida");
+    let statVida = crearElemento("div", "stat-vida");
     statVida.appendChild(crearElemento("span", "stat-label", "Vida"));
-    var barraFondo = crearElemento("div", "barra-vida-fondo");
-    var barraRelleno = crearElemento("div", "barra-vida-relleno");
+    let barraFondo = crearElemento("div", "barra-vida-fondo");
+    let barraRelleno = crearElemento("div", "barra-vida-relleno");
     barraRelleno.style.width = Math.round(datos.vidaMax / 1.5) + "%";
     barraFondo.appendChild(barraRelleno);
     statVida.appendChild(barraFondo);
@@ -36,10 +36,10 @@ function llenarStats(tarjeta, datos) {
     stats.appendChild(statVida);
 
     // Ataques
-    var statAtaques = crearElemento("div", "stat-ataques");
+    let statAtaques = crearElemento("div", "stat-ataques");
     statAtaques.appendChild(crearElemento("span", "stat-label", "Ataques"));
     datos.ataques.forEach(function (ataque) {
-        var ataqueDiv = crearElemento("div", "ataque");
+        let ataqueDiv = crearElemento("div", "ataque");
         ataqueDiv.appendChild(crearElemento("span", "ataque-nombre", ataque.nombre));
         ataqueDiv.appendChild(crearElemento("span", "ataque-dano", ataque.dano.toString()));
         statAtaques.appendChild(ataqueDiv);
@@ -47,16 +47,56 @@ function llenarStats(tarjeta, datos) {
     stats.appendChild(statAtaques);
 }
 
-// Tarjetas de personajes
-document.querySelectorAll(".personaje").forEach(function (tarjeta) {
-    var datos = PERSONAJES[tarjeta.dataset.nombre];
-    if (datos) llenarStats(tarjeta, datos);
+// Genera una tarjeta de personaje o villano con la misma estructura HTML
+function generarTarjeta(nombre, datos, tipo) {
+    // tipo: "personaje" o "villano"
+    // Para personajes, la clase CSS de tarjeta es "personaje-X" (no "jugador-X")
+    let claseTarjeta;
+    if (tipo === "personaje") {
+        claseTarjeta = tipo + " " + datos.clase.replace("jugador-", "personaje-");
+    } else {
+        claseTarjeta = tipo + " " + datos.clase;
+    }
+    let tarjeta = crearElemento("div", claseTarjeta);
+    tarjeta.dataset.nombre = nombre;
+
+    // Avatar con imagen
+    let avatarDiv = crearElemento("div", "avatar");
+    let img = document.createElement("img");
+    img.src = datos.img;
+    img.alt = nombre;
+    avatarDiv.appendChild(img);
+    tarjeta.appendChild(avatarDiv);
+
+    // Nombre
+    tarjeta.appendChild(crearElemento("h3", null, nombre));
+
+    // Descripcion y stats (vacíos, se llenarán por llenarStats)
+    tarjeta.appendChild(crearElemento("p", "descripcion"));
+    tarjeta.appendChild(crearElemento("div", "stats"));
+
+    // Llenar stats
+    llenarStats(tarjeta, datos);
+
+    return tarjeta;
+}
+
+// --- Generar tarjetas dinámicamente ---
+
+// Generar tarjetas de personajes
+let contenedorPersonajes = document.querySelector(".personajes");
+contenedorPersonajes.replaceChildren();
+Object.keys(PERSONAJES).forEach(function (nombre) {
+    let tarjeta = generarTarjeta(nombre, PERSONAJES[nombre], "personaje");
+    contenedorPersonajes.appendChild(tarjeta);
 });
 
-// Tarjetas de villanos
-document.querySelectorAll(".villano").forEach(function (tarjeta) {
-    var datos = ENEMIGOS[tarjeta.dataset.nombre];
-    if (datos) llenarStats(tarjeta, datos);
+// Generar tarjetas de villanos
+let contenedorVillanos = document.querySelector(".villanos");
+contenedorVillanos.replaceChildren();
+Object.keys(ENEMIGOS).forEach(function (nombre) {
+    let tarjeta = generarTarjeta(nombre, ENEMIGOS[nombre], "villano");
+    contenedorVillanos.appendChild(tarjeta);
 });
 
 // --- Selección de personaje ---
@@ -66,8 +106,9 @@ let jugadorActual = null;      // instancia de Personaje
 let indiceFoco = -1;           // índice de tarjeta con foco de teclado
 let habitacionActual = null;   // nombre de la habitación activa (para limpieza al morir)
 
-const personajes = document.querySelectorAll(".personaje");
-const tarjetasPersonajes = Array.from(personajes);
+// Consultar tarjetas después de generarlas
+let personajes = document.querySelectorAll(".personaje");
+let tarjetasPersonajes = Array.from(personajes);
 
 // Selecciona un personaje y muestra el botón de empezar sobre la tarjeta
 function seleccionarPersonaje(tarjeta) {
@@ -163,9 +204,9 @@ document.addEventListener("jugador-muerto", function () {
     if (!jugadorActual) return;
 
     // Buscar la pantalla de habitación activa como contenedor del modal
-    var pantallaHabitacion = document.getElementById("pantalla-habitacion1")
+    let pantallaHabitacion = document.getElementById("pantalla-habitacion1")
         || document.getElementById("pantalla-habitacion2");
-    var contenedorModal = pantallaHabitacion || contenedorJuego;
+    let contenedorModal = pantallaHabitacion || contenedorJuego;
     modalDerrota.mostrar(jugadorActual.nombre, contenedorModal);
 });
 

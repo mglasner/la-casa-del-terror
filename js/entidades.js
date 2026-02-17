@@ -33,12 +33,19 @@ class Personaje extends Entidad {
     }
 }
 
-// Enemigo con ataques y descripción
+// Enemigo con ataques y datos visuales
 class Enemigo extends Entidad {
-    constructor(nombre, vidaMax, ataques, descripcion) {
+    constructor(nombre, vidaMax, ataques, datos) {
         super(nombre, vidaMax);
         this.ataques = ataques;
-        this.descripcion = descripcion || "";
+        // Soportar el formato anterior (string) y el nuevo (objeto)
+        if (typeof datos === "string") {
+            this.descripcion = datos;
+        } else if (datos) {
+            this.img = datos.img;
+            this.clase = datos.clase;
+            this.descripcion = datos.descripcion || "";
+        }
     }
 }
 
