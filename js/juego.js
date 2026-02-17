@@ -6,6 +6,7 @@ import { iniciarHabitacion2, limpiarHabitacion2 } from './habitaciones/habitacio
 import { crearBarraSuperior } from './componentes/barraSuperior.js';
 import { crearModalPuerta } from './componentes/modalPuerta.js';
 import { crearModalDerrota } from './componentes/modalDerrota.js';
+import { crearTransicion } from './componentes/transicion.js';
 
 // --- Estados del juego (máquina de estados) ---
 
@@ -205,6 +206,7 @@ const contenedorJuego = document.getElementById('juego');
 const barra = crearBarraSuperior(contenedorJuego);
 const modal = crearModalPuerta(contenedorJuego);
 const modalDerrota = crearModalDerrota();
+const transicion = crearTransicion();
 
 // Escuchar cambios de inventario desde las habitaciones
 document.addEventListener('inventario-cambio', function () {
@@ -234,10 +236,17 @@ document.addEventListener('jugador-muerto', function () {
 
 // --- Máquina de estados: transiciones centralizadas ---
 
-function cambiarEstado(nuevo, datos) {
-    const anterior = estado.estadoActual;
+// Elegir estilo de transición según el cambio de pantalla
+function elegirTransicion(anterior, nuevo) {
+    if (nuevo === ESTADOS.HABITACION) return 'iris';
+    if (anterior === ESTADOS.HABITACION) return 'iris';
+    if (anterior === ESTADOS.SELECCION && nuevo === ESTADOS.PASILLO) return 'wipe';
+    return 'fade';
+}
 
-    // Salir del estado actual
+// Lógica interna del cambio de estado (se ejecuta con pantalla cubierta)
+function ejecutarCambioEstado(anterior, nuevo, datos) {
+    // Salir del estado anterior
     if (anterior === ESTADOS.PASILLO) {
         estado.loopActivo = false;
     } else if (anterior === ESTADOS.HABITACION) {
@@ -315,6 +324,15 @@ function cambiarEstado(nuevo, datos) {
             cambiarEstado(ESTADOS.PASILLO);
         });
     }
+}
+
+function cambiarEstado(nuevo, datos) {
+    const anterior = estado.estadoActual;
+    const estilo = elegirTransicion(anterior, nuevo);
+
+    transicion.ejecutar(estilo, function () {
+        ejecutarCambioEstado(anterior, nuevo, datos);
+    });
 }
 
 // --- Iniciar el juego ---
