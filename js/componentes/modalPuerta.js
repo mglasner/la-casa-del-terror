@@ -2,37 +2,37 @@
 // Muestra diálogo con botones Entrar/Cancelar y navegación con flechas
 
 export function crearModalPuerta(contenedor) {
-    var puertaActiva = null;
-    var botonSeleccionado = 0;
-    var callbackEntrar = null;
-    var callbackCancelar = null;
+    let puertaActiva = null;
+    let botonSeleccionado = 0;
+    let callbackEntrar = null;
+    let callbackCancelar = null;
 
     // --- Crear estructura DOM ---
 
-    var el = document.createElement("div");
+    let el = document.createElement("div");
     el.id = "modal-puerta";
     el.classList.add("oculto");
 
-    var fondo = document.createElement("div");
+    let fondo = document.createElement("div");
     fondo.className = "modal-fondo";
 
-    var contenido = document.createElement("div");
+    let contenido = document.createElement("div");
     contenido.className = "modal-contenido";
 
-    var titulo = document.createElement("h2");
+    let titulo = document.createElement("h2");
     titulo.id = "modal-titulo";
 
-    var mensaje = document.createElement("p");
+    let mensaje = document.createElement("p");
     mensaje.id = "modal-mensaje";
 
-    var botonesDiv = document.createElement("div");
+    let botonesDiv = document.createElement("div");
     botonesDiv.className = "modal-botones";
 
-    var btnEntrar = document.createElement("button");
+    let btnEntrar = document.createElement("button");
     btnEntrar.id = "btn-entrar";
     btnEntrar.textContent = "Entrar";
 
-    var btnCancelar = document.createElement("button");
+    let btnCancelar = document.createElement("button");
     btnCancelar.id = "btn-cancelar";
     btnCancelar.textContent = "No, mejor no";
 
@@ -45,7 +45,7 @@ export function crearModalPuerta(contenedor) {
     el.appendChild(contenido);
     contenedor.appendChild(el);
 
-    var botones = [btnEntrar, btnCancelar];
+    let botones = [btnEntrar, btnCancelar];
 
     // --- Funciones internas ---
 
@@ -60,7 +60,7 @@ export function crearModalPuerta(contenedor) {
     }
 
     function cerrarYEjecutar(callback) {
-        var puerta = puertaActiva;
+        let puerta = puertaActiva;
         api.cerrar();
         if (callback) callback(puerta);
     }
@@ -81,7 +81,7 @@ export function crearModalPuerta(contenedor) {
 
     // --- API del componente ---
 
-    var api = {
+    let api = {
         mostrar: function (numeroPuerta) {
             puertaActiva = numeroPuerta;
             titulo.textContent = "Habitación " + numeroPuerta;

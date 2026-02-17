@@ -4,29 +4,29 @@
 // Se monta dentro del contenedor que recibe en mostrar()
 
 export function crearModalDerrota() {
-    var callbackAceptar = null;
+    let callbackAceptar = null;
 
     // --- Crear estructura DOM ---
 
-    var el = document.createElement("div");
+    let el = document.createElement("div");
     el.className = "modal-derrota oculto";
 
-    var fondo = document.createElement("div");
+    let fondo = document.createElement("div");
     fondo.className = "modal-derrota-fondo";
 
-    var contenido = document.createElement("div");
+    let contenido = document.createElement("div");
     contenido.className = "modal-derrota-caja";
 
-    var icono = document.createElement("div");
+    let icono = document.createElement("div");
     icono.className = "modal-derrota-icono";
     icono.textContent = "💀";
 
-    var titulo = document.createElement("h2");
+    let titulo = document.createElement("h2");
     titulo.textContent = "Has sido derrotado...";
 
-    var mensaje = document.createElement("p");
+    let mensaje = document.createElement("p");
 
-    var btnAceptar = document.createElement("button");
+    let btnAceptar = document.createElement("button");
     btnAceptar.className = "modal-derrota-btn";
     btnAceptar.textContent = "Volver a intentar";
 
@@ -53,7 +53,7 @@ export function crearModalDerrota() {
 
     // --- API del componente ---
 
-    var api = {
+    let api = {
         // contenedor: elemento DOM donde montar el modal (ej: pantalla de habitación)
         mostrar: function (nombreJugador, contenedor) {
             mensaje.textContent = nombreJugador

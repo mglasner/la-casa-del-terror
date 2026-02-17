@@ -9,50 +9,50 @@ const ICONOS_ITEMS = {
 export function crearBarraSuperior(contenedor) {
     // --- Crear estructura DOM ---
 
-    var el = document.createElement("div");
+    let el = document.createElement("div");
     el.id = "barra-superior";
     el.classList.add("oculto");
 
     // Jugador (avatar + nombre)
-    var jugadorDiv = document.createElement("div");
+    let jugadorDiv = document.createElement("div");
     jugadorDiv.className = "barra-jugador";
 
-    var avatar = document.createElement("img");
+    let avatar = document.createElement("img");
     avatar.id = "barra-avatar";
 
-    var nombre = document.createElement("span");
+    let nombre = document.createElement("span");
     nombre.id = "barra-nombre";
 
     jugadorDiv.appendChild(avatar);
     jugadorDiv.appendChild(nombre);
 
     // Barra de vida
-    var vidaDiv = document.createElement("div");
+    let vidaDiv = document.createElement("div");
     vidaDiv.className = "barra-vida-jugador";
 
-    var barraFondo = document.createElement("div");
+    let barraFondo = document.createElement("div");
     barraFondo.className = "barra-vida-fondo";
 
-    var barraRelleno = document.createElement("div");
+    let barraRelleno = document.createElement("div");
     barraRelleno.className = "barra-vida-relleno";
 
     barraFondo.appendChild(barraRelleno);
 
-    var vidaTexto = document.createElement("span");
+    let vidaTexto = document.createElement("span");
     vidaTexto.className = "barra-vida-texto";
 
     vidaDiv.appendChild(barraFondo);
     vidaDiv.appendChild(vidaTexto);
 
     // Inventario
-    var invDiv = document.createElement("div");
+    let invDiv = document.createElement("div");
     invDiv.className = "barra-inventario";
 
-    var invLabel = document.createElement("span");
+    let invLabel = document.createElement("span");
     invLabel.className = "barra-inventario-label";
     invLabel.textContent = "Items:";
 
-    var invItems = document.createElement("div");
+    let invItems = document.createElement("div");
     invItems.className = "barra-inventario-items";
 
     invDiv.appendChild(invLabel);
@@ -66,7 +66,7 @@ export function crearBarraSuperior(contenedor) {
 
     // --- API del componente ---
 
-    var api = {
+    let api = {
         mostrar: function (jugador) {
             avatar.src = jugador.img;
             avatar.alt = jugador.nombre;
@@ -85,7 +85,7 @@ export function crearBarraSuperior(contenedor) {
         },
 
         actualizarVida: function (jugador) {
-            var porcentaje = Math.round((jugador.vidaActual / jugador.vidaMax) * 100);
+            let porcentaje = Math.round((jugador.vidaActual / jugador.vidaMax) * 100);
             barraRelleno.style.width = porcentaje + "%";
             vidaTexto.textContent = jugador.vidaActual + "/" + jugador.vidaMax;
         },
@@ -94,7 +94,7 @@ export function crearBarraSuperior(contenedor) {
             invItems.replaceChildren();
 
             if (jugador.inventario.length === 0) {
-                var vacio = document.createElement("span");
+                let vacio = document.createElement("span");
                 vacio.style.fontSize = "0.75rem";
                 vacio.style.color = "#555";
                 vacio.textContent = "—";
@@ -103,7 +103,7 @@ export function crearBarraSuperior(contenedor) {
             }
 
             jugador.inventario.forEach(function (item) {
-                var span = document.createElement("span");
+                let span = document.createElement("span");
                 span.className = "inventario-item";
                 span.textContent = ICONOS_ITEMS[item] || "📦";
                 span.title = item;
