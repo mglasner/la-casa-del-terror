@@ -1,18 +1,36 @@
 // Código de La Casa del Terror
-import { PERSONAJES } from "./personajes.js";
-import { ENEMIGOS } from "./enemigos.js";
-import { iniciarHabitacion1, limpiarHabitacion1 } from "./habitaciones/habitacion1.js";
-import { iniciarHabitacion2, limpiarHabitacion2 } from "./habitaciones/habitacion2.js";
-import { crearBarraSuperior } from "./componentes/barraSuperior.js";
-import { crearModalPuerta } from "./componentes/modalPuerta.js";
-import { crearModalDerrota } from "./componentes/modalDerrota.js";
+import { PERSONAJES } from './personajes.js';
+import { ENEMIGOS } from './enemigos.js';
+import { iniciarHabitacion1, limpiarHabitacion1 } from './habitaciones/habitacion1/index.js';
+import { iniciarHabitacion2, limpiarHabitacion2 } from './habitaciones/habitacion2.js';
+import { crearBarraSuperior } from './componentes/barraSuperior.js';
+import { crearModalPuerta } from './componentes/modalPuerta.js';
+import { crearModalDerrota } from './componentes/modalDerrota.js';
 
-console.log("¡La Casa del Terror está cargando!");
+console.log('¡La Casa del Terror está cargando!');
+
+// --- Estados del juego (máquina de estados) ---
+
+const ESTADOS = {
+    SELECCION: 'SELECCION',
+    PASILLO: 'PASILLO',
+    HABITACION: 'HABITACION',
+};
+
+// Registro dinámico de habitaciones: { "1": { iniciar, limpiar }, ... }
+const habitaciones = {};
+
+function registrarHabitacion(numero, modulo) {
+    habitaciones[numero] = modulo;
+}
+
+registrarHabitacion('1', { iniciar: iniciarHabitacion1, limpiar: limpiarHabitacion1 });
+registrarHabitacion('2', { iniciar: iniciarHabitacion2, limpiar: limpiarHabitacion2 });
 
 // --- Generación dinámica de tarjetas ---
 
 function crearElemento(tag, clase, texto) {
-    let el = document.createElement(tag);
+    const el = document.createElement(tag);
     if (clase) el.className = clase;
     if (texto) el.textContent = texto;
     return el;
@@ -20,28 +38,28 @@ function crearElemento(tag, clase, texto) {
 
 // Llena la sección de stats (vida + ataques) de una tarjeta
 function llenarStats(tarjeta, datos) {
-    tarjeta.querySelector(".descripcion").textContent = datos.descripcion;
+    tarjeta.querySelector('.descripcion').textContent = datos.descripcion;
 
-    let stats = tarjeta.querySelector(".stats");
+    const stats = tarjeta.querySelector('.stats');
 
     // Barra de vida (escala: 150 = 100%)
-    let statVida = crearElemento("div", "stat-vida");
-    statVida.appendChild(crearElemento("span", "stat-label", "Vida"));
-    let barraFondo = crearElemento("div", "barra-vida-fondo");
-    let barraRelleno = crearElemento("div", "barra-vida-relleno");
-    barraRelleno.style.width = Math.round(datos.vidaMax / 1.5) + "%";
+    const statVida = crearElemento('div', 'stat-vida');
+    statVida.appendChild(crearElemento('span', 'stat-label', 'Vida'));
+    const barraFondo = crearElemento('div', 'barra-vida-fondo');
+    const barraRelleno = crearElemento('div', 'barra-vida-relleno');
+    barraRelleno.style.width = Math.round(datos.vidaMax / 1.5) + '%';
     barraFondo.appendChild(barraRelleno);
     statVida.appendChild(barraFondo);
-    statVida.appendChild(crearElemento("span", "stat-valor", datos.vidaMax.toString()));
+    statVida.appendChild(crearElemento('span', 'stat-valor', datos.vidaMax.toString()));
     stats.appendChild(statVida);
 
     // Ataques
-    let statAtaques = crearElemento("div", "stat-ataques");
-    statAtaques.appendChild(crearElemento("span", "stat-label", "Ataques"));
+    const statAtaques = crearElemento('div', 'stat-ataques');
+    statAtaques.appendChild(crearElemento('span', 'stat-label', 'Ataques'));
     datos.ataques.forEach(function (ataque) {
-        let ataqueDiv = crearElemento("div", "ataque");
-        ataqueDiv.appendChild(crearElemento("span", "ataque-nombre", ataque.nombre));
-        ataqueDiv.appendChild(crearElemento("span", "ataque-dano", ataque.dano.toString()));
+        const ataqueDiv = crearElemento('div', 'ataque');
+        ataqueDiv.appendChild(crearElemento('span', 'ataque-nombre', ataque.nombre));
+        ataqueDiv.appendChild(crearElemento('span', 'ataque-dano', ataque.dano.toString()));
         statAtaques.appendChild(ataqueDiv);
     });
     stats.appendChild(statAtaques);
@@ -52,28 +70,28 @@ function generarTarjeta(nombre, datos, tipo) {
     // tipo: "personaje" o "villano"
     // Para personajes, la clase CSS de tarjeta es "personaje-X" (no "jugador-X")
     let claseTarjeta;
-    if (tipo === "personaje") {
-        claseTarjeta = tipo + " " + datos.clase.replace("jugador-", "personaje-");
+    if (tipo === 'personaje') {
+        claseTarjeta = tipo + ' ' + datos.clase.replace('jugador-', 'personaje-');
     } else {
-        claseTarjeta = tipo + " " + datos.clase;
+        claseTarjeta = tipo + ' ' + datos.clase;
     }
-    let tarjeta = crearElemento("div", claseTarjeta);
+    const tarjeta = crearElemento('div', claseTarjeta);
     tarjeta.dataset.nombre = nombre;
 
     // Avatar con imagen
-    let avatarDiv = crearElemento("div", "avatar");
-    let img = document.createElement("img");
+    const avatarDiv = crearElemento('div', 'avatar');
+    const img = document.createElement('img');
     img.src = datos.img;
     img.alt = nombre;
     avatarDiv.appendChild(img);
     tarjeta.appendChild(avatarDiv);
 
     // Nombre
-    tarjeta.appendChild(crearElemento("h3", null, nombre));
+    tarjeta.appendChild(crearElemento('h3', null, nombre));
 
     // Descripcion y stats (vacíos, se llenarán por llenarStats)
-    tarjeta.appendChild(crearElemento("p", "descripcion"));
-    tarjeta.appendChild(crearElemento("div", "stats"));
+    tarjeta.appendChild(crearElemento('p', 'descripcion'));
+    tarjeta.appendChild(crearElemento('div', 'stats'));
 
     // Llenar stats
     llenarStats(tarjeta, datos);
@@ -84,55 +102,70 @@ function generarTarjeta(nombre, datos, tipo) {
 // --- Generar tarjetas dinámicamente ---
 
 // Generar tarjetas de personajes
-let contenedorPersonajes = document.querySelector(".personajes");
+const contenedorPersonajes = document.querySelector('.personajes');
 contenedorPersonajes.replaceChildren();
 Object.keys(PERSONAJES).forEach(function (nombre) {
-    let tarjeta = generarTarjeta(nombre, PERSONAJES[nombre], "personaje");
+    const tarjeta = generarTarjeta(nombre, PERSONAJES[nombre], 'personaje');
     contenedorPersonajes.appendChild(tarjeta);
 });
 
 // Generar tarjetas de villanos
-let contenedorVillanos = document.querySelector(".villanos");
+const contenedorVillanos = document.querySelector('.villanos');
 contenedorVillanos.replaceChildren();
 Object.keys(ENEMIGOS).forEach(function (nombre) {
-    let tarjeta = generarTarjeta(nombre, ENEMIGOS[nombre], "villano");
+    const tarjeta = generarTarjeta(nombre, ENEMIGOS[nombre], 'villano');
     contenedorVillanos.appendChild(tarjeta);
 });
 
+// --- Estado del juego ---
+
+const estado = {
+    estadoActual: ESTADOS.SELECCION, // estado de la máquina de estados
+    personajeElegido: null, // nombre del personaje (string)
+    jugadorActual: null, // instancia de Personaje
+    indiceFoco: -1, // índice de tarjeta con foco de teclado
+    habitacionActual: null, // nombre de la habitación activa
+    loopActivo: false, // si el game loop está corriendo
+    esperandoSalirDePuerta: false, // flag de espera post-modal puerta
+};
+
+const movimiento = {
+    x: 0, // posición X del jugador en píxeles
+    y: 0, // posición Y del jugador en píxeles
+    limiteDerecho: 0, // límite derecho del pasillo
+    limiteInferior: 0, // límite inferior del pasillo
+    teclas: {}, // teclas presionadas actualmente
+};
+
 // --- Selección de personaje ---
 
-let personajeElegido = null;   // nombre del personaje (string)
-let jugadorActual = null;      // instancia de Personaje
-let indiceFoco = -1;           // índice de tarjeta con foco de teclado
-let habitacionActual = null;   // nombre de la habitación activa (para limpieza al morir)
-
 // Consultar tarjetas después de generarlas
-let personajes = document.querySelectorAll(".personaje");
-let tarjetasPersonajes = Array.from(personajes);
+const personajes = document.querySelectorAll('.personaje');
+const tarjetasPersonajes = Array.from(personajes);
 
 // Selecciona un personaje y muestra el botón de empezar sobre la tarjeta
 function seleccionarPersonaje(tarjeta) {
     // Quitar selección y overlay anterior
     personajes.forEach(function (p) {
-        p.classList.remove("seleccionado");
-        const overlay = p.querySelector(".seleccion-overlay");
+        p.classList.remove('seleccionado');
+        const overlay = p.querySelector('.seleccion-overlay');
         if (overlay) overlay.remove();
     });
 
-    tarjeta.classList.add("seleccionado");
-    personajeElegido = tarjeta.dataset.nombre;
+    tarjeta.classList.add('seleccionado');
+    estado.personajeElegido = tarjeta.dataset.nombre;
 
     // Crear overlay con botón de empezar
-    const overlay = document.createElement("div");
-    overlay.className = "seleccion-overlay";
-    const btn = document.createElement("button");
-    btn.className = "btn-empezar";
-    btn.textContent = "¡Empezar!";
+    const overlay = document.createElement('div');
+    overlay.className = 'seleccion-overlay';
+    const btn = document.createElement('button');
+    btn.className = 'btn-empezar';
+    btn.textContent = '¡Empezar!';
     overlay.appendChild(btn);
     tarjeta.appendChild(overlay);
 
     // Clic en overlay inicia el juego
-    overlay.addEventListener("click", function (e) {
+    overlay.addEventListener('click', function (e) {
         e.stopPropagation();
         iniciarJuego();
     });
@@ -141,17 +174,17 @@ function seleccionarPersonaje(tarjeta) {
 // Mueve el foco del teclado a una tarjeta
 function enfocarPersonaje(indice) {
     tarjetasPersonajes.forEach(function (p) {
-        p.classList.remove("enfocado");
+        p.classList.remove('enfocado');
     });
-    indiceFoco = indice;
+    estado.indiceFoco = indice;
     if (indice >= 0 && indice < tarjetasPersonajes.length) {
-        tarjetasPersonajes[indice].classList.add("enfocado");
-        tarjetasPersonajes[indice].scrollIntoView({ block: "nearest", behavior: "smooth" });
+        tarjetasPersonajes[indice].classList.add('enfocado');
+        tarjetasPersonajes[indice].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
 }
 
 personajes.forEach(function (personaje, i) {
-    personaje.addEventListener("click", function () {
+    personaje.addEventListener('click', function () {
         enfocarPersonaje(i);
         seleccionarPersonaje(personaje);
     });
@@ -160,139 +193,152 @@ personajes.forEach(function (personaje, i) {
 // --- Pantalla del pasillo ---
 
 // Elementos del pasillo
-const pasillo = document.getElementById("pasillo");
-const personajeJugador = document.getElementById("personaje-jugador");
-const imgJugador = document.getElementById("img-jugador");
+const pasillo = document.getElementById('pasillo');
+const personajeJugador = document.getElementById('personaje-jugador');
+const imgJugador = document.getElementById('img-jugador');
 
-// Posición y movimiento
-let posX = 0;
-let posY = 0;
+// Constantes de movimiento
 const velocidad = 4;
 const tamPersonaje = 50;
 
-// Teclas presionadas (para movimiento continuo)
-const teclasPresionadas = {};
-let loopActivo = false;
-
-// Límites del pasillo (se calculan al iniciar)
-let limiteDerecho = 0;
-let limiteInferior = 0;
-
 // --- Crear componentes ---
 
-const contenedorJuego = document.getElementById("juego");
+const contenedorJuego = document.getElementById('juego');
 const barra = crearBarraSuperior(contenedorJuego);
 const modal = crearModalPuerta(contenedorJuego);
 const modalDerrota = crearModalDerrota();
 
 // Escuchar cambios de inventario desde las habitaciones
-document.addEventListener("inventario-cambio", function () {
-    if (jugadorActual) {
-        barra.actualizarInventario(jugadorActual);
+document.addEventListener('inventario-cambio', function () {
+    if (estado.jugadorActual) {
+        barra.actualizarInventario(estado.jugadorActual);
     }
 });
 
 // Escuchar cambios de vida (trampas, combate, etc.)
-document.addEventListener("vida-cambio", function () {
-    if (jugadorActual) {
-        barra.actualizarVida(jugadorActual);
+document.addEventListener('vida-cambio', function () {
+    if (estado.jugadorActual) {
+        barra.actualizarVida(estado.jugadorActual);
     }
 });
 
 // Escuchar muerte del jugador
-document.addEventListener("jugador-muerto", function () {
-    if (!jugadorActual) return;
+document.addEventListener('jugador-muerto', function () {
+    if (!estado.jugadorActual) return;
 
     // Buscar la pantalla de habitación activa como contenedor del modal
-    let pantallaHabitacion = document.getElementById("pantalla-habitacion1")
-        || document.getElementById("pantalla-habitacion2");
-    let contenedorModal = pantallaHabitacion || contenedorJuego;
-    modalDerrota.mostrar(jugadorActual.nombre, contenedorModal);
+    const pantallaHabitacion = estado.habitacionActual
+        ? document.getElementById('pantalla-habitacion' + estado.habitacionActual)
+        : null;
+    const contenedorModal = pantallaHabitacion || contenedorJuego;
+    modalDerrota.mostrar(estado.jugadorActual.nombre, contenedorModal);
 });
+
+// --- Máquina de estados: transiciones centralizadas ---
+
+function cambiarEstado(nuevo, datos) {
+    const anterior = estado.estadoActual;
+
+    // Salir del estado actual
+    if (anterior === ESTADOS.PASILLO) {
+        estado.loopActivo = false;
+    } else if (anterior === ESTADOS.HABITACION) {
+        const hab = habitaciones[estado.habitacionActual];
+        if (hab) hab.limpiar();
+        estado.habitacionActual = null;
+    }
+
+    estado.estadoActual = nuevo;
+
+    // Entrar al nuevo estado
+    if (nuevo === ESTADOS.SELECCION) {
+        document.getElementById('pantalla-juego').classList.add('oculto');
+        document.getElementById('seleccion-personaje').classList.remove('oculto');
+        barra.ocultar();
+
+        if (estado.jugadorActual) {
+            estado.jugadorActual.vidaActual = estado.jugadorActual.vidaMax;
+            estado.jugadorActual.inventario = [];
+        }
+
+        estado.personajeElegido = null;
+        estado.jugadorActual = null;
+        estado.indiceFoco = -1;
+        personajes.forEach(function (p) {
+            p.classList.remove('seleccionado', 'enfocado');
+            const overlay = p.querySelector('.seleccion-overlay');
+            if (overlay) overlay.remove();
+        });
+        Object.keys(movimiento.teclas).forEach(function (k) {
+            delete movimiento.teclas[k];
+        });
+    } else if (nuevo === ESTADOS.PASILLO) {
+        if (anterior === ESTADOS.SELECCION) {
+            // Primera entrada: configurar personaje
+            document.getElementById('seleccion-personaje').classList.add('oculto');
+
+            estado.jugadorActual = PERSONAJES[estado.personajeElegido];
+            imgJugador.src = estado.jugadorActual.img;
+            imgJugador.alt = estado.personajeElegido;
+
+            personajeJugador.classList.remove(
+                'jugador-lina',
+                'jugador-rose',
+                'jugador-pandajuro',
+                'jugador-hana',
+                'jugador-kira',
+                'jugador-donbu'
+            );
+            personajeJugador.classList.add(estado.jugadorActual.clase);
+
+            movimiento.limiteDerecho = pasillo.clientWidth - tamPersonaje;
+            movimiento.limiteInferior = pasillo.clientHeight - tamPersonaje;
+            movimiento.x = (pasillo.clientWidth - tamPersonaje) / 2;
+            movimiento.y = pasillo.clientHeight - tamPersonaje - 15;
+            actualizarPosicion();
+
+            barra.mostrar(estado.jugadorActual);
+        }
+
+        document.getElementById('pantalla-juego').classList.remove('oculto');
+        estado.loopActivo = true;
+        requestAnimationFrame(gameLoop);
+    } else if (nuevo === ESTADOS.HABITACION) {
+        const hab = habitaciones[datos.numero];
+        if (!hab) return;
+
+        document.getElementById('pantalla-juego').classList.add('oculto');
+        estado.habitacionActual = datos.numero;
+
+        hab.iniciar(estado.jugadorActual, function () {
+            cambiarEstado(ESTADOS.PASILLO);
+        });
+    }
+}
 
 // --- Iniciar el juego ---
 
 function iniciarJuego() {
-    if (!personajeElegido) return;
-
-    // Cambiar pantalla
-    document.getElementById("seleccion-personaje").classList.add("oculto");
-    document.getElementById("pantalla-juego").classList.remove("oculto");
-
-    // Configurar personaje actual
-    jugadorActual = PERSONAJES[personajeElegido];
-    imgJugador.src = jugadorActual.img;
-    imgJugador.alt = personajeElegido;
-
-    // Quitar clases de personaje anteriores y poner la nueva
-    personajeJugador.classList.remove("jugador-lina", "jugador-rose", "jugador-pandajuro", "jugador-hana", "jugador-kira", "jugador-donbu");
-    personajeJugador.classList.add(jugadorActual.clase);
-
-    // Calcular límites del pasillo
-    limiteDerecho = pasillo.clientWidth - tamPersonaje;
-    limiteInferior = pasillo.clientHeight - tamPersonaje;
-
-    // Posicionar personaje en la entrada (abajo-centro)
-    posX = (pasillo.clientWidth - tamPersonaje) / 2;
-    posY = pasillo.clientHeight - tamPersonaje - 15;
-    actualizarPosicion();
-
-    // Mostrar barra superior
-    barra.mostrar(jugadorActual);
-
-    // Activar el game loop
-    if (!loopActivo) {
-        loopActivo = true;
-        requestAnimationFrame(gameLoop);
-    }
+    if (!estado.personajeElegido) return;
+    cambiarEstado(ESTADOS.PASILLO);
 }
 
 // --- Volver a selección ---
 
 function volverASeleccion() {
-    document.getElementById("pantalla-juego").classList.add("oculto");
-    document.getElementById("seleccion-personaje").classList.remove("oculto");
-    barra.ocultar();
-
-    // Detener game loop
-    loopActivo = false;
-
-    // Resetear vida del personaje para la próxima partida
-    if (jugadorActual) {
-        jugadorActual.vidaActual = jugadorActual.vidaMax;
-        jugadorActual.inventario = [];
-    }
-
-    // Limpiar selección
-    personajeElegido = null;
-    jugadorActual = null;
-    indiceFoco = -1;
-    personajes.forEach(function (p) {
-        p.classList.remove("seleccionado", "enfocado");
-        const overlay = p.querySelector(".seleccion-overlay");
-        if (overlay) overlay.remove();
-    });
-
-    // Limpiar teclas
-    Object.keys(teclasPresionadas).forEach(function (k) {
-        delete teclasPresionadas[k];
-    });
+    cambiarEstado(ESTADOS.SELECCION);
 }
 
-document.getElementById("btn-volver").addEventListener("click", volverASeleccion);
+document.getElementById('btn-volver').addEventListener('click', volverASeleccion);
 
 // Callback del modal de derrota: limpiar habitación y volver a selección
 modalDerrota.onAceptar(function () {
-    // Limpiar la habitación activa
-    if (habitacionActual === "1") limpiarHabitacion1();
-    if (habitacionActual === "2") limpiarHabitacion2();
-    habitacionActual = null;
-    volverASeleccion();
+    cambiarEstado(ESTADOS.SELECCION);
 });
 
 // --- Controles del teclado ---
 
-document.addEventListener("keydown", function (e) {
+document.addEventListener('keydown', function (e) {
     // Si algún modal está abierto, delegar al componente
     if (modalDerrota.estaAbierto()) {
         modalDerrota.manejarTecla(e);
@@ -304,55 +350,54 @@ document.addEventListener("keydown", function (e) {
     }
 
     // Navegación con teclado en pantalla de selección
-    const pantallaSeleccion = document.getElementById("seleccion-personaje");
-    if (!pantallaSeleccion.classList.contains("oculto")) {
-        if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+    if (estado.estadoActual === ESTADOS.SELECCION) {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
             e.preventDefault();
-            if (indiceFoco === -1) {
+            if (estado.indiceFoco === -1) {
                 enfocarPersonaje(0);
-            } else if (e.key === "ArrowLeft") {
-                enfocarPersonaje(Math.max(0, indiceFoco - 1));
+            } else if (e.key === 'ArrowLeft') {
+                enfocarPersonaje(Math.max(0, estado.indiceFoco - 1));
             } else {
-                enfocarPersonaje(Math.min(tarjetasPersonajes.length - 1, indiceFoco + 1));
+                enfocarPersonaje(Math.min(tarjetasPersonajes.length - 1, estado.indiceFoco + 1));
             }
-        } else if (e.key === "Enter") {
+        } else if (e.key === 'Enter') {
             e.preventDefault();
-            if (indiceFoco >= 0) {
-                const tarjetaFocada = tarjetasPersonajes[indiceFoco];
-                if (tarjetaFocada.classList.contains("seleccionado")) {
+            if (estado.indiceFoco >= 0) {
+                const tarjetaFocada = tarjetasPersonajes[estado.indiceFoco];
+                if (tarjetaFocada.classList.contains('seleccionado')) {
                     iniciarJuego();
                 } else {
                     seleccionarPersonaje(tarjetaFocada);
                 }
-            } else if (personajeElegido) {
+            } else if (estado.personajeElegido) {
                 iniciarJuego();
             }
         }
         return;
     }
 
-    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
         e.preventDefault();
-        teclasPresionadas[e.key] = true;
+        movimiento.teclas[e.key] = true;
     }
 });
 
-document.addEventListener("keyup", function (e) {
-    delete teclasPresionadas[e.key];
+document.addEventListener('keyup', function (e) {
+    delete movimiento.teclas[e.key];
 });
 
 // --- Game loop ---
 
 function gameLoop() {
-    if (!loopActivo) return;
+    if (!estado.loopActivo) return;
 
     let dx = 0;
     let dy = 0;
 
-    if (teclasPresionadas["ArrowUp"])    dy -= velocidad;
-    if (teclasPresionadas["ArrowDown"])  dy += velocidad;
-    if (teclasPresionadas["ArrowLeft"])  dx -= velocidad;
-    if (teclasPresionadas["ArrowRight"]) dx += velocidad;
+    if (movimiento.teclas['ArrowUp']) dy -= velocidad;
+    if (movimiento.teclas['ArrowDown']) dy += velocidad;
+    if (movimiento.teclas['ArrowLeft']) dx -= velocidad;
+    if (movimiento.teclas['ArrowRight']) dx += velocidad;
 
     if (dx !== 0 || dy !== 0) {
         moverPersonaje(dx, dy);
@@ -367,31 +412,29 @@ function gameLoop() {
 // --- Movimiento con colisiones ---
 
 function moverPersonaje(dx, dy) {
-    let nuevaX = posX + dx;
-    let nuevaY = posY + dy;
+    let nuevaX = movimiento.x + dx;
+    let nuevaY = movimiento.y + dy;
 
     // Limitar a los bordes del pasillo
     if (nuevaX < 0) nuevaX = 0;
-    if (nuevaX > limiteDerecho) nuevaX = limiteDerecho;
+    if (nuevaX > movimiento.limiteDerecho) nuevaX = movimiento.limiteDerecho;
     if (nuevaY < 0) nuevaY = 0;
-    if (nuevaY > limiteInferior) nuevaY = limiteInferior;
+    if (nuevaY > movimiento.limiteInferior) nuevaY = movimiento.limiteInferior;
 
-    posX = nuevaX;
-    posY = nuevaY;
+    movimiento.x = nuevaX;
+    movimiento.y = nuevaY;
     actualizarPosicion();
 }
 
 function actualizarPosicion() {
-    personajeJugador.style.left = posX + "px";
-    personajeJugador.style.top = posY + "px";
+    personajeJugador.style.left = movimiento.x + 'px';
+    personajeJugador.style.top = movimiento.y + 'px';
 }
 
 // --- Detección de colisión con puertas ---
 
-let esperandoSalirDePuerta = false;
-
 function detectarColisionPuertas() {
-    const puertas = document.querySelectorAll(".puerta");
+    const puertas = document.querySelectorAll('.puerta');
     let tocandoAlguna = false;
 
     puertas.forEach(function (puerta) {
@@ -404,31 +447,31 @@ function detectarColisionPuertas() {
         const ph = rect.height;
 
         const colisiona =
-            posX < px + pw &&
-            posX + tamPersonaje > px &&
-            posY < py + ph &&
-            posY + tamPersonaje > py;
+            movimiento.x < px + pw &&
+            movimiento.x + tamPersonaje > px &&
+            movimiento.y < py + ph &&
+            movimiento.y + tamPersonaje > py;
 
         if (colisiona) {
             tocandoAlguna = true;
-            if (!esperandoSalirDePuerta && !modal.estaAbierto()) {
-                loopActivo = false;
+            if (!estado.esperandoSalirDePuerta && !modal.estaAbierto()) {
+                estado.loopActivo = false;
                 modal.mostrar(puerta.dataset.puerta);
             }
         }
     });
 
     if (!tocandoAlguna) {
-        esperandoSalirDePuerta = false;
+        estado.esperandoSalirDePuerta = false;
     }
 }
 
 // --- Clic en las puertas ---
 
-document.querySelectorAll(".puerta").forEach(function (puerta) {
-    puerta.addEventListener("click", function () {
+document.querySelectorAll('.puerta').forEach(function (puerta) {
+    puerta.addEventListener('click', function () {
         if (!modal.estaAbierto()) {
-            loopActivo = false;
+            estado.loopActivo = false;
             modal.mostrar(puerta.dataset.puerta);
         }
     });
@@ -437,34 +480,19 @@ document.querySelectorAll(".puerta").forEach(function (puerta) {
 // --- Callbacks del modal ---
 
 modal.onCancelar(function () {
-    esperandoSalirDePuerta = true;
-    loopActivo = true;
+    estado.esperandoSalirDePuerta = true;
+    estado.loopActivo = true;
     requestAnimationFrame(gameLoop);
 });
 
 modal.onEntrar(function (numeroPuerta) {
-    esperandoSalirDePuerta = true;
+    estado.esperandoSalirDePuerta = true;
 
-    if (numeroPuerta === "1") {
-        habitacionActual = "1";
-        document.getElementById("pantalla-juego").classList.add("oculto");
-        iniciarHabitacion1(jugadorActual, function () {
-            habitacionActual = null;
-            document.getElementById("pantalla-juego").classList.remove("oculto");
-            loopActivo = true;
-            requestAnimationFrame(gameLoop);
-        });
-    } else if (numeroPuerta === "2") {
-        habitacionActual = "2";
-        document.getElementById("pantalla-juego").classList.add("oculto");
-        iniciarHabitacion2(jugadorActual, function () {
-            habitacionActual = null;
-            document.getElementById("pantalla-juego").classList.remove("oculto");
-            loopActivo = true;
-            requestAnimationFrame(gameLoop);
-        });
+    if (habitaciones[numeroPuerta]) {
+        cambiarEstado(ESTADOS.HABITACION, { numero: numeroPuerta });
     } else {
-        loopActivo = true;
+        // Habitación no implementada
+        estado.loopActivo = true;
         requestAnimationFrame(gameLoop);
     }
 });
