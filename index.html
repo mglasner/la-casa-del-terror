@@ -103,7 +103,13 @@
         <script type="module" src="js/juego.js"></script>
         <script>
             if ('serviceWorker' in navigator) {
+                var refreshing = false;
                 navigator.serviceWorker.register('sw.js');
+                navigator.serviceWorker.addEventListener('controllerchange', function () {
+                    if (refreshing) return;
+                    refreshing = true;
+                    window.location.reload();
+                });
             }
         </script>
     </body>
