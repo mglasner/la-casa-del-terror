@@ -90,12 +90,14 @@ function generarTarjeta(nombre, datos, tipo) {
     // Nombre
     tarjeta.appendChild(crearElemento('h3', null, nombre));
 
-    // Descripcion y stats (vacíos, se llenarán por llenarStats)
-    tarjeta.appendChild(crearElemento('p', 'descripcion'));
-    tarjeta.appendChild(crearElemento('div', 'stats'));
+    // Descripción
+    tarjeta.appendChild(crearElemento('p', 'descripcion', datos.descripcion));
 
-    // Llenar stats
-    llenarStats(tarjeta, datos);
+    // Stats completos solo en tarjetas de villanos (personajes los muestran en el modal)
+    if (tipo === 'villano') {
+        tarjeta.appendChild(crearElemento('div', 'stats'));
+        llenarStats(tarjeta, datos);
+    }
 
     return tarjeta;
 }
@@ -199,30 +201,16 @@ const tarjetasPersonajes = Array.from(personajes);
 
 // Selecciona un personaje y muestra el botón de empezar sobre la tarjeta
 function seleccionarPersonaje(tarjeta) {
-    // Quitar selección y overlay anterior
+    // Quitar selección anterior
     personajes.forEach(function (p) {
         p.classList.remove('seleccionado');
-        const overlay = p.querySelector('.seleccion-overlay');
-        if (overlay) overlay.remove();
     });
 
     tarjeta.classList.add('seleccionado');
     estado.personajeElegido = tarjeta.dataset.nombre;
 
-    // Crear overlay con botón de empezar
-    const overlay = document.createElement('div');
-    overlay.className = 'seleccion-overlay';
-    const btn = document.createElement('button');
-    btn.className = 'btn-empezar';
-    btn.textContent = '¡Empezar!';
-    overlay.appendChild(btn);
-    tarjeta.appendChild(overlay);
-
-    // Clic en overlay inicia el juego
-    overlay.addEventListener('click', function (e) {
-        e.stopPropagation();
-        iniciarJuego();
-    });
+    // Abrir modal con detalle del personaje
+    mostrarModalPersonaje(estado.personajeElegido);
 }
 
 // Mueve el foco del teclado a una tarjeta
@@ -298,6 +286,75 @@ const transicion = crearTransicion();
 const dpad = crearControlesTouch();
 crearToast();
 
+// --- Modal de detalle de personaje ---
+
+const elModalPersonaje = document.createElement('div');
+elModalPersonaje.id = 'modal-personaje';
+elModalPersonaje.className = 'oculto';
+
+const elModalPersonajeFondo = document.createElement('div');
+elModalPersonajeFondo.className = 'modal-fondo';
+elModalPersonaje.appendChild(elModalPersonajeFondo);
+
+const elModalPersonajeContenido = document.createElement('div');
+elModalPersonajeContenido.className = 'modal-personaje-contenido';
+elModalPersonaje.appendChild(elModalPersonajeContenido);
+
+contenedorJuego.appendChild(elModalPersonaje);
+
+elModalPersonajeFondo.addEventListener('click', cerrarModalPersonaje);
+
+function mostrarModalPersonaje(nombre) {
+    const datos = PERSONAJES[nombre];
+    if (!datos) return;
+
+    const clasePersonaje = datos.clase.replace('jugador-', 'personaje-');
+    elModalPersonajeContenido.className = 'modal-personaje-contenido ' + clasePersonaje;
+    elModalPersonajeContenido.replaceChildren();
+
+    // Avatar (más grande que en la tarjeta)
+    const avatarDiv = crearElemento('div', 'avatar');
+    const img = document.createElement('img');
+    img.src = datos.img;
+    img.alt = nombre;
+    avatarDiv.appendChild(img);
+    elModalPersonajeContenido.appendChild(avatarDiv);
+
+    // Nombre
+    elModalPersonajeContenido.appendChild(crearElemento('h3', null, nombre));
+
+    // Descripción y stats (reutiliza llenarStats)
+    elModalPersonajeContenido.appendChild(crearElemento('p', 'descripcion'));
+    elModalPersonajeContenido.appendChild(crearElemento('div', 'stats'));
+    llenarStats(elModalPersonajeContenido, datos);
+
+    // Botones
+    const botones = crearElemento('div', 'modal-personaje-botones');
+
+    const btnEmpezar = crearElemento('button', 'btn-empezar', '¡Empezar!');
+    btnEmpezar.addEventListener('click', function () {
+        elModalPersonaje.classList.add('oculto');
+        iniciarJuego();
+    });
+    botones.appendChild(btnEmpezar);
+
+    const btnVolver = crearElemento('button', 'btn-cerrar-modal', 'Volver');
+    btnVolver.addEventListener('click', cerrarModalPersonaje);
+    botones.appendChild(btnVolver);
+
+    elModalPersonajeContenido.appendChild(botones);
+
+    elModalPersonaje.classList.remove('oculto');
+}
+
+function cerrarModalPersonaje() {
+    elModalPersonaje.classList.add('oculto');
+    personajes.forEach(function (p) {
+        p.classList.remove('seleccionado');
+    });
+    estado.personajeElegido = null;
+}
+
 // Ocultar hint de teclado en dispositivos touch
 const esTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 if (esTouch) {
@@ -369,10 +426,9 @@ function ejecutarCambioEstado(anterior, nuevo, datos) {
         estado.personajeElegido = null;
         estado.jugadorActual = null;
         estado.indiceFoco = -1;
+        elModalPersonaje.classList.add('oculto');
         personajes.forEach(function (p) {
             p.classList.remove('seleccionado', 'enfocado');
-            const overlay = p.querySelector('.seleccion-overlay');
-            if (overlay) overlay.remove();
         });
         Object.keys(movimiento.teclas).forEach(function (k) {
             delete movimiento.teclas[k];
@@ -480,6 +536,19 @@ document.addEventListener('keydown', function (e) {
 
     // Navegación con teclado en pantalla de selección
     if (estado.estadoActual === ESTADOS.SELECCION) {
+        // Si el modal de personaje está abierto
+        if (!elModalPersonaje.classList.contains('oculto')) {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                cerrarModalPersonaje();
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                elModalPersonaje.classList.add('oculto');
+                iniciarJuego();
+            }
+            return;
+        }
+
         if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
             e.preventDefault();
             if (estado.indiceFoco === -1) {
@@ -492,14 +561,7 @@ document.addEventListener('keydown', function (e) {
         } else if (e.key === 'Enter') {
             e.preventDefault();
             if (estado.indiceFoco >= 0) {
-                const tarjetaFocada = tarjetasPersonajes[estado.indiceFoco];
-                if (tarjetaFocada.classList.contains('seleccionado')) {
-                    iniciarJuego();
-                } else {
-                    seleccionarPersonaje(tarjetaFocada);
-                }
-            } else if (estado.personajeElegido) {
-                iniciarJuego();
+                seleccionarPersonaje(tarjetasPersonajes[estado.indiceFoco]);
             }
         }
         return;

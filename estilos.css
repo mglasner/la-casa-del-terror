@@ -2774,6 +2774,19 @@ h1 {
         font-size: 1.1rem;
     }
 
+    .modal-personaje-contenido {
+        padding: 20px;
+    }
+
+    .modal-personaje-contenido .avatar img {
+        width: 110px;
+        height: 110px;
+    }
+
+    .modal-personaje-contenido h3 {
+        font-size: 1.3rem;
+    }
+
     .modal-derrota-caja {
         padding: 18px 16px;
     }
@@ -2849,7 +2862,8 @@ h1 {
     #btn-entrar,
     #btn-cancelar,
     .modal-derrota-btn,
-    .btn-huir {
+    .btn-huir,
+    .btn-cerrar-modal {
         min-height: 44px;
         min-width: 44px;
     }
