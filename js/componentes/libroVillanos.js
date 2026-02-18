@@ -19,14 +19,12 @@ function ordenarPorTier(nombres) {
 function crearCabecera(nombre, datos, claseAvatar) {
     const frag = document.createDocumentFragment();
 
-    const marco = crearElemento('div', 'libro-avatar-marco ' + (claseAvatar || ''));
-    const avatarDiv = crearElemento('div', 'avatar');
+    const avatarDiv = crearElemento('div', 'avatar ' + (claseAvatar || ''));
     const img = document.createElement('img');
     img.src = datos.img;
     img.alt = nombre;
     avatarDiv.appendChild(img);
-    marco.appendChild(avatarDiv);
-    frag.appendChild(marco);
+    frag.appendChild(avatarDiv);
 
     const cabecera = crearElemento('div', 'libro-detalle-cabecera');
     cabecera.appendChild(crearElemento('h3', null, nombre));

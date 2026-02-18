@@ -3046,6 +3046,7 @@ h1 {
     width: 700px;
     height: 680px;
     max-width: 100%;
+    max-height: calc(90vh - 40px);
     margin: 0 auto;
     border-radius: 8px;
     overflow: hidden;
@@ -3090,7 +3091,7 @@ h1 {
 .libro-pagina-der {
     flex: 1;
     position: relative;
-    padding: 28px 32px;
+    padding: 28px 32px 0;
     background:
         repeating-linear-gradient(135deg, rgb(120 100 70 / 2%) 0, transparent 2px, transparent 8px),
         radial-gradient(ellipse at 70% 30%, rgb(80 60 30 / 8%) 0%, transparent 60%),
@@ -3099,6 +3100,10 @@ h1 {
         linear-gradient(135deg, #1c1510 0%, #18120d 50%, #140f0a 100%);
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 215 0 / 25%) transparent;
 }
 
 /* Tintado del villano en página derecha */
@@ -3297,44 +3302,14 @@ h1 {
     }
 }
 
-/* Marco ornamental del avatar */
-.libro-avatar-marco {
-    display: inline-block;
-    position: relative;
-    border-radius: 50%;
-    padding: 4px;
-    border: 2px solid rgb(255 215 0 / 30%);
-    box-shadow: 0 0 14px var(--v-glow, rgb(233 69 96 / 20%));
-    margin-bottom: 6px;
-    transition: box-shadow 0.5s;
-}
-
-.libro-avatar-marco::before {
-    content: '';
-    position: absolute;
-    inset: -4px;
-    border-radius: 50%;
-    border: 1px solid rgb(255 215 0 / 12%);
-    pointer-events: none;
-}
-
-/* Avatar mini para panel de habilidades */
-.libro-avatar-mini {
-    padding: 2px;
+.libro-detalle-contenido .avatar {
     margin-bottom: 4px;
 }
 
-.libro-avatar-mini .avatar img {
-    width: 64px;
-    height: 64px;
-}
-
-.libro-avatar-mini::before {
-    inset: -3px;
-}
-
-.libro-detalle-contenido .avatar {
-    margin-bottom: 0;
+/* Avatar mini para panel de habilidades */
+.libro-avatar-mini img {
+    width: 48px;
+    height: 48px;
 }
 
 .libro-detalle-contenido .avatar img {
@@ -3501,11 +3476,13 @@ h1 {
     align-items: center;
     justify-content: center;
     gap: 12px;
-    padding-top: 10px;
+    padding: 10px 0;
     margin-top: auto;
     border-top: 1px solid rgb(255 215 0 / 10%);
-    position: relative;
-    z-index: 1;
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    background: linear-gradient(to top, #140f0a 70%, rgb(20 15 10 / 95%) 85%, transparent);
 }
 
 .libro-nav-btn {
@@ -3842,6 +3819,8 @@ h1 {
     /* Libro de villanos tablet */
     .libro-villanos {
         max-width: 580px;
+        height: 560px;
+        max-height: calc(85vh - 40px);
     }
 
     .libro-pagina-izq {
@@ -3858,12 +3837,8 @@ h1 {
     }
 
     .libro-detalle-contenido .avatar img {
-        width: 100px;
-        height: 100px;
-    }
-
-    .libro-avatar-marco {
-        padding: 3px;
+        width: 90px;
+        height: 90px;
     }
 
     .libro-esquina {
@@ -3876,7 +3851,22 @@ h1 {
     }
 
     .libro-detalle-cabecera h3 {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
+    }
+
+    .libro-tab {
+        font-size: 0.7rem;
+        padding: 3px 10px;
+    }
+
+    .libro-nav-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 1rem;
+    }
+
+    .libro-nav-contador {
+        font-size: 0.7rem;
     }
 
     .libro-modal-cuerpo {
@@ -4009,11 +3999,12 @@ h1 {
         flex-direction: column;
         max-width: 100%;
         height: auto;
+        max-height: calc(80vh - 20px);
     }
 
     .libro-pagina-izq {
         flex: none;
-        padding: 12px;
+        padding: 10px 12px;
     }
 
     .libro-titulo {
@@ -4032,8 +4023,8 @@ h1 {
     }
 
     .libro-indice-item {
-        padding: 5px 8px;
-        font-size: 0.7rem;
+        padding: 4px 6px;
+        font-size: 0.65rem;
         text-align: center;
         border-left: none;
         border-bottom: 2px solid transparent;
@@ -4045,7 +4036,7 @@ h1 {
     }
 
     .libro-lomo {
-        flex: 0 0 4px;
+        display: none;
     }
 
     .libro-lomo-costura {
@@ -4053,12 +4044,16 @@ h1 {
     }
 
     .libro-pagina-der {
-        padding: 14px;
+        padding: 12px;
+    }
+
+    .libro-detalle-contenido {
+        padding: 8px 12px;
     }
 
     .libro-detalle-contenido .avatar img {
-        width: 90px;
-        height: 90px;
+        width: 80px;
+        height: 80px;
     }
 
     .libro-esquina {
@@ -4068,7 +4063,27 @@ h1 {
     }
 
     .libro-detalle-cabecera h3 {
-        font-size: 1.1rem;
+        font-size: 1rem;
+    }
+
+    .libro-tab {
+        font-size: 0.65rem;
+        padding: 3px 8px;
+    }
+
+    .libro-descripcion-grande {
+        font-size: 0.8rem;
+        line-height: 1.5;
+    }
+
+    .libro-nav-btn {
+        width: 26px;
+        height: 26px;
+        font-size: 0.9rem;
+    }
+
+    .libro-nav-contador {
+        font-size: 0.65rem;
     }
 
     .libro-boton img {
@@ -4090,6 +4105,40 @@ h1 {
         font-size: 1.1rem;
         top: 6px;
         right: 6px;
+    }
+}
+
+/* --- Pantallas muy pequeñas (≤360px) --- */
+@media (width <= 360px) {
+    .libro-villanos {
+        max-height: calc(78vh - 20px);
+    }
+
+    .libro-detalle-contenido .avatar img {
+        width: 64px;
+        height: 64px;
+    }
+
+    .libro-esquina {
+        display: none;
+    }
+
+    .libro-tab {
+        font-size: 0.6rem;
+        padding: 2px 6px;
+    }
+
+    .libro-detalle-cabecera h3 {
+        font-size: 0.9rem;
+    }
+
+    .libro-descripcion-grande {
+        font-size: 0.75rem;
+    }
+
+    .libro-indice-item {
+        padding: 3px 5px;
+        font-size: 0.6rem;
     }
 }
 
