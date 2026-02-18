@@ -1128,6 +1128,78 @@ h1 {
     margin-bottom: 12px;
 }
 
+/* --- Tabs en modal de personaje --- */
+
+.modal-personaje-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+
+.modal-personaje-tab {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: rgb(180 165 140 / 50%);
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    padding: 4px 14px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition:
+        color 0.2s,
+        border-color 0.2s;
+}
+
+.modal-personaje-tab:hover {
+    color: rgb(200 185 160);
+}
+
+.modal-personaje-tab-activo {
+    color: var(--p-color, var(--color-accent));
+    border-bottom-color: var(--p-color, var(--color-accent));
+}
+
+.modal-personaje-paneles {
+    display: grid;
+}
+
+.modal-personaje-panel {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.modal-personaje-panel-activo {
+    visibility: visible;
+    opacity: 1;
+    animation: modal-panel-entrada 0.25s ease;
+}
+
+@keyframes modal-panel-entrada {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-personaje-descripcion {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgb(210 195 170);
+    font-style: italic;
+    text-align: left;
+    padding: 4px 0;
+}
+
 .modal-personaje-botones {
     display: flex;
     gap: 15px;
@@ -3104,8 +3176,7 @@ h1 {
         linear-gradient(135deg, #1c1510 0%, #18120d 50%, #140f0a 100%);
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden auto;
     scrollbar-width: thin;
     scrollbar-color: rgb(255 215 0 / 25%) transparent;
 }
@@ -3335,7 +3406,6 @@ h1 {
         color 0.5s,
         text-shadow 0.5s;
 }
-
 
 /* Descripción grande (panel perfil) */
 .libro-descripcion-grande {
@@ -3934,6 +4004,16 @@ h1 {
         font-size: 1.3rem;
     }
 
+    .modal-personaje-tab {
+        font-size: 0.7rem;
+        padding: 3px 10px;
+    }
+
+    .modal-personaje-descripcion {
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+
     .modal-derrota-caja {
         padding: 18px 16px;
     }
@@ -4137,6 +4217,15 @@ h1 {
     .libro-indice-item {
         padding: 3px 5px;
         font-size: 0.6rem;
+    }
+
+    .modal-personaje-tab {
+        font-size: 0.6rem;
+        padding: 2px 6px;
+    }
+
+    .modal-personaje-descripcion {
+        font-size: 0.75rem;
     }
 }
 

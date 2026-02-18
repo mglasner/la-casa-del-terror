@@ -288,9 +288,10 @@ function mostrarModalPersonaje(nombre) {
 
     const clasePersonaje = datos.clase.replace('jugador-', 'personaje-');
     elModalPersonajeContenido.className = 'modal-personaje-contenido ' + clasePersonaje;
+    elModalPersonajeContenido.style.setProperty('--p-color', datos.colorHudClaro);
     elModalPersonajeContenido.replaceChildren();
 
-    // Avatar (más grande que en la tarjeta)
+    // Avatar
     const avatarDiv = crearElemento('div', 'avatar');
     const img = document.createElement('img');
     img.src = datos.img;
@@ -301,12 +302,53 @@ function mostrarModalPersonaje(nombre) {
     // Nombre
     elModalPersonajeContenido.appendChild(crearElemento('h3', null, nombre));
 
-    // Descripción y stats (reutiliza llenarStats)
-    elModalPersonajeContenido.appendChild(crearElemento('p', 'descripcion'));
-    elModalPersonajeContenido.appendChild(crearElemento('div', 'stats'));
+    // Tabs
+    const tabs = crearElemento('div', 'modal-personaje-tabs');
+    const tabPerfil = crearElemento(
+        'button',
+        'modal-personaje-tab modal-personaje-tab-activo',
+        'Perfil'
+    );
+    tabPerfil.type = 'button';
+    const tabStats = crearElemento('button', 'modal-personaje-tab', 'Habilidades');
+    tabStats.type = 'button';
+    tabs.appendChild(tabPerfil);
+    tabs.appendChild(tabStats);
+    elModalPersonajeContenido.appendChild(tabs);
+
+    // Contenedor de paneles (grid-stack: ambos ocupan la misma celda)
+    const paneles = crearElemento('div', 'modal-personaje-paneles');
+
+    // Panel Perfil (descripción narrativa)
+    const panelPerfil = crearElemento('div', 'modal-personaje-panel modal-personaje-panel-activo');
+    panelPerfil.appendChild(crearElemento('p', 'descripcion modal-personaje-descripcion'));
+    paneles.appendChild(panelPerfil);
+
+    // Panel Habilidades (stats)
+    const panelStats = crearElemento('div', 'modal-personaje-panel');
+    panelStats.appendChild(crearElemento('div', 'stats'));
+    paneles.appendChild(panelStats);
+
+    elModalPersonajeContenido.appendChild(paneles);
+
+    // llenarStats busca .descripcion y .stats dentro del contenedor
     llenarStats(elModalPersonajeContenido, datos);
 
-    // Botones
+    // Lógica de tabs
+    tabPerfil.addEventListener('click', function () {
+        tabPerfil.classList.add('modal-personaje-tab-activo');
+        tabStats.classList.remove('modal-personaje-tab-activo');
+        panelPerfil.classList.add('modal-personaje-panel-activo');
+        panelStats.classList.remove('modal-personaje-panel-activo');
+    });
+    tabStats.addEventListener('click', function () {
+        tabStats.classList.add('modal-personaje-tab-activo');
+        tabPerfil.classList.remove('modal-personaje-tab-activo');
+        panelStats.classList.add('modal-personaje-panel-activo');
+        panelPerfil.classList.remove('modal-personaje-panel-activo');
+    });
+
+    // Botones (siempre visibles, fuera de los paneles)
     const botones = crearElemento('div', 'modal-personaje-botones');
 
     const btnEmpezar = crearElemento('button', 'btn-empezar', '¡Empezar!');
