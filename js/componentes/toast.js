@@ -1,5 +1,5 @@
 // Componente de notificaciones toast
-// Muestra mensajes breves en la parte superior de la pantalla
+// Badges compactos en el borde derecho con tooltip de mensaje
 
 const TIPOS_TOAST = {
     item: { color: '#ffd700' }, // Dorado — items obtenidos
@@ -9,6 +9,7 @@ const TIPOS_TOAST = {
 };
 
 const MAX_TOASTS = 3;
+const TIEMPO_MENSAJE = 1200; // ms que el tooltip se muestra al aparecer
 
 export function lanzarToast(mensaje, icono, tipo, duracion) {
     document.dispatchEvent(
@@ -46,6 +47,12 @@ export function crearToast() {
 
         contenedor.appendChild(el);
         activos.push(el);
+
+        // Mostrar el tooltip brevemente al aparecer
+        el.classList.add('toast-mostrar-mensaje');
+        setTimeout(function () {
+            el.classList.remove('toast-mostrar-mensaje');
+        }, TIEMPO_MENSAJE);
 
         // Auto-eliminar después de la duración
         setTimeout(function () {
