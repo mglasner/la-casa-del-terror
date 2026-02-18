@@ -1,4 +1,5 @@
-// Definición de enemigos
+// GENERADO desde datos/*.yaml — no editar directamente
+
 import { Enemigo } from './entidades.js';
 
 const ENEMIGOS = {

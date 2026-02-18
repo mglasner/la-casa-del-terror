@@ -1,4 +1,5 @@
-// Definición de personajes jugables
+// GENERADO desde datos/*.yaml — no editar directamente
+
 import { Personaje } from './entidades.js';
 
 const PERSONAJES = {
@@ -7,12 +8,17 @@ const PERSONAJES = {
         100,
         [
             { nombre: 'Nota aguda', dano: 15, descripcion: 'Un agudo que aturde al rival' },
-            { nombre: 'Encore explosivo', dano: 25, descripcion: 'Actuación final que arrasa el escenario' },
+            {
+                nombre: 'Encore explosivo',
+                dano: 25,
+                descripcion: 'Actuación final que arrasa el escenario',
+            },
         ],
         {
             img: 'assets/img/personajes/lina.webp',
             clase: 'jugador-lina',
-            descripcion: '13 años. Idol de K-pop y visual de su banda. Lucha al ritmo de la música.',
+            descripcion:
+                '13 años. Idol de K-pop y visual de su banda. Lucha al ritmo de la música.',
             edad: 13,
             velocidad: 7,
             estatura: 1.55,
@@ -23,8 +29,16 @@ const PERSONAJES = {
         'Rosé',
         90,
         [
-            { nombre: 'Latigazo de tela', dano: 20, descripcion: 'Un giro envolvente con la tela aérea' },
-            { nombre: 'Giro del cubo', dano: 10, descripcion: 'Atrapa al rival girando desde el cubo' },
+            {
+                nombre: 'Latigazo de tela',
+                dano: 20,
+                descripcion: 'Un giro envolvente con la tela aérea',
+            },
+            {
+                nombre: 'Giro del cubo',
+                dano: 10,
+                descripcion: 'Atrapa al rival girando desde el cubo',
+            },
         ],
         {
             img: 'assets/img/personajes/rose.webp',
@@ -46,7 +60,8 @@ const PERSONAJES = {
         {
             img: 'assets/img/personajes/pandajuro.webp',
             clase: 'jugador-pandajuro',
-            descripcion: 'Shōgun legendario de la era Tokugawa. Venció a 100 ninjas con un solo bambú.',
+            descripcion:
+                'Shōgun legendario de la era Tokugawa. Venció a 100 ninjas con un solo bambú.',
             edad: 300,
             velocidad: 5,
             estatura: 1.7,
@@ -57,7 +72,11 @@ const PERSONAJES = {
         'Hana',
         95,
         [
-            { nombre: 'Pirueta fulminante', dano: 20, descripcion: 'Un giro vertiginoso que derriba al rival' },
+            {
+                nombre: 'Pirueta fulminante',
+                dano: 20,
+                descripcion: 'Un giro vertiginoso que derriba al rival',
+            },
             { nombre: 'Coreografía letal', dano: 22, descripcion: 'Movimientos mortales de baile' },
         ],
         {
@@ -97,7 +116,8 @@ const PERSONAJES = {
         {
             img: 'assets/img/personajes/donbu.webp',
             clase: 'jugador-donbu',
-            descripcion: 'Padre de familia. Casado con Pamelota, sus hijas Pototo y Topete le dan más problemas que cualquier villano.',
+            descripcion:
+                'Padre de familia. Casado con Pamelota, sus hijas Pototo y Topete le dan más problemas que cualquier villano.',
             edad: 45,
             velocidad: 4,
             estatura: 1.5,
