@@ -284,8 +284,8 @@ function construirLibro() {
             setTimeout(function () {
                 nuevoContenido.classList.remove('libro-fade-in');
                 transicionEnCurso = false;
-            }, 300);
-        }, 150);
+            }, 350);
+        }, 300);
     }
 
     function actualizarIndice() {
