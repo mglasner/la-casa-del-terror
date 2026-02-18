@@ -30,8 +30,9 @@ la-casa-del-terror/
 
 ## Stack
 
-- HTML, CSS y JavaScript puro (ES modules, sin frameworks ni bundlers)
-- Servidor de desarrollo: `npm run dev` (BrowserSync con hot-reload en http://localhost:3000)
+- HTML, CSS y JavaScript puro (ES modules)
+- Build de producción: esbuild (bundle + minificación)
+- Deploy: GitHub Actions → GitHub Pages
 
 ## Personajes
 
@@ -86,12 +87,55 @@ Primero los linters (que pueden cambiar lógica como `let` → `const`), luego P
 - `.prettierrc` — 4 espacios, single quotes, printWidth 100
 - `.stylelintrc.json` — extiende `stylelint-config-standard`
 
-## Deployment
+## Entornos: desarrollo y producción
 
-- **Hosting**: GitHub Pages desde la rama `main` (se actualiza automáticamente en cada push)
+### Desarrollo (`npm run dev`)
+
+BrowserSync sirve los archivos fuente directamente (hot-reload en http://localhost:3000). No hay build, se usan los ES modules originales:
+
+- `index.html` carga `estilos.css` y `js/juego.js`
+- Los 25+ módulos JS se cargan individualmente por el navegador
+- Editar cualquier archivo recarga el navegador automáticamente
+
+### Producción (`npm run build`)
+
+esbuild genera la carpeta `dist/` con todo optimizado:
+
+| Paso | Entrada | Salida |
+|------|---------|--------|
+| `build:js` | `js/juego.js` + todos sus imports | `dist/juego.min.js` (~54 KB, 1 archivo) |
+| `build:css` | `estilos.css` | `dist/estilos.min.css` (~34 KB) |
+| `build:html` | `index.html`, `assets/`, `sw.js` | `dist/index.html` (rutas reescritas), `dist/assets/`, `dist/sw.js` |
+
+El script `scripts/build-html.js` reescribe las rutas en el HTML:
+- `estilos.css` → `estilos.min.css`
+- `js/juego.js` → `juego.min.js`
+
+La carpeta `dist/` está en `.gitignore` — nunca se commitea.
+
+### Deploy (GitHub Actions → GitHub Pages)
+
+Archivo: `.github/workflows/deploy.yml`
+
+```
+Push a main → GitHub Actions ejecuta npm run build → dist/ se despliega a GitHub Pages
+```
+
+**Configuración requerida en GitHub**: Settings → Pages → Source: **GitHub Actions**
+
 - **URL**: https://mglasner.github.io/la-casa-del-terror/
 - **Redirect**: `mglasner.github.io` redirige al juego (repo `mglasner.github.io` con meta refresh)
 - **Repo público**: requerido por GitHub Pages en plan gratuito
+
+### Service Worker (`sw.js`)
+
+Estrategias diferenciadas de cache para segunda visita instantánea:
+
+- **Assets estáticos** (JS, CSS, fuentes, imágenes): cache-first
+- **HTML** (navegación): network-first con fallback a cache
+- **`/api/**`** (futuro backend): network-only, nunca cachear
+
+Incrementar `CACHE_NAME` en `sw.js` para invalidar el cache en actualizaciones.
 
 ## Convenciones
 
