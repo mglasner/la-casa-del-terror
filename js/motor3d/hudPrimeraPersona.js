@@ -29,6 +29,13 @@ function oscurecerColor(hex, factor) {
     return `rgb(${Math.round(r * f)}, ${Math.round(g * f)}, ${Math.round(b * f)})`;
 }
 
+function aclararColor(hex, factor) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgb(${Math.min(255, Math.round(r + (255 - r) * factor))}, ${Math.min(255, Math.round(g + (255 - g) * factor))}, ${Math.min(255, Math.round(b + (255 - b) * factor))})`;
+}
+
 function esColorOscuro(hex) {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
@@ -101,6 +108,19 @@ function dibujarSombraAntebrazo(ctx, e) {
     ctx.restore();
 }
 
+function dibujarRimLight(ctx, e, config) {
+    ctx.save();
+    ctx.globalAlpha = 0.25;
+    ctx.strokeStyle = aclararColor(config.colorHud, 0.4);
+    ctx.lineWidth = 1.2 * e;
+    ctx.beginPath();
+    // Borde exterior del antebrazo (lado músculo) — retroiluminación
+    ctx.moveTo(-16 * e, 8 * e);
+    ctx.bezierCurveTo(-20 * e, 25 * e, -18 * e, 50 * e, -12 * e, 70 * e);
+    ctx.stroke();
+    ctx.restore();
+}
+
 function dibujarMuneca(ctx, e, config) {
     const colorOscuro = oscurecerColor(config.colorPiel, 0.15);
     const grad = ctx.createRadialGradient(0, 72 * e, 2 * e, 0, 72 * e, 10 * e);
@@ -114,7 +134,10 @@ function dibujarMuneca(ctx, e, config) {
 }
 
 function dibujarPalma(ctx, e, config) {
-    ctx.fillStyle = config.colorPiel;
+    const grad = ctx.createRadialGradient(0, 82 * e, 2 * e, 0, 82 * e, 14 * e);
+    grad.addColorStop(0, aclararColor(config.colorPiel, 0.08));
+    grad.addColorStop(1, oscurecerColor(config.colorPiel, 0.1));
+    ctx.fillStyle = grad;
     ctx.beginPath();
     // Trapezoide con esquinas redondeadas
     ctx.moveTo(-10 * e, 76 * e);
@@ -145,7 +168,12 @@ function dibujarDedos(ctx, e, config) {
         const curv = dedo.curva * e;
         const baseY = 89 * e;
 
-        ctx.fillStyle = config.colorPiel;
+        // Gradiente cilíndrico: oscuro → claro → oscuro
+        const dedoGrad = ctx.createLinearGradient(dx - w, baseY, dx + w, baseY);
+        dedoGrad.addColorStop(0, oscurecerColor(config.colorPiel, 0.12));
+        dedoGrad.addColorStop(0.4, aclararColor(config.colorPiel, 0.05));
+        dedoGrad.addColorStop(1, oscurecerColor(config.colorPiel, 0.15));
+        ctx.fillStyle = dedoGrad;
         ctx.beginPath();
         // Lado izquierdo del dedo (curva)
         ctx.moveTo(dx - w, baseY);
@@ -219,6 +247,7 @@ function dibujarMano(ctx, x, y, espejo, config, escala) {
     dibujarManga(ctx, e, config);
     dibujarAntebrazo(ctx, e, config);
     dibujarSombraAntebrazo(ctx, e);
+    dibujarRimLight(ctx, e, config);
     dibujarMuneca(ctx, e, config);
     dibujarPalma(ctx, e, config);
     dibujarDedos(ctx, e, config);
@@ -290,6 +319,16 @@ export function renderizarHUD(ctx) {
     const manoIzqX = centroX - separacion + offsetX;
     const manoDerX = centroX + separacion + offsetX;
     const manoBaseY = baseY + 15 * escala + offsetY;
+
+    // Sombra ambiental: gradiente oscuro en la base del canvas
+    ctx.save();
+    const sombraAlto = 70 * escala;
+    const sombraGrad = ctx.createLinearGradient(0, baseY, 0, baseY - sombraAlto);
+    sombraGrad.addColorStop(0, 'rgba(0, 0, 0, 0.25)');
+    sombraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = sombraGrad;
+    ctx.fillRect(0, baseY - sombraAlto, canvas.ancho, sombraAlto);
+    ctx.restore();
 
     // Dibujar brazos y manos (alternando largo al caminar)
     dibujarMano(ctx, manoIzqX, manoBaseY + bobAlterna, 1, _config, escala);
