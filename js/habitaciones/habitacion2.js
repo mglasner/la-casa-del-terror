@@ -369,6 +369,9 @@ export function iniciarHabitacion2(jugadorRef, callback, dpadRef) {
     // Inicializar partículas
     inicializarEmisores(mapa, FILAS, COLS);
 
+    // Modo inmersivo: expandir contenedor para usar más viewport
+    document.getElementById('juego').classList.add('juego-inmersivo');
+
     // Crear pantalla DOM
     crearPantalla(!!dpadRef);
 
@@ -414,6 +417,9 @@ export function limpiarHabitacion2() {
     texturas = null;
     decoraciones = null;
     mapaLuz = null;
+
+    // Restaurar contenedor normal
+    document.getElementById('juego').classList.remove('juego-inmersivo');
 
     if (pantalla && pantalla.parentNode) {
         pantalla.parentNode.removeChild(pantalla);

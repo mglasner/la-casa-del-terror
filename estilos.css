@@ -58,6 +58,11 @@ body {
     text-align: center;
 }
 
+#juego.juego-inmersivo {
+    max-width: none;
+    padding: 10px;
+}
+
 h1 {
     font-family: var(--font-display);
     font-size: 2.5rem;
@@ -953,6 +958,69 @@ h1 {
 .btn-empezar:hover {
     background-color: var(--color-accent-hover);
     box-shadow: 0 0 30px rgb(233 69 96 / 80%);
+}
+
+/* --- Modal de detalle de personaje --- */
+
+#modal-personaje {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-personaje-contenido {
+    position: relative;
+    background-color: var(--color-superficie);
+    border: 2px solid rgb(255 255 255 / 12%);
+    border-radius: var(--radio-tarjeta);
+    padding: 28px 32px 24px;
+    text-align: center;
+    box-shadow: 0 0 40px rgb(0 0 0 / 50%);
+    animation: modal-aparecer 0.3s ease;
+    max-width: min(340px, 90vw);
+}
+
+.modal-personaje-contenido .avatar img {
+    width: 130px;
+    height: 130px;
+}
+
+.modal-personaje-contenido h3 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    margin: 8px 0 4px;
+}
+
+.modal-personaje-contenido .descripcion {
+    margin-bottom: 12px;
+}
+
+.modal-personaje-botones {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+.btn-cerrar-modal {
+    padding: 10px 30px;
+    font-size: 1rem;
+    border: 2px solid var(--color-borde-claro);
+    border-radius: var(--radio-boton);
+    cursor: pointer;
+    background-color: transparent;
+    color: #888;
+    transition:
+        border-color 0.3s,
+        color 0.3s;
+}
+
+.btn-cerrar-modal:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
 }
 
 /* --- Pantalla del pasillo --- */
@@ -2619,6 +2687,10 @@ h1 {
     }
 
     .modal-contenido {
+        padding: 24px 28px;
+    }
+
+    .modal-personaje-contenido {
         padding: 24px 28px;
     }
 

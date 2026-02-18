@@ -28,13 +28,39 @@ export const canvas = {
     altoMini: 150,
 };
 
-// Recalcula dimensiones según el contenedor del juego
+// Recalcula dimensiones usando todo el viewport disponible
 export function calcularDimensiones() {
-    const contenedor = document.getElementById('juego');
-    canvas.ancho = Math.min(640, contenedor.clientWidth - 20);
-    canvas.alto = Math.round(canvas.ancho * 0.625);
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // Espacio vertical para UI: barra superior, cabecera, indicador, hint, paddings
+    const overheadV = 180;
+    const margenH = 40;
+
+    const maxAncho = Math.min(vw - margenH, 1280);
+    const maxAlto = vh - overheadV;
+
+    // Aspecto 16:10 — ajustar a la dimensión limitante
+    const anchoPorAlto = Math.round(maxAlto * 1.6);
+
+    if (anchoPorAlto <= maxAncho) {
+        canvas.ancho = anchoPorAlto;
+        canvas.alto = maxAlto;
+    } else {
+        canvas.ancho = maxAncho;
+        canvas.alto = Math.round(maxAncho / 1.6);
+    }
+
+    // Mínimos razonables
+    canvas.ancho = Math.max(320, canvas.ancho);
+    canvas.alto = Math.max(200, canvas.alto);
+
+    // Números pares para renderizado limpio
+    canvas.ancho = Math.floor(canvas.ancho / 2) * 2;
+    canvas.alto = Math.floor(canvas.alto / 2) * 2;
+
     canvas.numRayos = Math.max(160, Math.round(canvas.ancho / 2));
     canvas.anchoFranja = canvas.ancho / canvas.numRayos;
-    canvas.anchoMini = Math.min(150, Math.round(canvas.ancho * 0.23));
+    canvas.anchoMini = Math.min(150, Math.round(canvas.ancho * 0.2));
     canvas.altoMini = canvas.anchoMini;
 }
