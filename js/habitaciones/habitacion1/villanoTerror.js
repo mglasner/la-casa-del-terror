@@ -211,7 +211,8 @@ export function actualizarVillanoTerror() {
 // Si el villano toca al jugador, ataca con uno de sus ataques
 function detectarColisionTerror() {
     const ahora = Date.now();
-    if (ahora - est.villanoTerror.ultimoGolpe < CONFIG.COOLDOWN_TERROR) return;
+    const cooldown = CONFIG.COOLDOWN_BASE / est.villanoTerror.datos.velAtaque;
+    if (ahora - est.villanoTerror.ultimoGolpe < cooldown) return;
 
     const solapan =
         est.villanoTerror.posX < est.posX + CONFIG.TAM_JUGADOR &&
@@ -301,16 +302,25 @@ function actualizarCountdownVisual(elem) {
     const fraccionRestante = est.tiempoRestante / CONFIG.COUNTDOWN_TERROR;
     progreso.style.strokeDashoffset = CIRCUNFERENCIA * (1 - fraccionRestante);
 
-    // Últimos 3 segundos: modo urgente
+    // Últimos 3 segundos: modo urgente (ring + borde rojo)
     if (est.tiempoRestante <= 3) {
         elem.classList.add('countdown-urgente');
+        est.contenedorLaberinto.classList.remove('laberinto-amenaza');
+        est.contenedorLaberinto.classList.add('laberinto-amenaza-urgente');
     }
+}
+
+// Quita las clases de borde del laberinto
+function limpiarBordeAmenaza() {
+    est.contenedorLaberinto.classList.remove('laberinto-amenaza');
+    est.contenedorLaberinto.classList.remove('laberinto-amenaza-urgente');
 }
 
 // Inicia el countdown que libera un villano terror
 export function iniciarCountdown() {
     est.tiempoRestante = CONFIG.COUNTDOWN_TERROR;
     const elem = crearCountdownDOM();
+    est.contenedorLaberinto.classList.add('laberinto-amenaza');
     actualizarCountdownVisual(elem);
 
     est.countdownTerror = setInterval(function () {
@@ -320,11 +330,12 @@ export function iniciarCountdown() {
             clearInterval(est.countdownTerror);
             est.countdownTerror = null;
 
-            // Animación de salida, luego remover
+            // Quitar borde pulsante y animación de salida del ring
+            limpiarBordeAmenaza();
             elem.classList.add('countdown-salida');
             setTimeout(function () {
                 if (elem.parentNode) elem.parentNode.removeChild(elem);
-            }, 500);
+            }, 400);
 
             // Liberar villano terror
             if (est.activo) {
@@ -342,6 +353,7 @@ export function limpiarVillanoTerror() {
         clearInterval(est.countdownTerror);
         est.countdownTerror = null;
     }
+    if (est.contenedorLaberinto) limpiarBordeAmenaza();
     est.villanoTerror = null;
     est.tiempoRestante = 0;
 }

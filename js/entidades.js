@@ -31,6 +31,7 @@ class Personaje extends Entidad {
         this.clase = datos.clase;
         this.descripcion = datos.descripcion;
         this.velocidad = datos.velocidad;
+        this.velAtaque = datos.velAtaque;
         this.estatura = datos.estatura;
         this.edad = datos.edad;
         this.colorHud = datos.colorHud;
@@ -54,6 +55,7 @@ class Enemigo extends Entidad {
             this.clase = datos.clase;
             this.descripcion = datos.descripcion || '';
             this.velocidad = datos.velocidad;
+            this.velAtaque = datos.velAtaque;
             this.estatura = datos.estatura;
             this.edad = datos.edad;
         }

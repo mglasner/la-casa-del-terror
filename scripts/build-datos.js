@@ -7,7 +7,15 @@ import prettier from 'prettier';
 const CABECERA = '// GENERADO desde datos/*.yaml — no editar directamente\n';
 const IMG_PLACEHOLDER = 'assets/img/placeholder.webp';
 
-const CAMPOS_ENTIDAD = ['vida', 'clase', 'descripcion', 'edad', 'velocidad', 'estatura'];
+const CAMPOS_ENTIDAD = [
+    'vida',
+    'clase',
+    'descripcion',
+    'edad',
+    'velocidad',
+    'velAtaque',
+    'estatura',
+];
 const CAMPOS_PERSONAJE = [...CAMPOS_ENTIDAD, 'colorHud', 'colorHudClaro', 'colorPiel', 'emojiHud'];
 const CAMPOS_ENEMIGO = ['tier', ...CAMPOS_ENTIDAD];
 const CAMPOS_ATAQUE = ['nombre', 'dano', 'descripcion'];
@@ -73,6 +81,7 @@ function generarDatos(datos) {
         `descripcion: '${datos.descripcion.replace(/'/g, "\\'")}',`,
         `edad: ${datos.edad},`,
         `velocidad: ${datos.velocidad},`,
+        `velAtaque: ${datos.velAtaque},`,
         `estatura: ${datos.estatura},`,
         ...(datos.colorHud ? [`colorHud: '${datos.colorHud}',`] : []),
         ...(datos.colorHudClaro ? [`colorHudClaro: '${datos.colorHudClaro}',`] : []),

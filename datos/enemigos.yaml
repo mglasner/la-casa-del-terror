@@ -6,13 +6,14 @@ Siniestra:
     descripcion: 'Espectro furioso. Destruye todo a su paso.'
     edad: 500
     velocidad: 5
+    velAtaque: 3
     estatura: 1.8
     ataques:
         - nombre: Llama negra
-          dano: 30
+          dano: 15
           descripcion: Fuego oscuro que consume todo
         - nombre: Grito infernal
-          dano: 30
+          dano: 18
           descripcion: Onda de terror puro
 
 Trasgo:
@@ -23,6 +24,7 @@ Trasgo:
     descripcion: 'Duende torpe. Intenta ser malo pero le sale mal.'
     edad: 120
     velocidad: 6
+    velAtaque: 7
     estatura: 0.6
     ataques:
         - nombre: Golpe sucio
@@ -40,13 +42,14 @@ El Errante:
     descripcion: 'Cadáver inteligente y siniestro. Planifica cada ataque.'
     edad: 1000
     velocidad: 3
+    velAtaque: 3
     estatura: 1.9
     ataques:
         - nombre: Mordida tóxica
-          dano: 35
+          dano: 18
           descripcion: Mordida venenosa que infecta
         - nombre: Grito de ultratumba
-          dano: 25
+          dano: 12
           descripcion: Aullido paralizante del más allá
 
 El Profano:
@@ -57,11 +60,12 @@ El Profano:
     descripcion: 'Sigiloso y despiadado. Aparece cuando menos lo esperas.'
     edad: 800
     velocidad: 4
+    velAtaque: 3
     estatura: 2.1
     ataques:
         - nombre: Cuchillada sombría
-          dano: 35
+          dano: 18
           descripcion: Un tajo rápido desde las sombras
         - nombre: Emboscada
-          dano: 30
+          dano: 15
           descripcion: Aparece por sorpresa y ataca

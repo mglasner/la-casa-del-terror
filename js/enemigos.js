@@ -7,8 +7,8 @@ const ENEMIGOS = {
         'Siniestra',
         150,
         [
-            { nombre: 'Llama negra', dano: 30, descripcion: 'Fuego oscuro que consume todo' },
-            { nombre: 'Grito infernal', dano: 30, descripcion: 'Onda de terror puro' },
+            { nombre: 'Llama negra', dano: 15, descripcion: 'Fuego oscuro que consume todo' },
+            { nombre: 'Grito infernal', dano: 18, descripcion: 'Onda de terror puro' },
         ],
         {
             tier: 'terror',
@@ -17,6 +17,7 @@ const ENEMIGOS = {
             descripcion: 'Espectro furioso. Destruye todo a su paso.',
             edad: 500,
             velocidad: 5,
+            velAtaque: 3,
             estatura: 1.8,
         }
     ),
@@ -35,6 +36,7 @@ const ENEMIGOS = {
             descripcion: 'Duende torpe. Intenta ser malo pero le sale mal.',
             edad: 120,
             velocidad: 6,
+            velAtaque: 7,
             estatura: 0.6,
         }
     ),
@@ -43,10 +45,10 @@ const ENEMIGOS = {
         'El Errante',
         140,
         [
-            { nombre: 'Mordida tóxica', dano: 35, descripcion: 'Mordida venenosa que infecta' },
+            { nombre: 'Mordida tóxica', dano: 18, descripcion: 'Mordida venenosa que infecta' },
             {
                 nombre: 'Grito de ultratumba',
-                dano: 25,
+                dano: 12,
                 descripcion: 'Aullido paralizante del más allá',
             },
         ],
@@ -57,6 +59,7 @@ const ENEMIGOS = {
             descripcion: 'Cadáver inteligente y siniestro. Planifica cada ataque.',
             edad: 1000,
             velocidad: 3,
+            velAtaque: 3,
             estatura: 1.9,
         }
     ),
@@ -67,10 +70,10 @@ const ENEMIGOS = {
         [
             {
                 nombre: 'Cuchillada sombría',
-                dano: 35,
+                dano: 18,
                 descripcion: 'Un tajo rápido desde las sombras',
             },
-            { nombre: 'Emboscada', dano: 30, descripcion: 'Aparece por sorpresa y ataca' },
+            { nombre: 'Emboscada', dano: 15, descripcion: 'Aparece por sorpresa y ataca' },
         ],
         {
             tier: 'terror',
@@ -79,6 +82,7 @@ const ENEMIGOS = {
             descripcion: 'Sigiloso y despiadado. Aparece cuando menos lo esperas.',
             edad: 800,
             velocidad: 4,
+            velAtaque: 3,
             estatura: 2.1,
         }
     ),

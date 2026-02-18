@@ -177,7 +177,8 @@ export function actualizarTrasgo() {
 // Si el Trasgo toca al jugador, ataca con uno de sus ataques
 function detectarColisionTrasgo() {
     const ahora = Date.now();
-    if (ahora - est.trasgo.ultimoGolpe < CONFIG.COOLDOWN_TRASGO) return;
+    const cooldown = CONFIG.COOLDOWN_BASE / est.trasgo.datos.velAtaque;
+    if (ahora - est.trasgo.ultimoGolpe < cooldown) return;
 
     const solapan =
         est.trasgo.posX < est.posX + CONFIG.TAM_JUGADOR &&
