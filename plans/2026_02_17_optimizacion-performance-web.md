@@ -2,7 +2,7 @@
 
 ## Contexto
 
-La Casa del Terror será desplegada como app web pública. El análisis completo de la
+La Mansión de Aventuras será desplegada como app web pública. El análisis completo de la
 base de código reveló problemas de rendimiento en tres categorías: **assets pesados**,
 **game loops ineficientes** y **ausencia de pipeline de producción**.
 
@@ -417,10 +417,10 @@ Resultado del build:
 ```html
 <meta
     name="description"
-    content="La Casa del Terror - Un juego web de aventura y misterio para toda la familia"
+    content="La Mansión de Aventuras - Un juego web de aventura y misterio para toda la familia"
 />
 <meta name="theme-color" content="#1a0a2e" />
-<meta property="og:title" content="La Casa del Terror" />
+<meta property="og:title" content="La Mansión de Aventuras" />
 <meta property="og:description" content="Juego web de aventura y misterio" />
 <meta
     property="og:image"

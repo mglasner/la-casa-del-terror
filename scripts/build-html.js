@@ -25,9 +25,9 @@ cpSync('assets', 'dist/assets', { recursive: true });
 
 // Service worker: inyectar versión única y URLs versionadas
 let sw = readFileSync('sw.js', 'utf-8');
-sw = sw.replace(/casa-terror-v\w+/, 'casa-terror-' + buildId);
+sw = sw.replace(/mansion-aventuras-v\w+/, 'mansion-aventuras-' + buildId);
 sw = sw.replace("'juego.min.js'", `'juego.min.js?v=${buildId}'`);
 sw = sw.replace("'estilos.min.css'", `'estilos.min.css?v=${buildId}'`);
 writeFileSync('dist/sw.js', sw);
 // eslint-disable-next-line no-console
-console.log('SW cache version: casa-terror-' + buildId);
+console.log('SW cache version: mansion-aventuras-' + buildId);

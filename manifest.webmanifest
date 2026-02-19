@@ -1,9 +1,9 @@
 {
-    "name": "La Casa del Terror",
-    "short_name": "Casa Terror",
+    "name": "La Mansión de Aventuras",
+    "short_name": "Mansión Aventuras",
     "description": "Juego web de aventura y misterio para toda la familia",
-    "start_url": "/la-casa-del-terror/",
-    "scope": "/la-casa-del-terror/",
+    "start_url": "/mansion-de-aventuras/",
+    "scope": "/mansion-de-aventuras/",
     "display": "standalone",
     "orientation": "portrait",
     "background_color": "#1a0a2e",

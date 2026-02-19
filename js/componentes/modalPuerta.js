@@ -6,7 +6,7 @@ const HABITACIONES = {
         iconoImg: 'assets/img/habitaciones/habitacion1.webp',
         nombre: 'El Laberinto',
         nivel: 'Nivel 1',
-        descripcion: 'Un oscuro laberinto de piedra te espera... ¿encontrarás la salida?',
+        descripcion: 'Un laberinto de piedra te espera... ¿encontrarás la salida?',
         boton: 'Entrar al laberinto',
         accent: '#bb86fc',
         fondo: '#2a1a3e',

@@ -4,7 +4,7 @@
 
 ```yaml
 Nombre del Villano:
-    tier: esbirro|terror|pesadilla|leyenda    # Requerido
+    tier: esbirro|elite|pesadilla|leyenda      # Requerido
     vida: 50                                   # Requerido (int)
     img: assets/img/enemigos/nombre.webp       # Requerido
     clase: villano-nombre                      # Requerido (sin espacios, kebab-case)
@@ -69,7 +69,7 @@ Nombre:
 
 ## Rangos de stats por tier
 
-| Stat | Esbirro | Terror | Pesadilla | Leyenda |
+| Stat | Esbirro | Élite | Pesadilla | Leyenda |
 |------|---------|--------|-----------|---------|
 | Vida | 35-60 | 130-180 | 200-250 | 250+ |
 | Velocidad | 5-8 | 3-6 | 3-5 | 4-7 |
@@ -82,7 +82,7 @@ Cada villano tiene 2 ataques: uno rápido (menor daño) y uno especial (mayor da
 | Tier | Ataque rápido | Ataque especial | Filosofía |
 |------|--------------|-----------------|-----------|
 | Esbirro | 6-8 | 10-12 | Molestias, no amenazas reales |
-| Terror | 12-15 | 15-18 | Peligrosos, requieren cuidado |
+| Élite | 12-15 | 15-18 | Peligrosos, requieren cuidado |
 | Pesadilla | 20-24 | 25-30 | Jefes duros, pocos golpes bastan |
 | Leyenda | 25-32 | 35-45 | Devastadores, exigen estrategia |
 
@@ -93,7 +93,7 @@ valores, leer `datos/personajes.yaml` para revisar los HP actuales y calcular
 cuántos golpes aguantaría un héroe promedio:
 
 - **Esbirro**: Un héroe aguanta ~8-12 golpes. Molestos pero no letales.
-- **Terror**: Un héroe aguanta ~5-7 golpes. Peleas tensas con criterio.
+- **Élite**: Un héroe aguanta ~5-7 golpes. Peleas tensas con criterio.
 - **Pesadilla**: Un héroe aguanta ~3-4 golpes. Cada error importa.
 - **Leyenda**: Un héroe aguanta ~2-3 golpes. Solo expertos sobreviven.
 

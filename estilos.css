@@ -1,13 +1,13 @@
-/* Estilos de La Casa del Terror */
+/* Estilos de La Mansión de Aventuras */
 
 /* --- Fuentes locales --- */
 
 @font-face {
-    font-family: Creepster;
+    font-family: MedievalSharp;
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: url('assets/fonts/creepster-400-latin.woff2') format('woff2');
+    src: url('assets/fonts/medievalsharp-400-latin.woff2') format('woff2');
 }
 
 @font-face {
@@ -20,7 +20,7 @@
 
 :root {
     /* Fuentes */
-    --font-display: creepster, cursive;
+    --font-display: medievalsharp, cursive;
     --font-body: quicksand, sans-serif;
 
     /* Tema base */
@@ -514,7 +514,7 @@ h1 {
     color: #aaa;
 }
 
-.tier-terror {
+.tier-elite {
     background-color: rgb(168 85 247 / 20%);
     color: #c084fc;
 }
@@ -1015,8 +1015,8 @@ h1 {
     }
 }
 
-/* Telarañas en esquinas superiores — SVG con hilos y anillos */
-.telarana {
+/* Enredaderas mágicas en esquinas superiores */
+.enredadera {
     position: absolute;
     top: 0;
     width: 28%;
@@ -1027,14 +1027,14 @@ h1 {
     background-repeat: no-repeat;
 }
 
-.telarana-izq {
+.enredadera-izq {
     left: 0;
-    background-image: url('assets/img/pasillo/telarana-izq.svg');
+    background-image: url('assets/img/pasillo/enredadera-izq.svg');
 }
 
-.telarana-der {
+.enredadera-der {
     right: 0;
-    background-image: url('assets/img/pasillo/telarana-der.svg');
+    background-image: url('assets/img/pasillo/enredadera-der.svg');
 }
 
 /* Alfombra central */
@@ -1071,7 +1071,7 @@ h1 {
     z-index: 0;
 }
 
-/* Cuadros siniestros mejorados */
+/* Cuadros misteriosos mejorados */
 .deco-cuadro {
     position: absolute;
     pointer-events: none;
@@ -1091,17 +1091,17 @@ h1 {
     position: relative;
 }
 
-/* Brillo inquietante periódico en los cuadros */
+/* Brillo misterioso periódico en los cuadros */
 .cuadro-marco::after {
     content: '';
     position: absolute;
     inset: 0;
     background: radial-gradient(ellipse at 50% 50%, rgb(200 50 30 / 15%) 0%, transparent 70%);
     opacity: 0;
-    animation: cuadro-inquietante 8s ease-in-out infinite;
+    animation: cuadro-misterioso 8s ease-in-out infinite;
 }
 
-@keyframes cuadro-inquietante {
+@keyframes cuadro-misterioso {
     0%,
     85%,
     100% {
@@ -2621,13 +2621,13 @@ h1 {
     pointer-events: none;
 }
 
-/* Villano terror en el laberinto */
-.terror-laberinto {
+/* Villano élite en el laberinto */
+.elite-laberinto {
     position: absolute;
     z-index: 4;
 }
 
-.terror-laberinto img {
+.elite-laberinto img {
     width: 100%;
     height: 100%;
     border-radius: 50%;
@@ -2637,7 +2637,7 @@ h1 {
 }
 
 /* Glow púrpura pulsante */
-.terror-laberinto::after {
+.elite-laberinto::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -2648,11 +2648,11 @@ h1 {
 }
 
 /* Animación de aparición */
-.terror-aparicion {
-    animation: terror-spawn 0.5s ease-out;
+.elite-aparicion {
+    animation: elite-spawn 0.5s ease-out;
 }
 
-@keyframes terror-spawn {
+@keyframes elite-spawn {
     from {
         transform: scale(0);
         opacity: 0;
@@ -2666,7 +2666,7 @@ h1 {
 /* --- Countdown de amenaza: ring en esquina + borde pulsante --- */
 
 /* Ring pequeño en esquina superior derecha */
-.countdown-terror {
+.countdown-elite {
     position: absolute;
     top: 6px;
     right: 6px;
@@ -4516,7 +4516,7 @@ h1 {
         inset: -10px;
     }
 
-    .telarana,
+    .enredadera,
     .pasillo-ventana {
         display: none;
     }
@@ -4946,7 +4946,7 @@ h1 {
     max-width: 100%;
 }
 
-/* Back: ícono de la casa del terror (boca abajo) */
+/* Back: ícono de la mansión (boca abajo) */
 .memorice-carta-back {
     background: linear-gradient(
         145deg,

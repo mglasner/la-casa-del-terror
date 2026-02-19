@@ -23,10 +23,10 @@ export const CONFIG = {
     VELOCIDAD_TRASGO: CFG.trasgo.velocidadBase,
     COOLDOWN_BASE: CFG.trasgo.cooldownBaseAtaque,
     INTERVALO_PATHFINDING: CFG.trasgo.intervaloPathfinding,
-    COUNTDOWN_TERROR: CFG.villanoTerror.countdown,
-    INTERVALO_PATHFINDING_TERROR: CFG.villanoTerror.intervaloPathfinding,
-    TAM_TERROR: CFG.villanoTerror.tamBase,
-    VELOCIDAD_TERROR: CFG.villanoTerror.velocidadBase,
+    COUNTDOWN_ELITE: CFG.villanoElite.countdown,
+    INTERVALO_PATHFINDING_ELITE: CFG.villanoElite.intervaloPathfinding,
+    TAM_ELITE: CFG.villanoElite.tamBase,
+    VELOCIDAD_ELITE: CFG.villanoElite.velocidadBase,
 };
 
 // --- Estado mutable ---
@@ -40,8 +40,8 @@ export const est = {
     trampas: [],
     trampasLentas: [],
     trasgo: null,
-    villanoTerror: null,
-    countdownTerror: null,
+    villanoElite: null,
+    countdownElite: null,
     tiempoRestante: 0,
     velocidadBase: CONFIG.VELOCIDAD,
     velocidadActual: CONFIG.VELOCIDAD,
@@ -69,10 +69,10 @@ const VALORES_BASE = {
     TAM_CELDA: CFG.render.tamCeldaBase,
     TAM_JUGADOR: CFG.jugador.tamBase,
     TAM_TRASGO: CFG.trasgo.tamBase,
-    TAM_TERROR: CFG.villanoTerror.tamBase,
+    TAM_ELITE: CFG.villanoElite.tamBase,
     VELOCIDAD: CFG.jugador.velocidadBase,
     VELOCIDAD_TRASGO: CFG.trasgo.velocidadBase,
-    VELOCIDAD_TERROR: CFG.villanoTerror.velocidadBase,
+    VELOCIDAD_ELITE: CFG.villanoElite.velocidadBase,
     MARGEN_COLISION: CFG.jugador.margenColision,
     TOLERANCIA_ESQUINA: CFG.jugador.toleranciaEsquina,
 };
@@ -98,10 +98,10 @@ export function calcularTamCelda() {
     const escala = CONFIG.TAM_CELDA / VALORES_BASE.TAM_CELDA;
     CONFIG.TAM_JUGADOR = Math.max(12, Math.round(VALORES_BASE.TAM_JUGADOR * escala));
     CONFIG.TAM_TRASGO = Math.max(10, Math.round(VALORES_BASE.TAM_TRASGO * escala));
-    CONFIG.TAM_TERROR = Math.max(12, Math.round(VALORES_BASE.TAM_TERROR * escala));
+    CONFIG.TAM_ELITE = Math.max(12, Math.round(VALORES_BASE.TAM_ELITE * escala));
     CONFIG.VELOCIDAD = Math.max(1.5, VALORES_BASE.VELOCIDAD * escala);
     CONFIG.VELOCIDAD_TRASGO = Math.max(1, VALORES_BASE.VELOCIDAD_TRASGO * escala);
-    CONFIG.VELOCIDAD_TERROR = Math.max(1, VALORES_BASE.VELOCIDAD_TERROR * escala);
+    CONFIG.VELOCIDAD_ELITE = Math.max(1, VALORES_BASE.VELOCIDAD_ELITE * escala);
     CONFIG.MARGEN_COLISION = Math.max(1, Math.round(VALORES_BASE.MARGEN_COLISION * escala));
     CONFIG.TOLERANCIA_ESQUINA = Math.max(3, Math.round(VALORES_BASE.TOLERANCIA_ESQUINA * escala));
 }

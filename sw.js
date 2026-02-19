@@ -1,15 +1,15 @@
-// Service Worker — La Casa del Terror
+// Service Worker — La Mansión de Aventuras
 // Estrategias diferenciadas por tipo de recurso
 
-const CACHE_NAME = 'casa-terror-v1';
-const BASE_PATH = '/la-casa-del-terror/';
+const CACHE_NAME = 'mansion-aventuras-v1';
+const BASE_PATH = '/mansion-de-aventuras/';
 
 // Assets estáticos para precachear en instalación
 const STATIC_ASSETS = [
     BASE_PATH,
     BASE_PATH + 'juego.min.js',
     BASE_PATH + 'estilos.min.css',
-    BASE_PATH + 'assets/fonts/creepster-400-latin.woff2',
+    BASE_PATH + 'assets/fonts/medievalsharp-400-latin.woff2',
     BASE_PATH + 'assets/fonts/quicksand-variable-latin.woff2',
     BASE_PATH + 'manifest.webmanifest',
 ];

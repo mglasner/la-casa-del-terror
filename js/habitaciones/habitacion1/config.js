@@ -11,7 +11,7 @@ export const CFG = {
         indicadorLlaveObtenida: '🔑 ¡Llave obtenida! Vuelve a la salida',
         toastLlave: '¡Llave encontrada!',
         mensajeExito: '¡Escapaste con la llave!',
-        toastTerror: '¡{nombre} ha aparecido!',
+        toastElite: '¡{nombre} ha aparecido!',
     },
     laberinto: {
         filas: 17,
@@ -59,7 +59,7 @@ export const CFG = {
         posicionDistMin: 0.4,
         posicionDistMax: 0.7,
     },
-    villanoTerror: {
+    villanoElite: {
         tamBase: 22,
         velocidadBase: 2,
         velocidadReferencia: 6,

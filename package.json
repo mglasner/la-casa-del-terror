@@ -1,5 +1,5 @@
 {
-    "name": "la-casa-del-terror",
+    "name": "mansion-de-aventuras",
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
@@ -21,16 +21,16 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/mglasner/la-casa-del-terror.git"
+        "url": "git+https://github.com/mglasner/mansion-de-aventuras.git"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "type": "module",
     "bugs": {
-        "url": "https://github.com/mglasner/la-casa-del-terror/issues"
+        "url": "https://github.com/mglasner/mansion-de-aventuras/issues"
     },
-    "homepage": "https://github.com/mglasner/la-casa-del-terror#readme",
+    "homepage": "https://github.com/mglasner/mansion-de-aventuras#readme",
     "devDependencies": {
         "@eslint/js": "^10.0.1",
         "browser-sync": "^3.0.4",

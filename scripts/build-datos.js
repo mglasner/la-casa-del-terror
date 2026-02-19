@@ -133,7 +133,7 @@ const SCHEMA_HABITACION1 = {
         'indicadorLlaveObtenida',
         'toastLlave',
         'mensajeExito',
-        'toastTerror',
+        'toastElite',
     ],
     laberinto: ['filas', 'columnas', 'atajos'],
     jugador: [
@@ -177,7 +177,7 @@ const SCHEMA_HABITACION1 = {
         'posicionDistMin',
         'posicionDistMax',
     ],
-    villanoTerror: [
+    villanoElite: [
         'tamBase',
         'velocidadBase',
         'velocidadReferencia',

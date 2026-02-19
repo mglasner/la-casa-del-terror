@@ -37,7 +37,7 @@ export function crearCarta(data) {
     front.appendChild(img);
     front.appendChild(nombre);
 
-    // Back (boca abajo): ícono de la casa del terror
+    // Back (boca abajo): ícono de la mansión
     const back = document.createElement('div');
     back.className = 'memorice-carta-back';
 

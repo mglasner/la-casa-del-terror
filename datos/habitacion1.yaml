@@ -15,7 +15,7 @@ textos:
     indicadorLlaveObtenida: "🔑 ¡Llave obtenida! Vuelve a la salida"
     toastLlave: "¡Llave encontrada!"                     # notificación al recoger llave
     mensajeExito: "¡Escapaste con la llave!"             # mensaje central al escapar
-    toastTerror: "¡{nombre} ha aparecido!"               # {nombre} se reemplaza por el villano
+    toastElite: "¡{nombre} ha aparecido!"                 # {nombre} se reemplaza por el villano
 
 # --- Dimensiones del laberinto ---
 # El laberinto se genera aleatoriamente con estas dimensiones
@@ -73,9 +73,9 @@ trasgo:
     posicionDistMin: 0.4     # aparece a mínimo 40% de la distancia máxima desde la entrada
     posicionDistMax: 0.7     # aparece a máximo 70% de la distancia máxima
 
-# --- Villano Terror 💀 (enemigo de tier alto) ---
+# --- Villano Élite ⚔️ (enemigo de tier alto) ---
 # Aparece tras un countdown y persigue al jugador
-villanoTerror:
+villanoElite:
     tamBase: 22              # px base del sprite
     velocidadBase: 2         # px/frame base de movimiento
     velocidadReferencia: 6   # atributo de velocidad que equivale a velocidadBase

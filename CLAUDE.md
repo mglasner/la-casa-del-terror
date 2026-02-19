@@ -1,11 +1,11 @@
-# La Casa del Terror
+# La Mansión de Aventuras
 
 Videojuego web creado como proyecto familiar para aprender HTML, CSS y JavaScript.
 
 ## Estructura del proyecto
 
 ```
-la-casa-del-terror/
+mansion-de-aventuras/
 ├── assets/
 │   └── img/
 │       └── personajes/      # Avatares de los personajes
@@ -52,9 +52,9 @@ la-casa-del-terror/
 
 El juego es apto para niños desde 7 años. Los villanos deben seguir estas reglas:
 
-- **Estilo visual**: cartoon/Halloween, sin sangre ni gore. Colores oscuros pero estilizados
-- **Descripciones**: tono misterioso y divertido, nunca violento ni gráfico (nada de "asesino", "sangre", "muerte", "infierno")
-- **Ataques**: nombres de magia/sombras/misterio en vez de violencia explícita (ej: "Hechizo sombrío" en vez de "Corte maldito")
+- **Estilo visual**: cartoon/fantasía/aventura, sin sangre ni gore. Colores variados y estilizados
+- **Descripciones**: tono de aventura, fantasía y misterio, divertido, nunca violento ni gráfico (nada de "asesino", "sangre", "muerte", "infierno")
+- **Ataques**: nombres de magia/sombras/misterio/aventura en vez de violencia explícita (ej: "Hechizo sombrío" en vez de "Corte maldito")
 - **Imagen**: generada con estilo semi-cartoon, apta para niños, circular para avatar de juego
 - **Paleta CSS**: cada villano tiene su clase `.villano-nombre` con colores de borde, fondo, h3, avatar img, barra de vida y ataque-dano
 - **Datos**: definidos en `js/enemigos.js` como instancias de `Enemigo(nombre, vidaMax, ataques[], descripcion)`
@@ -124,7 +124,7 @@ Push a main → GitHub Actions ejecuta npm run build → dist/ se despliega a Gi
 
 **Configuración requerida en GitHub**: Settings → Pages → Source: **GitHub Actions**
 
-- **URL**: https://mglasner.github.io/la-casa-del-terror/
+- **URL**: https://mglasner.github.io/mansion-de-aventuras/
 - **Redirect**: `mglasner.github.io` redirige al juego (repo `mglasner.github.io` con meta refresh)
 - **Repo público**: requerido por GitHub Pages en plan gratuito
 

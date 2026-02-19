@@ -15,11 +15,7 @@ import {
     renderizarTrampasLentas,
 } from './trampas.js';
 import { iniciarTrasgo, actualizarTrasgo, renderizarTrasgo } from './trasgo.js';
-import {
-    iniciarCountdown,
-    actualizarVillanoTerror,
-    limpiarVillanoTerror,
-} from './villanoTerror.js';
+import { iniciarCountdown, actualizarVillanoElite, limpiarVillanoElite } from './villanoElite.js';
 import { lanzarToast } from '../../componentes/toast.js';
 
 // --- Crear pantalla HTML ---
@@ -162,7 +158,7 @@ export function iniciarHabitacion1(jugadorRef, callback, dpadRef) {
         dpadRef.mostrar();
     }
 
-    // Iniciar countdown para villano terror
+    // Iniciar countdown para villano élite
     iniciarCountdown();
 
     // Iniciar game loop
@@ -364,7 +360,7 @@ function loopLaberinto() {
     actualizarTrampasLentas();
     detectarTrampasLentas();
     actualizarTrasgo();
-    actualizarVillanoTerror();
+    actualizarVillanoElite();
     detectarLlave();
     detectarSalida();
 
@@ -395,7 +391,7 @@ export function limpiarHabitacion1() {
     est.trampas = [];
     est.trampasLentas = [];
     est.trasgo = null;
-    limpiarVillanoTerror();
+    limpiarVillanoElite();
     est.velocidadActual = CONFIG.VELOCIDAD;
     if (est.timerLentitud) {
         clearTimeout(est.timerLentitud);

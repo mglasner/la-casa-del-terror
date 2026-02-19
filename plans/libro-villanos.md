@@ -78,7 +78,7 @@ div.libro-villanos
 ### Contenido de cada página de villano
 
 - Avatar circular con imagen (`datos.img`)
-- Nombre (h3, fuente Creepster) + badge de tier
+- Nombre (h3, fuente MedievalSharp) + badge de tier
 - Descripción
 - Stats: barra vida, barra velocidad, atributos (edad/estatura), ataques
 
@@ -94,7 +94,7 @@ Sin duplicación de código — reutiliza las funciones extraídas en el paso 1.
 
 ### Orden de villanos
 
-Orden fijo por tier (esbirro → terror → pesadilla → leyenda), coherente con el concepto de "libro/bestiario". No se usa `mezclar()`.
+Orden fijo por tier (esbirro → élite → pesadilla → leyenda), coherente con el concepto de "libro/bestiario". No se usa `mezclar()`.
 
 ### Lógica de navegación
 
@@ -121,7 +121,7 @@ Insertar antes de la sección `@media` (línea ~2914). Secciones:
 3. **Páginas** — `.libro-pagina-izq/der` con gradientes oscuros tipo pergamino, min-height 380px
 4. **Lomo** — `.libro-lomo` 20-24px con gradiente tipo cuero/madera y sombras inset para profundidad
 5. **Índice** — `.libro-indice-item` con hover, `.libro-indice-activo` con color accent, `cursor: pointer`
-6. **Contenido villano** — Avatar circular, nombre Creepster, stats reutilizando clases `.stat-vida`, `.barra-vida-relleno`, etc.
+6. **Contenido villano** — Avatar circular, nombre MedievalSharp, stats reutilizando clases `.stat-vida`, `.barra-vida-relleno`, etc.
 7. **Ornamentos** — Pseudo-elementos `::before/::after` en esquinas con caracteres decorativos, líneas divisorias con gradiente
 8. **Crossfade** — `@keyframes libro-fadeIn/libro-fadeOut` con opacity + leve translateX (~10px), duración 0.3s
 9. **Navegación** — Botones circulares con hover accent, contador de página

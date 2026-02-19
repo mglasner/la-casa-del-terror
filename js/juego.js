@@ -1,4 +1,4 @@
-// Código de La Casa del Terror
+// Código de La Mansión de Aventuras
 import { PERSONAJES } from './personajes.js';
 import { iniciarHabitacion1, limpiarHabitacion1 } from './habitaciones/habitacion1/index.js';
 import { iniciarHabitacion2, limpiarHabitacion2 } from './habitaciones/habitacion2.js';

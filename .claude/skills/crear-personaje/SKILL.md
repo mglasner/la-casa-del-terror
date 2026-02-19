@@ -4,13 +4,13 @@ description: >
     Esta skill debe usarse cuando el usuario pide "crear villano", "crear héroe",
     "nuevo personaje", "nuevo enemigo", "agregar villano", "agregar personaje",
     "crear esbirro", "crear pesadilla", o menciona crear/agregar un personaje
-    jugable o enemigo para La Casa del Terror.
+    jugable o enemigo para La Mansión de Aventuras.
 ---
 
 # Crear Personaje o Villano
 
 Guía el proceso completo de creación de héroes (personajes jugables) y villanos
-(enemigos) para La Casa del Terror, asegurando que los datos se definan en la
+(enemigos) para La Mansión de Aventuras, asegurando que los datos se definan en la
 fuente de verdad correcta y que todos los assets se generen y optimicen.
 
 ## Regla Fundamental
@@ -28,9 +28,9 @@ para los campos requeridos según el tipo (héroe o villano).
 
 **Convenciones del juego (CLAUDE.md):**
 - Apto para niños desde 7 años
-- Estilo visual: cartoon/Halloween, sin sangre ni gore
-- Descripciones: tono misterioso y divertido, nunca violento
-- Ataques: nombres de magia/sombras/misterio (no violencia explícita)
+- Estilo visual: cartoon/fantasía/aventura, sin sangre ni gore
+- Descripciones: tono de aventura, fantasía y misterio, nunca violento
+- Ataques: nombres de magia/aventura/misterio (no violencia explícita)
 - Descripciones en dos párrafos separados por `\n\n`
 
 **Tiers de villanos** (de menor a mayor poder):
@@ -38,7 +38,7 @@ para los campos requeridos según el tipo (héroe o villano).
 | Tier | Emoji | Vida típica | Uso |
 |------|-------|------------|-----|
 | esbirro | 👹 | 35-50 | Villanos menores, cómicos |
-| terror | 💀 | 140-180 | Villanos principales |
+| elite | ⚔️ | 140-180 | Villanos principales |
 | pesadilla | 👁️ | 200+ | Jefes de zona |
 | leyenda | 🔥 | 250+ | Jefe final |
 
@@ -46,7 +46,7 @@ para los campos requeridos según el tipo (héroe o villano).
 
 Generar la imagen con `mcp__image-gen__generate_image`:
 - Aspecto circular (1:1), estilo semi-cartoon
-- Fondo oscuro, paleta Halloween
+- Paleta variada según temática del personaje
 - Sin texto/labels en la imagen
 - Apto para niños
 

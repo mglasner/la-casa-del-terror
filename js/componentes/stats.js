@@ -5,9 +5,9 @@ import { crearElemento } from '../utils.js';
 // Tiers de villanos
 export const TIERS = {
     esbirro: { emoji: '\u{1F479}', label: 'Esbirro' },
-    terror: { emoji: '\u{1F480}', label: 'Terror' },
+    elite: { emoji: '\u2694\uFE0F', label: 'Élite' },
     pesadilla: { emoji: '\u{1F441}\uFE0F', label: 'Pesadilla' },
-    leyenda: { emoji: '\u{1F525}', label: 'Leyenda Oscura' },
+    leyenda: { emoji: '\u{1F525}', label: 'Leyenda' },
 };
 
 // Llena la sección de stats (vida + ataques) de una tarjeta

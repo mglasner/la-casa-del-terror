@@ -1,4 +1,4 @@
-// Villano Terror — Enemigo de tier "terror" que aparece tras un countdown
+// Villano Élite — Enemigo de tier "elite" que aparece tras un countdown
 // Persigue al jugador usando el mismo pathfinding BFS que el Trasgo
 
 import { ENEMIGOS } from '../../enemigos.js';
@@ -7,11 +7,11 @@ import { CONFIG, CFG, est, getCeldaJugador, aplicarDanoJugador } from './estado.
 import { calcularCamino } from './trasgo.js';
 import { lanzarToast } from '../../componentes/toast.js';
 
-// Filtra enemigos de tier terror
-function obtenerEnemigosTerror() {
+// Filtra enemigos de tier elite
+function obtenerEnemigosElite() {
     const lista = [];
     for (const key in ENEMIGOS) {
-        if (ENEMIGOS[key].tier === 'terror') {
+        if (ENEMIGOS[key].tier === 'elite') {
             lista.push(ENEMIGOS[key]);
         }
     }
@@ -19,7 +19,7 @@ function obtenerEnemigosTerror() {
 }
 
 // Posición aleatoria lejos del jugador (50-80% de distancia máxima)
-function posicionInicialTerror() {
+function posicionInicialElite() {
     const celdaJ = getCeldaJugador();
     const cola = [[celdaJ.fila, celdaJ.col, 0]];
     let idx = 0;
@@ -59,8 +59,8 @@ function posicionInicialTerror() {
     }
 
     // Elegir celdas a rango configurado de la distancia máxima (más lejos que el Trasgo)
-    const distMin = Math.floor(maxDist * CFG.villanoTerror.posicionDistMin);
-    const distMax = Math.floor(maxDist * CFG.villanoTerror.posicionDistMax);
+    const distMin = Math.floor(maxDist * CFG.villanoElite.posicionDistMin);
+    const distMax = Math.floor(maxDist * CFG.villanoElite.posicionDistMax);
     const candidatas = [];
 
     // Celda del Trasgo para evitarla
@@ -91,24 +91,23 @@ function posicionInicialTerror() {
     return candidatas.length > 0 ? candidatas[0] : [1, CONFIG.COLS - 2];
 }
 
-// Inicializa el villano terror
-function iniciarVillanoTerror() {
-    const enemigos = obtenerEnemigosTerror();
+// Inicializa el villano élite
+function iniciarVillanoElite() {
+    const enemigos = obtenerEnemigosElite();
     if (enemigos.length === 0) return;
 
     mezclar(enemigos);
     const datos = enemigos[0];
-    const pos = posicionInicialTerror();
+    const pos = posicionInicialElite();
 
     // Escala visual según estatura del villano
     const escalaVisual =
-        CFG.villanoTerror.escalaVisualBase *
-        (datos.estatura / CFG.villanoTerror.estaturaReferencia);
+        CFG.villanoElite.escalaVisualBase * (datos.estatura / CFG.villanoElite.estaturaReferencia);
 
-    est.villanoTerror = {
+    est.villanoElite = {
         datos: datos,
-        posX: pos[1] * CONFIG.TAM_CELDA + (CONFIG.TAM_CELDA - CONFIG.TAM_TERROR) / 2,
-        posY: pos[0] * CONFIG.TAM_CELDA + (CONFIG.TAM_CELDA - CONFIG.TAM_TERROR) / 2,
+        posX: pos[1] * CONFIG.TAM_CELDA + (CONFIG.TAM_CELDA - CONFIG.TAM_ELITE) / 2,
+        posY: pos[0] * CONFIG.TAM_CELDA + (CONFIG.TAM_CELDA - CONFIG.TAM_ELITE) / 2,
         camino: [],
         ultimoGolpe: 0,
         ultimoPathfinding: 0,
@@ -117,28 +116,28 @@ function iniciarVillanoTerror() {
     };
 
     // Renderizar el villano
-    renderizarVillanoTerror();
+    renderizarVillanoElite();
 
     // Toast de alerta
-    lanzarToast(CFG.textos.toastTerror.replace('{nombre}', datos.nombre), '💀', 'dano');
+    lanzarToast(CFG.textos.toastElite.replace('{nombre}', datos.nombre), '💀', 'dano');
 }
 
-// Renderiza el villano terror en el laberinto
-function renderizarVillanoTerror() {
-    if (!est.villanoTerror) return;
+// Renderiza el villano élite en el laberinto
+function renderizarVillanoElite() {
+    if (!est.villanoElite) return;
 
-    const datos = est.villanoTerror.datos;
+    const datos = est.villanoElite.datos;
     const elem = document.createElement('div');
-    elem.className = 'terror-laberinto terror-aparicion';
-    elem.style.width = CONFIG.TAM_TERROR + 'px';
-    elem.style.height = CONFIG.TAM_TERROR + 'px';
+    elem.className = 'elite-laberinto elite-aparicion';
+    elem.style.width = CONFIG.TAM_ELITE + 'px';
+    elem.style.height = CONFIG.TAM_ELITE + 'px';
     elem.style.transform =
         'translate(' +
-        est.villanoTerror.posX +
+        est.villanoElite.posX +
         'px, ' +
-        est.villanoTerror.posY +
+        est.villanoElite.posY +
         'px) scale(' +
-        est.villanoTerror.escalaVisual +
+        est.villanoElite.escalaVisual +
         ')';
 
     const img = document.createElement('img');
@@ -146,89 +145,89 @@ function renderizarVillanoTerror() {
     img.alt = datos.nombre;
     elem.appendChild(img);
     est.contenedorLaberinto.appendChild(elem);
-    est.villanoTerror.elemento = elem;
+    est.villanoElite.elemento = elem;
 
     // Quitar clase de animación de aparición después de que termine
     setTimeout(function () {
-        elem.classList.remove('terror-aparicion');
+        elem.classList.remove('elite-aparicion');
     }, 500);
 }
 
-// Actualiza pathfinding, movimiento y colisión del villano terror (cada frame)
-export function actualizarVillanoTerror() {
-    if (!est.villanoTerror) return;
+// Actualiza pathfinding, movimiento y colisión del villano élite (cada frame)
+export function actualizarVillanoElite() {
+    if (!est.villanoElite) return;
 
     const ahora = Date.now();
 
     // Recalcular ruta periódicamente
-    if (ahora - est.villanoTerror.ultimoPathfinding >= CONFIG.INTERVALO_PATHFINDING_TERROR) {
-        est.villanoTerror.ultimoPathfinding = ahora;
+    if (ahora - est.villanoElite.ultimoPathfinding >= CONFIG.INTERVALO_PATHFINDING_ELITE) {
+        est.villanoElite.ultimoPathfinding = ahora;
 
         const celdaV = {
-            fila: Math.floor((est.villanoTerror.posY + CONFIG.TAM_TERROR / 2) / CONFIG.TAM_CELDA),
-            col: Math.floor((est.villanoTerror.posX + CONFIG.TAM_TERROR / 2) / CONFIG.TAM_CELDA),
+            fila: Math.floor((est.villanoElite.posY + CONFIG.TAM_ELITE / 2) / CONFIG.TAM_CELDA),
+            col: Math.floor((est.villanoElite.posX + CONFIG.TAM_ELITE / 2) / CONFIG.TAM_CELDA),
         };
         const celdaJ = getCeldaJugador();
-        est.villanoTerror.camino = calcularCamino(celdaV.fila, celdaV.col, celdaJ.fila, celdaJ.col);
+        est.villanoElite.camino = calcularCamino(celdaV.fila, celdaV.col, celdaJ.fila, celdaJ.col);
     }
 
     // Velocidad escalada por atributo del enemigo
     const velocidad =
-        CONFIG.VELOCIDAD_TERROR *
-        (est.villanoTerror.datos.velocidad / CFG.villanoTerror.velocidadReferencia);
+        CONFIG.VELOCIDAD_ELITE *
+        (est.villanoElite.datos.velocidad / CFG.villanoElite.velocidadReferencia);
 
     // Mover hacia el siguiente punto del camino
-    if (est.villanoTerror.camino.length > 0) {
-        const objetivo = est.villanoTerror.camino[0];
-        const targetX = objetivo[1] * CONFIG.TAM_CELDA + (CONFIG.TAM_CELDA - CONFIG.TAM_TERROR) / 2;
-        const targetY = objetivo[0] * CONFIG.TAM_CELDA + (CONFIG.TAM_CELDA - CONFIG.TAM_TERROR) / 2;
+    if (est.villanoElite.camino.length > 0) {
+        const objetivo = est.villanoElite.camino[0];
+        const targetX = objetivo[1] * CONFIG.TAM_CELDA + (CONFIG.TAM_CELDA - CONFIG.TAM_ELITE) / 2;
+        const targetY = objetivo[0] * CONFIG.TAM_CELDA + (CONFIG.TAM_CELDA - CONFIG.TAM_ELITE) / 2;
 
-        const dx = targetX - est.villanoTerror.posX;
-        const dy = targetY - est.villanoTerror.posY;
+        const dx = targetX - est.villanoElite.posX;
+        const dy = targetY - est.villanoElite.posY;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (dist <= velocidad) {
-            est.villanoTerror.posX = targetX;
-            est.villanoTerror.posY = targetY;
-            est.villanoTerror.camino.shift();
+            est.villanoElite.posX = targetX;
+            est.villanoElite.posY = targetY;
+            est.villanoElite.camino.shift();
         } else {
-            est.villanoTerror.posX += (dx / dist) * velocidad;
-            est.villanoTerror.posY += (dy / dist) * velocidad;
+            est.villanoElite.posX += (dx / dist) * velocidad;
+            est.villanoElite.posY += (dy / dist) * velocidad;
         }
 
-        est.villanoTerror.elemento.style.transform =
+        est.villanoElite.elemento.style.transform =
             'translate(' +
-            est.villanoTerror.posX +
+            est.villanoElite.posX +
             'px, ' +
-            est.villanoTerror.posY +
+            est.villanoElite.posY +
             'px) scale(' +
-            est.villanoTerror.escalaVisual +
+            est.villanoElite.escalaVisual +
             ')';
     }
 
     // Detectar colisión con jugador
-    detectarColisionTerror();
+    detectarColisionElite();
 }
 
 // Si el villano toca al jugador, ataca con uno de sus ataques
-function detectarColisionTerror() {
+function detectarColisionElite() {
     const ahora = Date.now();
-    const cooldown = CONFIG.COOLDOWN_BASE / est.villanoTerror.datos.velAtaque;
-    if (ahora - est.villanoTerror.ultimoGolpe < cooldown) return;
+    const cooldown = CONFIG.COOLDOWN_BASE / est.villanoElite.datos.velAtaque;
+    if (ahora - est.villanoElite.ultimoGolpe < cooldown) return;
 
     const solapan =
-        est.villanoTerror.posX < est.posX + CONFIG.TAM_JUGADOR &&
-        est.villanoTerror.posX + CONFIG.TAM_TERROR > est.posX &&
-        est.villanoTerror.posY < est.posY + CONFIG.TAM_JUGADOR &&
-        est.villanoTerror.posY + CONFIG.TAM_TERROR > est.posY;
+        est.villanoElite.posX < est.posX + CONFIG.TAM_JUGADOR &&
+        est.villanoElite.posX + CONFIG.TAM_ELITE > est.posX &&
+        est.villanoElite.posY < est.posY + CONFIG.TAM_JUGADOR &&
+        est.villanoElite.posY + CONFIG.TAM_ELITE > est.posY;
 
     if (solapan) {
-        const ataques = est.villanoTerror.datos.ataques;
+        const ataques = est.villanoElite.datos.ataques;
         const ataque = ataques[Math.floor(Math.random() * ataques.length)];
-        est.villanoTerror.ultimoGolpe = ahora;
+        est.villanoElite.ultimoGolpe = ahora;
         aplicarDanoJugador(ataque.dano);
         lanzarToast(
-            est.villanoTerror.datos.nombre + ' — ' + ataque.nombre + ' (-' + ataque.dano + ')',
+            est.villanoElite.datos.nombre + ' — ' + ataque.nombre + ' (-' + ataque.dano + ')',
             '💀',
             'dano'
         );
@@ -243,7 +242,7 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 // Crea la estructura DOM del countdown con anillo SVG
 function crearCountdownDOM() {
     const contenedor = document.createElement('div');
-    contenedor.className = 'countdown-terror';
+    contenedor.className = 'countdown-elite';
 
     // Wrapper del anillo
     const wrap = document.createElement('div');
@@ -301,7 +300,7 @@ function actualizarCountdownVisual(elem) {
     numero.classList.add('countdown-tick');
 
     // Deplecionar anillo: de 0 (lleno) a CIRCUNFERENCIA (vacío)
-    const fraccionRestante = est.tiempoRestante / CONFIG.COUNTDOWN_TERROR;
+    const fraccionRestante = est.tiempoRestante / CONFIG.COUNTDOWN_ELITE;
     progreso.style.strokeDashoffset = CIRCUNFERENCIA * (1 - fraccionRestante);
 
     // Últimos 3 segundos: modo urgente (ring + borde rojo)
@@ -318,19 +317,19 @@ function limpiarBordeAmenaza() {
     est.contenedorLaberinto.classList.remove('laberinto-amenaza-urgente');
 }
 
-// Inicia el countdown que libera un villano terror
+// Inicia el countdown que libera un villano élite
 export function iniciarCountdown() {
-    est.tiempoRestante = CONFIG.COUNTDOWN_TERROR;
+    est.tiempoRestante = CONFIG.COUNTDOWN_ELITE;
     const elem = crearCountdownDOM();
     est.contenedorLaberinto.classList.add('laberinto-amenaza');
     actualizarCountdownVisual(elem);
 
-    est.countdownTerror = setInterval(function () {
+    est.countdownElite = setInterval(function () {
         est.tiempoRestante--;
 
         if (est.tiempoRestante <= 0) {
-            clearInterval(est.countdownTerror);
-            est.countdownTerror = null;
+            clearInterval(est.countdownElite);
+            est.countdownElite = null;
 
             // Quitar borde pulsante y animación de salida del ring
             limpiarBordeAmenaza();
@@ -339,9 +338,9 @@ export function iniciarCountdown() {
                 if (elem.parentNode) elem.parentNode.removeChild(elem);
             }, 400);
 
-            // Liberar villano terror
+            // Liberar villano élite
             if (est.activo) {
-                iniciarVillanoTerror();
+                iniciarVillanoElite();
             }
         } else {
             actualizarCountdownVisual(elem);
@@ -350,12 +349,12 @@ export function iniciarCountdown() {
 }
 
 // Limpieza completa
-export function limpiarVillanoTerror() {
-    if (est.countdownTerror) {
-        clearInterval(est.countdownTerror);
-        est.countdownTerror = null;
+export function limpiarVillanoElite() {
+    if (est.countdownElite) {
+        clearInterval(est.countdownElite);
+        est.countdownElite = null;
     }
     if (est.contenedorLaberinto) limpiarBordeAmenaza();
-    est.villanoTerror = null;
+    est.villanoElite = null;
     est.tiempoRestante = 0;
 }
