@@ -1,0 +1,37 @@
+# ============================================
+# Configuración de la Habitación 3 — El Memorice
+# El jugador voltea cartas para encontrar pares de héroes y villanos
+# ============================================
+
+# --- Información general de la habitación ---
+meta:
+    titulo: "El Memorice"
+    itemInventario: llave-habitacion-4   # ID del item que se agrega al inventario
+    tiempoVictoria: 2000                 # ms antes de volver al pasillo
+
+# --- Dimensiones del tablero ---
+# filas × columnas debe ser PAR y >= 2*(numHeroes + numVillanos)
+tablero:
+    filas: 4                 # filas de la grilla de cartas
+    columnas: 5              # columnas de la grilla de cartas
+    numHeroes: 5             # cantidad de pares de héroes
+    numVillanos: 5           # cantidad de pares de villanos
+
+# --- Intentos del jugador ---
+intentos:
+    max: 20                  # intentos totales permitidos
+    alerta: 5                # umbral para alerta visual (pulsing rojo)
+    margenAdvertencia: 3     # margen de turnos sobrantes para lanzar toast
+
+# --- Tiempos de animación (ms) ---
+tiempos:
+    volteo: 500              # ms animación de flip
+    noMatch: 800             # ms antes de voltear de vuelta
+
+# --- Textos mostrados en pantalla ---
+# {restantes} se interpola en JS con .replace()
+textos:
+    indicador: "Intentos: {restantes}"
+    toastMatch: "¡Par encontrado!"
+    toastVictoria: "¡Memorice completado!"
+    toastAdvertencia: "¡Quedan pocos turnos!"

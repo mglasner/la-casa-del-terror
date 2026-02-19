@@ -1,7 +1,7 @@
 // Habitación 3 — El Memorice
 // El jugador voltea cartas para encontrar pares de héroes y villanos
 
-import { CONFIG } from './config.js';
+import { CFG } from './config.js';
 import { generarTablero } from './tablero.js';
 import { crearCarta } from './carta.js';
 import { lanzarToast } from '../../componentes/toast.js';
@@ -18,10 +18,10 @@ let cartas = [];
 
 let primeraCarta = null;
 let bloqueado = false;
-let intentosRestantes = CONFIG.intentosMax;
+let intentosRestantes = CFG.intentos.max;
 let paresEncontrados = 0;
 let toastAdvertenciaMostrado = false;
-const totalPares = CONFIG.numHeroes + CONFIG.numVillanos;
+const totalPares = CFG.tablero.numHeroes + CFG.tablero.numVillanos;
 
 // --- Crear pantalla HTML ---
 
@@ -42,7 +42,7 @@ function crearPantalla() {
 
     const titulo = document.createElement('h2');
     titulo.className = 'titulo-habitacion';
-    titulo.textContent = CONFIG.meta.titulo;
+    titulo.textContent = CFG.meta.titulo;
 
     cabecera.appendChild(btnHuir);
     cabecera.appendChild(titulo);
@@ -86,10 +86,10 @@ function crearPantalla() {
 // --- Lógica del juego ---
 
 function actualizarIndicador() {
-    indicadorTexto.textContent = CONFIG.textos.indicador(intentosRestantes);
-    indicadorProgreso.style.width = (intentosRestantes / CONFIG.intentosMax) * 100 + '%';
+    indicadorTexto.textContent = CFG.textos.indicador.replace('{restantes}', intentosRestantes);
+    indicadorProgreso.style.width = (intentosRestantes / CFG.intentos.max) * 100 + '%';
 
-    if (intentosRestantes <= CONFIG.intentosAlerta) {
+    if (intentosRestantes <= CFG.intentos.alerta) {
         indicador.classList.add('memorice-alerta');
     } else {
         indicador.classList.remove('memorice-alerta');
@@ -97,9 +97,9 @@ function actualizarIndicador() {
 
     // Toast de advertencia cuando quedan pocos turnos de margen
     const margen = intentosRestantes - (totalPares - paresEncontrados);
-    if (margen <= CONFIG.margenAdvertencia && !toastAdvertenciaMostrado) {
+    if (margen <= CFG.intentos.margenAdvertencia && !toastAdvertenciaMostrado) {
         toastAdvertenciaMostrado = true;
-        lanzarToast(CONFIG.textos.toastAdvertencia, '\u26A0\uFE0F', 'dano');
+        lanzarToast(CFG.textos.toastAdvertencia, '\u26A0\uFE0F', 'dano');
     }
 }
 
@@ -138,7 +138,7 @@ function onClickGrilla(e) {
         primeraCarta.marcarEncontrada();
         segunda.marcarEncontrada();
         paresEncontrados++;
-        lanzarToast(CONFIG.textos.toastMatch, '\u2728', 'exito');
+        lanzarToast(CFG.textos.toastMatch, '\u2728', 'exito');
 
         intentosRestantes--;
         actualizarIndicador();
@@ -168,19 +168,19 @@ function onClickGrilla(e) {
             if (derrotaInminente()) {
                 derrota();
             }
-        }, CONFIG.tiempoNoMatch);
+        }, CFG.tiempos.noMatch);
     }
 }
 
 function victoria() {
-    jugador.inventario.push(CONFIG.meta.itemInventario);
+    jugador.inventario.push(CFG.meta.itemInventario);
     document.dispatchEvent(new Event('inventario-cambio'));
-    lanzarToast(CONFIG.textos.toastVictoria, '\uD83D\uDD11', 'item');
+    lanzarToast(CFG.textos.toastVictoria, '\uD83D\uDD11', 'item');
 
     setTimeout(function () {
         limpiarHabitacion3();
         callbackSalir();
-    }, CONFIG.tiempoVictoria);
+    }, CFG.meta.tiempoVictoria);
 }
 
 function derrota() {
@@ -210,7 +210,7 @@ export function iniciarHabitacion3(jugadorRef, callback, dpadRef) {
     callbackSalir = callback;
     primeraCarta = null;
     bloqueado = false;
-    intentosRestantes = CONFIG.intentosMax;
+    intentosRestantes = CFG.intentos.max;
     paresEncontrados = 0;
     toastAdvertenciaMostrado = false;
 
@@ -220,7 +220,7 @@ export function iniciarHabitacion3(jugadorRef, callback, dpadRef) {
     }
 
     // Generar tablero con cartas mezcladas
-    const datosCartas = generarTablero(CONFIG.numHeroes, CONFIG.numVillanos);
+    const datosCartas = generarTablero(CFG.tablero.numHeroes, CFG.tablero.numVillanos);
     cartas = datosCartas.map(function (data) {
         return crearCarta(data);
     });

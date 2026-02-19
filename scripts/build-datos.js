@@ -209,6 +209,14 @@ const SCHEMA_HABITACION2 = {
     rendimiento: ['warmupFrames', 'umbralFrameLento', 'framesLentosParaFallback', 'flashDano'],
 };
 
+const SCHEMA_HABITACION3 = {
+    meta: ['titulo', 'itemInventario', 'tiempoVictoria'],
+    tablero: ['filas', 'columnas', 'numHeroes', 'numVillanos'],
+    intentos: ['max', 'alerta', 'margenAdvertencia'],
+    tiempos: ['volteo', 'noMatch'],
+    textos: ['indicador', 'toastMatch', 'toastVictoria', 'toastAdvertencia'],
+};
+
 // Valida una habitación contra su schema
 function validarHabitacion(datos, archivo, schema) {
     const errores = [];
@@ -278,6 +286,18 @@ async function main() {
         const hab2Fmt = await prettier.format(hab2JS, configPrettier);
         writeFileSync('js/habitaciones/config-habitacion2.js', hab2Fmt);
         console.log('js/habitaciones/config-habitacion2.js generado');
+    }
+
+    // Habitación 3
+    const hab3Archivo = 'datos/habitacion3.yaml';
+    if (existsSync(hab3Archivo)) {
+        const hab3Yaml = readFileSync(hab3Archivo, 'utf-8');
+        const hab3Data = yaml.load(hab3Yaml);
+        validarHabitacion(hab3Data, 'habitacion3.yaml', SCHEMA_HABITACION3);
+        const hab3JS = generarConfigJS(hab3Data);
+        const hab3Fmt = await prettier.format(hab3JS, configPrettier);
+        writeFileSync('js/habitaciones/habitacion3/config.js', hab3Fmt);
+        console.log('js/habitaciones/habitacion3/config.js generado');
     }
 }
 
