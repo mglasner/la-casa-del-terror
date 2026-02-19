@@ -4766,7 +4766,7 @@ h1 {
     /* Botón Empezar: barra fija sobre la navegación en mobile */
     .libro-heroes-empezar {
         position: absolute;
-        bottom: 49px;
+        bottom: 56px;
         left: 0;
         width: 100%;
         margin: 0;
