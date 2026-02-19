@@ -3081,52 +3081,68 @@ h1 {
     animation: parpadeo-hint 2s ease-in-out infinite;
 }
 
-/* Botón huir: icono compacto en la cabecera */
+/* Botón huir: icono circular con imagen de puerta mágica */
 .btn-huir {
-    height: 32px;
-    padding: 0 10px;
-    border: 2px solid rgb(255 255 255 / 10%);
-    border-radius: 16px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 2px solid rgb(240 165 0 / 30%);
+    border-radius: 50%;
     cursor: pointer;
-    background-color: rgb(255 255 255 / 5%);
-    color: #999;
-    font-size: 0.85rem;
+    background-color: rgb(240 165 0 / 8%);
     display: flex;
     align-items: center;
-    gap: 3px;
+    justify-content: center;
     flex-shrink: 0;
+    position: relative;
     transition:
         border-color 0.3s,
-        color 0.3s,
         background-color 0.3s,
-        box-shadow 0.3s;
+        box-shadow 0.3s,
+        transform 0.2s;
 }
 
-.btn-huir:hover,
+.btn-huir::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 1px solid rgb(240 165 0 / 0%);
+    transition: border-color 0.3s;
+    pointer-events: none;
+}
+
+.btn-huir:hover {
+    border-color: rgb(240 165 0 / 60%);
+    background-color: rgb(240 165 0 / 15%);
+    box-shadow:
+        0 0 12px rgb(240 165 0 / 30%),
+        0 0 24px rgb(240 165 0 / 10%);
+    transform: scale(1.08);
+}
+
+.btn-huir:hover::after {
+    border-color: rgb(240 165 0 / 20%);
+}
+
 .btn-huir:active {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
-    background-color: rgb(233 69 96 / 10%);
-    box-shadow: 0 0 12px rgb(233 69 96 / 30%);
+    transform: scale(0.95);
+    border-color: rgb(240 165 0 / 80%);
+    box-shadow: 0 0 16px rgb(240 165 0 / 40%);
 }
 
-/* Flecha del botón huir: pulso sutil */
-.btn-huir-flecha {
-    display: inline-block;
-    animation: pulso-huir 2s ease-in-out infinite;
+.btn-huir-icono {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 4px rgb(240 165 0 / 40%));
+    transition: filter 0.3s;
+    pointer-events: none;
 }
 
-@keyframes pulso-huir {
-    0%,
-    100% {
-        transform: translateX(0);
-        opacity: 0.7;
-    }
-
-    50% {
-        transform: translateX(-2px);
-        opacity: 1;
-    }
+.btn-huir:hover .btn-huir-icono {
+    filter: drop-shadow(0 0 8px rgb(240 165 0 / 60%));
 }
 
 /* --- Habitación 2: El Laberinto 3D --- */

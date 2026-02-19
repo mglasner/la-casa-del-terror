@@ -111,8 +111,13 @@ function crearPantalla(esTouch) {
 
     const btnHuir = document.createElement('button');
     btnHuir.className = 'btn-huir';
-    btnHuir.innerHTML = '<span class="btn-huir-flecha">\u2190</span> \uD83D\uDEAA';
     btnHuir.title = 'Huir al pasillo (Esc)';
+    btnHuir.setAttribute('aria-label', 'Huir al pasillo');
+    const imgHuir = document.createElement('img');
+    imgHuir.src = 'assets/img/icons/btn-salir.webp';
+    imgHuir.alt = '';
+    imgHuir.className = 'btn-huir-icono';
+    btnHuir.appendChild(imgHuir);
     btnHuir.addEventListener('click', function () {
         limpiarHabitacion2();
         callbackSalir();
