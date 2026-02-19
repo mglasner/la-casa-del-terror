@@ -3,7 +3,7 @@
 import { crearElemento } from '../utils.js';
 import { ENEMIGOS } from '../enemigos.js';
 import { crearLibro } from './libro.js';
-import { generarDetalleHeroe, adaptarEntidades } from './libroHeroes.js';
+import { generarDetalleHeroe, adaptarEntidades, HABITACIONES_HEROARIO } from './libroHeroes.js';
 import {
     generarDetalleVillano,
     ordenarPorTier,
@@ -103,6 +103,9 @@ export function crearLibrosPasillo(contenedor) {
         claseRaiz: 'libro-heroes',
         titulo: 'Heroario',
         subtitulo: 'Los héroes de la mansión',
+        paginasExtras: HABITACIONES_HEROARIO,
+        tituloExtras: 'Habitaciones',
+        tituloEntidades: 'Héroes',
     });
     const modalHeroes = crearModalLibro(heroario.libro, heroario.manejarTecladoLibro);
     contenedor.appendChild(modalHeroes.overlay);

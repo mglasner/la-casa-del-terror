@@ -45,10 +45,13 @@ export function crearLibro(opciones) {
     const subtitulo = opciones.subtitulo || '';
     const pieContenido = opciones.pieContenido || null;
     const paginaInicio = opciones.paginaInicio || null;
+    const paginasExtras = opciones.paginasExtras || [];
+    const tituloExtras = opciones.tituloExtras || '';
+    const tituloEntidades = opciones.tituloEntidades || '';
 
     const nombres = ordenar(Object.keys(entidades));
-    // Si hay página de inicio, el índice 0 es la intro y las entidades empiezan en 1
-    const offset = paginaInicio ? 1 : 0;
+    // Offset: intro (si existe) + páginas extras
+    const offset = (paginaInicio ? 1 : 0) + paginasExtras.length;
     const totalPaginas = offset + nombres.length;
     let indiceActual = 0;
     let transicionEnCurso = false;
@@ -58,17 +61,26 @@ export function crearLibro(opciones) {
         return paginaInicio && i === 0;
     }
 
+    function esExtra(i) {
+        const inicio = paginaInicio ? 1 : 0;
+        return i >= inicio && i < inicio + paginasExtras.length;
+    }
+
     function getNombrePorIndice(i) {
         return nombres[i - offset];
     }
 
     function getClasePorIndice(i) {
-        if (esIntro(i)) return '';
+        if (esIntro(i) || esExtra(i)) return '';
         return entidades[getNombrePorIndice(i)].clase;
     }
 
     function getDetallePorIndice(i, tabAnterior) {
         if (esIntro(i)) return paginaInicio.generarContenido();
+        if (esExtra(i)) {
+            const inicio = paginaInicio ? 1 : 0;
+            return paginasExtras[i - inicio].generarContenido();
+        }
         return generarDetalle(getNombrePorIndice(i), tabAnterior);
     }
 
@@ -119,6 +131,50 @@ export function crearLibro(opciones) {
         listaIndice.appendChild(sep);
     }
 
+    // Items de páginas extras (habitaciones, etc.)
+    if (paginasExtras.length > 0) {
+        if (tituloExtras) {
+            const labelExtras = crearElemento('li', 'libro-indice-seccion');
+            labelExtras.textContent = tituloExtras;
+            labelExtras.setAttribute('aria-hidden', 'true');
+            listaIndice.appendChild(labelExtras);
+        }
+
+        const extraInicio = paginaInicio ? 1 : 0;
+        paginasExtras.forEach(function (extra, j) {
+            const indiceGlobal = extraInicio + j;
+            const item = crearElemento('li', 'libro-indice-item libro-indice-extra');
+            item.dataset.indice = String(indiceGlobal);
+            item.tabIndex = 0;
+            item.textContent = extra.textoIndice;
+
+            if (!paginaInicio && j === 0) item.classList.add('libro-indice-activo');
+
+            item.addEventListener('click', function () {
+                navegarA(indiceGlobal);
+            });
+            item.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    navegarA(indiceGlobal);
+                }
+            });
+            listaIndice.appendChild(item);
+        });
+
+        // Separador después de los extras
+        const sepExtras = crearElemento('li', 'libro-indice-sep');
+        sepExtras.setAttribute('aria-hidden', 'true');
+        listaIndice.appendChild(sepExtras);
+    }
+
+    if (tituloEntidades) {
+        const labelEntidades = crearElemento('li', 'libro-indice-seccion');
+        labelEntidades.textContent = tituloEntidades;
+        labelEntidades.setAttribute('aria-hidden', 'true');
+        listaIndice.appendChild(labelEntidades);
+    }
+
     nombres.forEach(function (nombre, i) {
         const datos = entidades[nombre];
         const indiceGlobal = i + offset;
@@ -136,7 +192,8 @@ export function crearLibro(opciones) {
         item.tabIndex = 0;
         item.textContent = crearItemIndice(nombre, datos);
 
-        if (!paginaInicio && i === 0) item.classList.add('libro-indice-activo');
+        if (!paginaInicio && paginasExtras.length === 0 && i === 0)
+            item.classList.add('libro-indice-activo');
 
         item.addEventListener('click', function () {
             navegarA(indiceGlobal);
@@ -155,7 +212,7 @@ export function crearLibro(opciones) {
     // Pie de contenido opcional (ej: botón Empezar del Heroario)
     if (pieContenido) {
         pieContenido(paginaIzq, function () {
-            if (esIntro(indiceActual)) return nombres[0];
+            if (esIntro(indiceActual) || esExtra(indiceActual)) return nombres[0];
             return getNombrePorIndice(indiceActual);
         });
     }
@@ -279,7 +336,7 @@ export function crearLibro(opciones) {
         libro: libro,
         manejarTecladoLibro: manejarTecladoLibro,
         getNombreActual: function () {
-            if (esIntro(indiceActual)) return nombres[0];
+            if (esIntro(indiceActual) || esExtra(indiceActual)) return nombres[0];
             return getNombrePorIndice(indiceActual);
         },
     };
