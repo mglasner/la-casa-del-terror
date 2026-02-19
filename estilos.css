@@ -4848,13 +4848,19 @@ h1 {
         font-size: 0.65rem;
     }
 
+    .libro-boton {
+        margin-top: 12px;
+        padding: 4px;
+    }
+
     .libro-boton img {
-        width: 70px;
-        height: 70px;
+        width: 54px;
+        height: 54px;
+        border-radius: 10px;
     }
 
     .libro-boton-texto {
-        font-size: 0.7rem;
+        font-size: 0.6rem;
     }
 
     .libro-modal-cuerpo {
