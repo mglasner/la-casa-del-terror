@@ -4238,10 +4238,18 @@ h1 {
 .libro-modal-cuerpo {
     position: relative;
     animation: modal-aparecer 0.3s ease;
-    max-height: 90vh;
+    height: calc(100dvh - 64px);
     max-width: min(700px, calc(100vw - 40px));
-    overflow: hidden auto;
+    overflow: hidden;
     border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.libro-modal-cuerpo .libro-villanos {
+    flex: 1;
+    height: auto;
+    min-height: 0;
 }
 
 .libro-modal-cerrar {
@@ -4412,7 +4420,7 @@ h1 {
     }
 
     .libro-modal-cuerpo {
-        max-height: 85vh;
+        height: calc(100dvh - 50px);
     }
 }
 
@@ -4674,7 +4682,7 @@ h1 {
     }
 
     .libro-modal-cuerpo {
-        max-height: 80vh;
+        height: calc(100dvh - 36px);
     }
 
     .libro-modal-cerrar {
