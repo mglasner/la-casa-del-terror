@@ -15,6 +15,9 @@ export const CONFIG = {
     // Umbral para alerta visual de intentos bajos
     intentosAlerta: 5,
 
+    // Margen de turnos sobrantes para lanzar advertencia toast
+    margenAdvertencia: 3,
+
     meta: {
         titulo: 'El Memorice',
         itemInventario: 'llave-habitacion-4',
@@ -24,5 +27,6 @@ export const CONFIG = {
         indicador: (restantes) => `Intentos: ${restantes}`,
         toastMatch: '¡Par encontrado!',
         toastVictoria: '¡Memorice completado!',
+        toastAdvertencia: '¡Quedan pocos turnos!',
     },
 };

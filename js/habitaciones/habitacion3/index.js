@@ -12,12 +12,15 @@ let jugador = null;
 let callbackSalir = null;
 let pantalla = null;
 let indicador = null;
+let indicadorTexto = null;
+let indicadorProgreso = null;
 let cartas = [];
 
 let primeraCarta = null;
 let bloqueado = false;
 let intentosRestantes = CONFIG.intentosMax;
 let paresEncontrados = 0;
+let toastAdvertenciaMostrado = false;
 const totalPares = CONFIG.numHeroes + CONFIG.numVillanos;
 
 // --- Crear pantalla HTML ---
@@ -45,8 +48,21 @@ function crearPantalla() {
     cabecera.appendChild(titulo);
 
     // Indicador de intentos
-    indicador = document.createElement('p');
+    indicador = document.createElement('div');
     indicador.id = 'memorice-indicador';
+
+    indicadorTexto = document.createElement('span');
+    indicadorTexto.className = 'memorice-indicador-texto';
+
+    const barra = document.createElement('div');
+    barra.className = 'memorice-indicador-barra';
+
+    indicadorProgreso = document.createElement('div');
+    indicadorProgreso.className = 'memorice-indicador-progreso';
+    barra.appendChild(indicadorProgreso);
+
+    indicador.appendChild(indicadorTexto);
+    indicador.appendChild(barra);
     actualizarIndicador();
 
     // Grilla de cartas
@@ -70,12 +86,20 @@ function crearPantalla() {
 // --- Lógica del juego ---
 
 function actualizarIndicador() {
-    indicador.textContent = CONFIG.textos.indicador(intentosRestantes);
+    indicadorTexto.textContent = CONFIG.textos.indicador(intentosRestantes);
+    indicadorProgreso.style.width = (intentosRestantes / CONFIG.intentosMax) * 100 + '%';
 
     if (intentosRestantes <= CONFIG.intentosAlerta) {
         indicador.classList.add('memorice-alerta');
     } else {
         indicador.classList.remove('memorice-alerta');
+    }
+
+    // Toast de advertencia cuando quedan pocos turnos de margen
+    const margen = intentosRestantes - (totalPares - paresEncontrados);
+    if (margen <= CONFIG.margenAdvertencia && !toastAdvertenciaMostrado) {
+        toastAdvertenciaMostrado = true;
+        lanzarToast(CONFIG.textos.toastAdvertencia, '\u26A0\uFE0F', 'dano');
     }
 }
 
@@ -188,6 +212,7 @@ export function iniciarHabitacion3(jugadorRef, callback, dpadRef) {
     bloqueado = false;
     intentosRestantes = CONFIG.intentosMax;
     paresEncontrados = 0;
+    toastAdvertenciaMostrado = false;
 
     // Ocultar D-pad (no se necesita en el memorice)
     if (dpadRef) {
@@ -219,4 +244,6 @@ export function limpiarHabitacion3() {
     primeraCarta = null;
     bloqueado = false;
     indicador = null;
+    indicadorTexto = null;
+    indicadorProgreso = null;
 }
