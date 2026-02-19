@@ -225,6 +225,7 @@ export function crearLibro(opciones) {
         setTimeout(function () {
             const tabAnterior = (contenidoActual && contenidoActual._tabActivo) || 'perfil';
             detalleWrap.replaceChildren();
+            paginaDer.scrollTop = 0;
             const nuevoContenido = getDetallePorIndice(nuevoIndice, tabAnterior);
             nuevoContenido.classList.add('libro-fade-in');
             detalleWrap.appendChild(nuevoContenido);
