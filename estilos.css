@@ -3852,6 +3852,59 @@ h1 {
     border-right: 2px solid rgb(255 215 0 / 50%);
 }
 
+/* Page curl — puntita inferior derecha */
+.libro-page-curl {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 28px;
+    height: 28px;
+    z-index: 4;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 0 0 8px;
+}
+
+.libro-page-curl::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 0 24px 24px;
+    border-color: transparent transparent #2a2015;
+    filter: drop-shadow(-2px -2px 3px rgb(0 0 0 / 40%));
+    transform-origin: bottom right;
+    animation: page-curl-idle 3s ease-in-out infinite;
+}
+
+.libro-page-curl::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 0 20px 20px;
+    border-color: transparent transparent rgb(255 215 0 / 8%);
+    transform-origin: bottom right;
+    animation: page-curl-idle 3s ease-in-out infinite;
+}
+
+@keyframes page-curl-idle {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2) translate(-1px, -1px);
+    }
+}
+
 /* Volteo 3D de página */
 @keyframes libro-flip-out {
     0% {

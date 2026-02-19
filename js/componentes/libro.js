@@ -176,6 +176,9 @@ export function crearLibro(opciones) {
         paginaDer.appendChild(crearElemento('div', 'libro-esquina libro-esquina-' + pos));
     });
 
+    // Page curl — puntita inferior derecha
+    paginaDer.appendChild(crearElemento('div', 'libro-page-curl'));
+
     const detalleWrap = crearElemento('div', 'libro-detalle-wrap');
     detalleWrap.appendChild(getDetallePorIndice(0));
     paginaDer.appendChild(detalleWrap);
