@@ -88,7 +88,11 @@ function generarIntro() {
     const contenido = crearElemento('div', 'libro-detalle-contenido libro-intro');
 
     contenido.appendChild(
-        crearElemento('h3', 'libro-intro-titulo', 'Bienvenido a la Mansi\u00f3n de Aventuras')
+        crearElemento(
+            'h2',
+            'libro-intro-game-titulo',
+            '\ud83c\udfe1 La Casa del Terror \ud83d\udc7b'
+        )
     );
     contenido.appendChild(crearElemento('div', 'libro-ornamento'));
 
@@ -97,21 +101,21 @@ function generarIntro() {
         crearElemento(
             'p',
             null,
-            'La Casa del Terror es un juego de aventuras donde t\u00fa eliges a tu h\u00e9roe y exploras una mansi\u00f3n llena de misterios, trampas y villanos.'
+            'Un juego de aventuras donde eliges a tu h\u00e9roe y exploras una mansi\u00f3n llena de misterios, trampas y villanos.'
         )
     );
     texto.appendChild(
         crearElemento(
             'p',
             null,
-            'En este Heroario encontrar\u00e1s a todos los h\u00e9roes disponibles. Cada uno tiene habilidades \u00fanicas que te ayudar\u00e1n a superar los desaf\u00edos que te esperan.'
+            'En el Heroario encontrar\u00e1s a todos los h\u00e9roes disponibles. Cada uno tiene habilidades \u00fanicas para superar los desaf\u00edos que te esperan.'
         )
     );
     texto.appendChild(
         crearElemento(
             'p',
             null,
-            '\u00bfQuieres conocer a los villanos? Abre el Villanario con el bot\u00f3n m\u00e1gico que encontrar\u00e1s abajo a la izquierda.'
+            '\u00bfQuieres conocer a los villanos? Abre el Villanario con el bot\u00f3n m\u00e1gico de abajo a la izquierda.'
         )
     );
     texto.appendChild(
