@@ -284,7 +284,7 @@ const modal = crearModalPuerta(contenedorJuego);
 const modalDerrota = crearModalDerrota();
 const transicion = crearTransicion();
 const dpad = crearControlesTouch();
-crearToast();
+const toast = crearToast();
 
 // --- Modal de detalle de personaje ---
 
@@ -539,6 +539,7 @@ function cambiarEstado(nuevo, datos) {
     const anterior = estado.estadoActual;
     const estilo = elegirTransicion(anterior, nuevo);
 
+    toast.limpiar();
     transicion.ejecutar(estilo, function () {
         ejecutarCambioEstado(anterior, nuevo, datos);
     });

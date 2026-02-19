@@ -70,10 +70,17 @@ export function crearToast() {
         });
     }
 
+    function limpiar() {
+        activos.slice().forEach(function (el) {
+            activos.splice(activos.indexOf(el), 1);
+            if (el.parentNode) el.parentNode.removeChild(el);
+        });
+    }
+
     // Escuchar eventos globales
     document.addEventListener('toast', function (e) {
         mostrar(e.detail);
     });
 
-    return { mostrar };
+    return { mostrar, limpiar };
 }
