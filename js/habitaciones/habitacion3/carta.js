@@ -37,10 +37,15 @@ export function crearCarta(data) {
     front.appendChild(img);
     front.appendChild(nombre);
 
-    // Back (boca abajo): signo de interrogación
+    // Back (boca abajo): ícono de la casa del terror
     const back = document.createElement('div');
     back.className = 'memorice-carta-back';
-    back.textContent = '?';
+
+    const imgBack = document.createElement('img');
+    imgBack.src = 'assets/img/icons/icon-192.png';
+    imgBack.alt = 'La Casa del Terror';
+    imgBack.draggable = false;
+    back.appendChild(imgBack);
 
     inner.appendChild(front);
     inner.appendChild(back);
