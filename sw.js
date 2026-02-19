@@ -11,6 +11,7 @@ const STATIC_ASSETS = [
     BASE_PATH + 'estilos.min.css',
     BASE_PATH + 'assets/fonts/creepster-400-latin.woff2',
     BASE_PATH + 'assets/fonts/quicksand-variable-latin.woff2',
+    BASE_PATH + 'manifest.webmanifest',
 ];
 
 // Instalación: precachear assets críticos

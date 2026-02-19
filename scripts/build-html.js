@@ -17,6 +17,9 @@ html = html.replace('src="js/juego.js"', `src="juego.min.js?v=${buildId}"`);
 
 writeFileSync('dist/index.html', html);
 
+// Copiar manifest
+cpSync('manifest.webmanifest', 'dist/manifest.webmanifest');
+
 // Copiar assets estáticos (imágenes y fuentes)
 cpSync('assets', 'dist/assets', { recursive: true });
 

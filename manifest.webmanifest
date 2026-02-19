@@ -1,0 +1,23 @@
+{
+    "name": "La Casa del Terror",
+    "short_name": "Casa Terror",
+    "description": "Juego web de aventura y misterio para toda la familia",
+    "start_url": "/la-casa-del-terror/",
+    "scope": "/la-casa-del-terror/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#1a0a2e",
+    "theme_color": "#1a0a2e",
+    "icons": [
+        {
+            "src": "assets/img/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "assets/img/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
