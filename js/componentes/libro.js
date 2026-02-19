@@ -151,6 +151,15 @@ export function crearLibro(opciones) {
         listaIndice.appendChild(item);
     });
     paginaIzq.appendChild(listaIndice);
+
+    // Pie de contenido opcional (ej: botón Empezar del Heroario)
+    if (pieContenido) {
+        pieContenido(paginaIzq, function () {
+            if (esIntro(indiceActual)) return nombres[0];
+            return getNombrePorIndice(indiceActual);
+        });
+    }
+
     paginaIzq.appendChild(crearElemento('div', 'libro-ornamento'));
 
     // --- Lomo con costuras ---
@@ -194,14 +203,6 @@ export function crearLibro(opciones) {
     nav.appendChild(contador);
     nav.appendChild(btnSiguiente);
     paginaDer.appendChild(nav);
-
-    // Pie de contenido opcional (ej: botón Empezar del Heroario)
-    if (pieContenido) {
-        pieContenido(paginaIzq, function () {
-            if (esIntro(indiceActual)) return nombres[0];
-            return getNombrePorIndice(indiceActual);
-        });
-    }
 
     // Ensamblar libro
     libro.appendChild(paginaIzq);
