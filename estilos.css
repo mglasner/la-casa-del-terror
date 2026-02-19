@@ -4679,14 +4679,14 @@ h1 {
         display: none;
     }
 
-    /* Botón Empezar: barra fija al fondo del libro en mobile */
+    /* Botón Empezar: barra fija sobre la navegación en mobile */
     .libro-heroes-empezar {
         position: absolute;
-        bottom: 0;
+        bottom: 49px;
         left: 0;
         width: 100%;
         margin: 0;
-        border-radius: 0 0 12px 12px;
+        border-radius: 0;
         padding: 10px 0;
         font-size: 0.9rem;
         z-index: 5;
@@ -4695,6 +4695,11 @@ h1 {
 
     .libro-en-inicio .libro-heroes-empezar {
         display: none;
+    }
+
+    /* Espacio extra para que el contenido pueda scrollear más allá del botón Empezar */
+    .libro-heroes .libro-detalle-wrap {
+        padding-bottom: 44px;
     }
 
     .libro-lomo {

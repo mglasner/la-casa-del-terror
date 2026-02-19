@@ -3,7 +3,7 @@
 
 const HABITACIONES = {
     1: {
-        icono: '🏰',
+        iconoImg: 'assets/img/habitaciones/habitacion1.webp',
         nombre: 'El Laberinto',
         nivel: 'Nivel 1',
         descripcion: 'Un oscuro laberinto de piedra te espera... ¿encontrarás la salida?',
@@ -12,7 +12,7 @@ const HABITACIONES = {
         fondo: '#2a1a3e',
     },
     2: {
-        icono: '👁️',
+        iconoImg: 'assets/img/habitaciones/habitacion2.webp',
         nombre: 'El Laberinto 3D',
         nivel: 'Nivel 2',
         descripcion: 'Las paredes se mueven y los pasillos no tienen fin...',
@@ -21,7 +21,7 @@ const HABITACIONES = {
         fondo: '#1a3e1a',
     },
     3: {
-        iconoImg: 'assets/img/habitaciones/memorice-icon.webp',
+        iconoImg: 'assets/img/habitaciones/habitacion3.webp',
         nombre: 'El Memorice',
         nivel: 'Nivel 3',
         descripcion: 'Cartas boca abajo cubren la mesa... ¿podrás recordar dónde está cada par?',
