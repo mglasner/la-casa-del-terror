@@ -8,9 +8,8 @@ import { crearModalDerrota } from './componentes/modalDerrota.js';
 import { crearTransicion } from './componentes/transicion.js';
 import { crearControlesTouch } from './componentes/controlesTouch.js';
 import { crearToast } from './componentes/toast.js';
-import { crearElemento } from './utils.js';
-import { TIERS, llenarStats } from './componentes/stats.js';
 import { crearLibroVillanos } from './componentes/libroVillanos.js';
+import { crearLibroHeroes } from './componentes/libroHeroes.js';
 
 // --- Estados del juego (máquina de estados) ---
 
@@ -30,144 +29,11 @@ function registrarHabitacion(numero, modulo) {
 registrarHabitacion('1', { iniciar: iniciarHabitacion1, limpiar: limpiarHabitacion1 });
 registrarHabitacion('2', { iniciar: iniciarHabitacion2, limpiar: limpiarHabitacion2 });
 
-// --- Generación dinámica de tarjetas ---
+// --- Heroario y Villanario ---
 
-// Genera una tarjeta de personaje o villano con la misma estructura HTML
-function generarTarjeta(nombre, datos, tipo) {
-    // tipo: "personaje" o "villano"
-    // Para personajes, la clase CSS de tarjeta es "personaje-X" (no "jugador-X")
-    let claseTarjeta;
-    if (tipo === 'personaje') {
-        claseTarjeta = tipo + ' ' + datos.clase.replace('jugador-', 'personaje-');
-    } else {
-        claseTarjeta = tipo + ' ' + datos.clase;
-    }
-    const tarjeta = crearElemento('div', claseTarjeta);
-    tarjeta.dataset.nombre = nombre;
-
-    // Avatar con imagen
-    const avatarDiv = crearElemento('div', 'avatar');
-    const img = document.createElement('img');
-    img.src = datos.img;
-    img.alt = nombre;
-    avatarDiv.appendChild(img);
-    tarjeta.appendChild(avatarDiv);
-
-    // Badge de tier (solo villanos)
-    if (tipo === 'villano' && datos.tier && TIERS[datos.tier]) {
-        const tier = TIERS[datos.tier];
-        const badge = crearElemento(
-            'span',
-            'tier-badge tier-' + datos.tier,
-            tier.emoji + ' ' + tier.label
-        );
-        tarjeta.appendChild(badge);
-    }
-
-    // Nombre
-    tarjeta.appendChild(crearElemento('h3', null, nombre));
-
-    // Descripción
-    tarjeta.appendChild(crearElemento('p', 'descripcion', datos.descripcion));
-
-    // Stats completos solo en tarjetas de villanos (personajes los muestran en el modal)
-    if (tipo === 'villano') {
-        tarjeta.appendChild(crearElemento('div', 'stats'));
-        llenarStats(tarjeta, datos);
-    }
-
-    return tarjeta;
-}
-
-// --- Carrusel con flechas ---
-
-function crearCarrusel(contenedor) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'carrusel-wrapper';
-    contenedor.parentNode.insertBefore(wrapper, contenedor);
-    wrapper.appendChild(contenedor);
-
-    const btnIzq = document.createElement('button');
-    btnIzq.className = 'carrusel-btn carrusel-btn-izq';
-    btnIzq.textContent = '\u2039';
-    btnIzq.type = 'button';
-
-    const btnDer = document.createElement('button');
-    btnDer.className = 'carrusel-btn carrusel-btn-der';
-    btnDer.textContent = '\u203A';
-    btnDer.type = 'button';
-
-    wrapper.appendChild(btnIzq);
-    wrapper.appendChild(btnDer);
-
-    function actualizarFlechas() {
-        btnIzq.disabled = contenedor.scrollLeft <= 0;
-        btnDer.disabled =
-            contenedor.scrollLeft >= contenedor.scrollWidth - contenedor.clientWidth - 1;
-    }
-
-    btnIzq.addEventListener('click', function () {
-        contenedor.scrollBy({ left: -220, behavior: 'smooth' });
-    });
-
-    btnDer.addEventListener('click', function () {
-        contenedor.scrollBy({ left: 220, behavior: 'smooth' });
-    });
-
-    contenedor.addEventListener('scroll', actualizarFlechas);
-    // Actualizar al cargar y cuando cambie el tamaño
-    actualizarFlechas();
-    window.addEventListener('resize', actualizarFlechas);
-}
-
-// --- Generar tarjetas dinámicamente ---
-
-// Mezclar un array en orden aleatorio (Fisher-Yates)
-function mezclar(array) {
-    const copia = array.slice();
-    for (let i = copia.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [copia[i], copia[j]] = [copia[j], copia[i]];
-    }
-    return copia;
-}
-
-// Generar tarjetas de personajes (orden aleatorio)
-const contenedorPersonajes = document.querySelector('.personajes');
-contenedorPersonajes.replaceChildren();
-mezclar(Object.keys(PERSONAJES)).forEach(function (nombre) {
-    const tarjeta = generarTarjeta(nombre, PERSONAJES[nombre], 'personaje');
-    contenedorPersonajes.appendChild(tarjeta);
-});
-crearCarrusel(contenedorPersonajes);
-
-// Buscador de héroes
-const subtituloSeleccion = document.querySelector('.subtitulo-seleccion');
-const buscadorHeroes = crearElemento('div', 'buscador-heroes');
-const inputBuscar = document.createElement('input');
-inputBuscar.type = 'text';
-inputBuscar.className = 'buscador-heroes-input';
-inputBuscar.placeholder = 'Buscar héroe...';
-buscadorHeroes.appendChild(inputBuscar);
-subtituloSeleccion.after(buscadorHeroes);
-
-inputBuscar.addEventListener('input', function () {
-    const texto = inputBuscar.value.toLowerCase().trim();
-    contenedorPersonajes.querySelectorAll('.personaje').forEach(function (tarjeta) {
-        const nombre = tarjeta.querySelector('h3').textContent.toLowerCase();
-        tarjeta.style.display = nombre.includes(texto) ? '' : 'none';
-    });
-});
-
-// Libro de villanos (botón flotante + modal)
 const pantallaSeleccion = document.getElementById('seleccion-personaje');
+crearLibroHeroes(pantallaSeleccion);
 crearLibroVillanos(pantallaSeleccion);
-
-// Limpiar sección villanos (el libro ahora flota en esquina)
-const tituloVillanos = document.querySelector('.titulo-villanos');
-if (tituloVillanos) tituloVillanos.remove();
-const contenedorVillanos = document.querySelector('.villanos');
-if (contenedorVillanos) contenedorVillanos.remove();
 
 // --- Estado del juego ---
 
@@ -175,7 +41,6 @@ const estado = {
     estadoActual: ESTADOS.SELECCION, // estado de la máquina de estados
     personajeElegido: null, // nombre del personaje (string)
     jugadorActual: null, // instancia de Personaje
-    indiceFoco: -1, // índice de tarjeta con foco de teclado
     habitacionActual: null, // nombre de la habitación activa
     loopActivo: false, // si el game loop está corriendo
     esperandoSalirDePuerta: false, // flag de espera post-modal puerta
@@ -188,49 +53,6 @@ const movimiento = {
     limiteInferior: 0, // límite inferior del pasillo
     teclas: {}, // teclas presionadas actualmente
 };
-
-// --- Selección de personaje ---
-
-// Consultar tarjetas después de generarlas
-const personajes = document.querySelectorAll('.personaje');
-const tarjetasPersonajes = Array.from(personajes);
-
-// Selecciona un personaje y muestra el botón de empezar sobre la tarjeta
-function seleccionarPersonaje(tarjeta) {
-    // Quitar selección anterior
-    personajes.forEach(function (p) {
-        p.classList.remove('seleccionado');
-    });
-
-    tarjeta.classList.add('seleccionado');
-    estado.personajeElegido = tarjeta.dataset.nombre;
-
-    // Abrir modal con detalle del personaje
-    mostrarModalPersonaje(estado.personajeElegido);
-}
-
-// Mueve el foco del teclado a una tarjeta
-function enfocarPersonaje(indice) {
-    tarjetasPersonajes.forEach(function (p) {
-        p.classList.remove('enfocado');
-    });
-    estado.indiceFoco = indice;
-    if (indice >= 0 && indice < tarjetasPersonajes.length) {
-        tarjetasPersonajes[indice].classList.add('enfocado');
-        tarjetasPersonajes[indice].scrollIntoView({
-            inline: 'center',
-            block: 'nearest',
-            behavior: 'smooth',
-        });
-    }
-}
-
-personajes.forEach(function (personaje, i) {
-    personaje.addEventListener('click', function () {
-        enfocarPersonaje(i);
-        seleccionarPersonaje(personaje);
-    });
-});
 
 // --- Pantalla del pasillo ---
 
@@ -286,123 +108,18 @@ const transicion = crearTransicion();
 const dpad = crearControlesTouch();
 const toast = crearToast();
 
-// --- Modal de detalle de personaje ---
-
-const elModalPersonaje = document.createElement('div');
-elModalPersonaje.id = 'modal-personaje';
-elModalPersonaje.className = 'oculto';
-
-const elModalPersonajeFondo = document.createElement('div');
-elModalPersonajeFondo.className = 'modal-fondo';
-elModalPersonaje.appendChild(elModalPersonajeFondo);
-
-const elModalPersonajeContenido = document.createElement('div');
-elModalPersonajeContenido.className = 'modal-personaje-contenido';
-elModalPersonaje.appendChild(elModalPersonajeContenido);
-
-contenedorJuego.appendChild(elModalPersonaje);
-
-elModalPersonajeFondo.addEventListener('click', cerrarModalPersonaje);
-
-function mostrarModalPersonaje(nombre) {
-    const datos = PERSONAJES[nombre];
-    if (!datos) return;
-
-    const clasePersonaje = datos.clase.replace('jugador-', 'personaje-');
-    elModalPersonajeContenido.className = 'modal-personaje-contenido ' + clasePersonaje;
-    elModalPersonajeContenido.style.setProperty('--p-color', datos.colorHudClaro);
-    elModalPersonajeContenido.replaceChildren();
-
-    // Avatar
-    const avatarDiv = crearElemento('div', 'avatar');
-    const img = document.createElement('img');
-    img.src = datos.img;
-    img.alt = nombre;
-    avatarDiv.appendChild(img);
-    elModalPersonajeContenido.appendChild(avatarDiv);
-
-    // Nombre
-    elModalPersonajeContenido.appendChild(crearElemento('h3', null, nombre));
-
-    // Tabs
-    const tabs = crearElemento('div', 'modal-personaje-tabs');
-    const tabPerfil = crearElemento(
-        'button',
-        'modal-personaje-tab modal-personaje-tab-activo',
-        'Perfil'
-    );
-    tabPerfil.type = 'button';
-    const tabStats = crearElemento('button', 'modal-personaje-tab', 'Habilidades');
-    tabStats.type = 'button';
-    tabs.appendChild(tabPerfil);
-    tabs.appendChild(tabStats);
-    elModalPersonajeContenido.appendChild(tabs);
-
-    // Contenedor de paneles (grid-stack: ambos ocupan la misma celda)
-    const paneles = crearElemento('div', 'modal-personaje-paneles');
-
-    // Panel Perfil (descripción narrativa)
-    const panelPerfil = crearElemento('div', 'modal-personaje-panel modal-personaje-panel-activo');
-    panelPerfil.appendChild(crearElemento('p', 'descripcion modal-personaje-descripcion'));
-    paneles.appendChild(panelPerfil);
-
-    // Panel Habilidades (stats)
-    const panelStats = crearElemento('div', 'modal-personaje-panel');
-    panelStats.appendChild(crearElemento('div', 'stats'));
-    paneles.appendChild(panelStats);
-
-    elModalPersonajeContenido.appendChild(paneles);
-
-    // llenarStats busca .descripcion y .stats dentro del contenedor
-    llenarStats(elModalPersonajeContenido, datos);
-
-    // Lógica de tabs
-    tabPerfil.addEventListener('click', function () {
-        tabPerfil.classList.add('modal-personaje-tab-activo');
-        tabStats.classList.remove('modal-personaje-tab-activo');
-        panelPerfil.classList.add('modal-personaje-panel-activo');
-        panelStats.classList.remove('modal-personaje-panel-activo');
-    });
-    tabStats.addEventListener('click', function () {
-        tabStats.classList.add('modal-personaje-tab-activo');
-        tabPerfil.classList.remove('modal-personaje-tab-activo');
-        panelStats.classList.add('modal-personaje-panel-activo');
-        panelPerfil.classList.remove('modal-personaje-panel-activo');
-    });
-
-    // Botones (siempre visibles, fuera de los paneles)
-    const botones = crearElemento('div', 'modal-personaje-botones');
-
-    const btnEmpezar = crearElemento('button', 'btn-empezar', '¡Empezar!');
-    btnEmpezar.addEventListener('click', function () {
-        elModalPersonaje.classList.add('oculto');
-        iniciarJuego();
-    });
-    botones.appendChild(btnEmpezar);
-
-    const btnVolver = crearElemento('button', 'btn-cerrar-modal', 'Volver');
-    btnVolver.addEventListener('click', cerrarModalPersonaje);
-    botones.appendChild(btnVolver);
-
-    elModalPersonajeContenido.appendChild(botones);
-
-    elModalPersonaje.classList.remove('oculto');
-}
-
-function cerrarModalPersonaje() {
-    elModalPersonaje.classList.add('oculto');
-    personajes.forEach(function (p) {
-        p.classList.remove('seleccionado');
-    });
-    estado.personajeElegido = null;
-}
-
 // Ocultar hint de teclado en dispositivos touch
 const esTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 if (esTouch) {
     const hint = document.getElementById('controles-hint');
     if (hint) hint.style.display = 'none';
 }
+
+// Escuchar selección de héroe desde el Heroario
+document.addEventListener('heroe-seleccionado', function (e) {
+    estado.personajeElegido = e.detail.nombre;
+    iniciarJuego();
+});
 
 // Escuchar cambios de inventario desde las habitaciones
 document.addEventListener('inventario-cambio', function () {
@@ -468,11 +185,6 @@ function ejecutarCambioEstado(anterior, nuevo, datos) {
 
         estado.personajeElegido = null;
         estado.jugadorActual = null;
-        estado.indiceFoco = -1;
-        elModalPersonaje.classList.add('oculto');
-        personajes.forEach(function (p) {
-            p.classList.remove('seleccionado', 'enfocado');
-        });
         Object.keys(movimiento.teclas).forEach(function (k) {
             delete movimiento.teclas[k];
         });
@@ -578,40 +290,11 @@ document.addEventListener('keydown', function (e) {
         return;
     }
 
-    // Navegación con teclado en pantalla de selección
+    // En pantalla de selección, el Heroario maneja sus propias teclas
     if (estado.estadoActual === ESTADOS.SELECCION) {
-        // Si el modal del libro está abierto, no interceptar teclas
+        // Si el modal del libro de villanos está abierto, no interceptar teclas
         const libroModal = document.querySelector('.libro-modal');
         if (libroModal && !libroModal.classList.contains('oculto')) return;
-
-        // Si el modal de personaje está abierto
-        if (!elModalPersonaje.classList.contains('oculto')) {
-            if (e.key === 'Escape') {
-                e.preventDefault();
-                cerrarModalPersonaje();
-            } else if (e.key === 'Enter') {
-                e.preventDefault();
-                elModalPersonaje.classList.add('oculto');
-                iniciarJuego();
-            }
-            return;
-        }
-
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-            e.preventDefault();
-            if (estado.indiceFoco === -1) {
-                enfocarPersonaje(0);
-            } else if (e.key === 'ArrowLeft') {
-                enfocarPersonaje(Math.max(0, estado.indiceFoco - 1));
-            } else {
-                enfocarPersonaje(Math.min(tarjetasPersonajes.length - 1, estado.indiceFoco + 1));
-            }
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (estado.indiceFoco >= 0) {
-                seleccionarPersonaje(tarjetasPersonajes[estado.indiceFoco]);
-            }
-        }
         return;
     }
 
