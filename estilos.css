@@ -4040,6 +4040,22 @@ h1 {
     color: rgb(220 205 180 / 95%);
 }
 
+.libro-intro-link {
+    color: rgb(230 200 160 / 90%);
+    text-decoration: underline;
+    text-decoration-color: rgb(230 200 160 / 30%);
+    text-underline-offset: 3px;
+    cursor: pointer;
+    transition:
+        color 0.2s,
+        text-decoration-color 0.2s;
+}
+
+.libro-intro-link:hover {
+    color: rgb(255 220 170);
+    text-decoration-color: rgb(255 220 170 / 60%);
+}
+
 .libro-intro-cta {
     color: rgb(240 210 150 / 95%) !important;
     font-family: var(--font-display);
@@ -4854,7 +4870,7 @@ h1 {
     max-width: 100%;
 }
 
-/* Back: signo de interrogación (boca abajo) */
+/* Back: ícono de la casa del terror (boca abajo) */
 .memorice-carta-back {
     background: linear-gradient(
         145deg,
@@ -4862,13 +4878,18 @@ h1 {
         var(--hab-pared-medio) 50%,
         var(--hab-pared-oscuro) 100%
     );
-    font-family: var(--font-display);
-    font-size: 2rem;
-    color: var(--hab-accent);
-    text-shadow: 0 0 15px rgb(233 69 96 / 50%);
     box-shadow:
         inset 0 0 20px rgb(0 0 0 / 40%),
         0 2px 8px rgb(0 0 0 / 50%);
+    overflow: hidden;
+}
+
+.memorice-carta-back img {
+    width: 65%;
+    aspect-ratio: 1;
+    object-fit: contain;
+    border-radius: 16px;
+    filter: drop-shadow(0 0 8px rgb(233 69 96 / 40%));
 }
 
 /* Villanos: borde rojo sutil para diferenciar */
@@ -4918,10 +4939,6 @@ h1 {
 
     .memorice-carta-nombre {
         font-size: 0.55rem;
-    }
-
-    .memorice-carta-back {
-        font-size: 1.5rem;
     }
 
     #memorice-indicador {

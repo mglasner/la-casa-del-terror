@@ -107,13 +107,20 @@ function generarIntro() {
             'En el Heroario encontrar\u00e1s a todos los h\u00e9roes disponibles. Cada uno tiene habilidades \u00fanicas para superar los desaf\u00edos que te esperan.'
         )
     );
-    texto.appendChild(
-        crearElemento(
-            'p',
-            null,
-            '\u00bfQuieres conocer a los villanos? Abre el Villanario con el bot\u00f3n m\u00e1gico de abajo a la izquierda.'
-        )
+    const pVillanos = crearElemento('p', null);
+    const linkVillanos = crearElemento(
+        'a',
+        'libro-intro-link',
+        '\u00bfQuieres conocer a los villanos?'
     );
+    linkVillanos.href = '#';
+    linkVillanos.addEventListener('click', function (e) {
+        e.preventDefault();
+        const btn = document.querySelector('.libro-boton');
+        if (btn) btn.click();
+    });
+    pVillanos.appendChild(linkVillanos);
+    texto.appendChild(pVillanos);
     texto.appendChild(
         crearElemento(
             'p',
