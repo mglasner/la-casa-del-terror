@@ -141,6 +141,24 @@ mezclar(Object.keys(PERSONAJES)).forEach(function (nombre) {
 });
 crearCarrusel(contenedorPersonajes);
 
+// Buscador de héroes
+const subtituloSeleccion = document.querySelector('.subtitulo-seleccion');
+const buscadorHeroes = crearElemento('div', 'buscador-heroes');
+const inputBuscar = document.createElement('input');
+inputBuscar.type = 'text';
+inputBuscar.className = 'buscador-heroes-input';
+inputBuscar.placeholder = 'Buscar héroe...';
+buscadorHeroes.appendChild(inputBuscar);
+subtituloSeleccion.after(buscadorHeroes);
+
+inputBuscar.addEventListener('input', function () {
+    const texto = inputBuscar.value.toLowerCase().trim();
+    contenedorPersonajes.querySelectorAll('.personaje').forEach(function (tarjeta) {
+        const nombre = tarjeta.querySelector('h3').textContent.toLowerCase();
+        tarjeta.style.display = nombre.includes(texto) ? '' : 'none';
+    });
+});
+
 // Libro de villanos (botón flotante + modal)
 const pantallaSeleccion = document.getElementById('seleccion-personaje');
 crearLibroVillanos(pantallaSeleccion);

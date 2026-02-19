@@ -142,6 +142,35 @@ h1 {
     letter-spacing: 0.02em;
 }
 
+.buscador-heroes {
+    display: flex;
+    justify-content: center;
+    margin: 14px 0 4px;
+}
+
+.buscador-heroes-input {
+    width: min(240px, 70vw);
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1px solid rgb(255 255 255 / 12%);
+    background: rgb(255 255 255 / 5%);
+    color: var(--color-texto);
+    font-size: 0.85rem;
+    outline: none;
+    transition:
+        border-color 0.25s,
+        box-shadow 0.25s;
+}
+
+.buscador-heroes-input::placeholder {
+    color: rgb(255 255 255 / 30%);
+}
+
+.buscador-heroes-input:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 12px rgb(255 215 0 / 20%);
+}
+
 .personajes {
     display: flex;
     gap: 20px;

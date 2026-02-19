@@ -53,7 +53,9 @@ function generarDetalle(nombre) {
     const panelPerfil = crearElemento('div', 'libro-panel libro-panel-activo');
     panelPerfil.appendChild(crearCabecera(nombre, datos));
     panelPerfil.appendChild(crearElemento('div', 'libro-ornamento'));
-    panelPerfil.appendChild(crearElemento('p', 'descripcion libro-descripcion-grande', datos.descripcion));
+    panelPerfil.appendChild(
+        crearElemento('p', 'descripcion libro-descripcion-grande', datos.descripcion)
+    );
     contenido.appendChild(panelPerfil);
 
     // --- Panel Habilidades ---
@@ -110,7 +112,11 @@ function generarDetalle(nombre) {
             const fila = crearElemento('div', 'ataque');
             fila.appendChild(crearElemento('span', 'ataque-nombre', 'Rango'));
             fila.appendChild(
-                crearElemento('span', 'tier-badge tier-' + datos.tier, tier.emoji + ' ' + tier.label)
+                crearElemento(
+                    'span',
+                    'tier-badge tier-' + datos.tier,
+                    tier.emoji + ' ' + tier.label
+                )
             );
             statAtrib.appendChild(fila);
         }
