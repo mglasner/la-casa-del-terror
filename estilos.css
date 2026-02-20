@@ -4163,8 +4163,9 @@ body:has(.libro-modal:not(.oculto)) .dpad-contenedor {
     --v-tenue: rgb(230 200 160 / 10%);
 }
 
-/* Ocultar botón Empezar en la página de inicio */
-.libro-en-inicio .libro-heroes-empezar {
+/* Ocultar botón Empezar en páginas de inicio y habitaciones */
+.libro-en-inicio .libro-heroes-empezar,
+.libro-en-extra .libro-heroes-empezar {
     display: none;
 }
 
@@ -4929,7 +4930,8 @@ body:has(.libro-modal:not(.oculto)) .dpad-contenedor {
         box-shadow: 0 -4px 12px rgb(0 0 0 / 40%);
     }
 
-    .libro-en-inicio .libro-heroes-empezar {
+    .libro-en-inicio .libro-heroes-empezar,
+    .libro-en-extra .libro-heroes-empezar {
         display: none;
     }
 
