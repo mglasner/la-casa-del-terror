@@ -5,7 +5,7 @@
  * 3. Normaliza tamaño
  * 4. Genera sprite sheet final (strip horizontal PNG con transparencia)
  *
- * Uso: node scripts/procesar-sprites.js
+ * Uso: node scripts/procesar-sprites.cjs
  */
 
 const sharp = require('sharp');
@@ -21,9 +21,14 @@ const FRAME_H = 40;
 
 // Personajes a procesar
 const SHEETS = [
-    { input: 'spritesheet_lina_v1.jpg', output: 'lina.png', name: 'Lina' },
-    { input: 'spritesheet_pandajuro_v1.jpg', output: 'pandajuro.png', name: 'PandaJuro' },
     { input: 'spritesheet_donbu_v3.jpg', output: 'donbu.png', name: 'DonBu' },
+    { input: 'spritesheet_rose_v2.jpg', output: 'rose.png', name: 'Rose' },
+    { input: 'spritesheet_lina_v2.jpg', output: 'lina.png', name: 'Lina' },
+    { input: 'spritesheet_pandajuro_v2.jpg', output: 'pandajuro.png', name: 'Pandajuro' },
+    { input: 'spritesheet_hana_v1.jpg', output: 'hana.png', name: 'Hana' },
+    { input: 'spritesheet_kira_v1.jpg', output: 'kira.png', name: 'Kira' },
+    { input: 'spritesheet_pompom_v1.jpg', output: 'pompom.png', name: 'Pompom' },
+    { input: 'spritesheet_orejas_v1.jpg', output: 'orejas.png', name: 'Orejas' },
 ];
 
 // --- Utilidades ---
@@ -79,14 +84,12 @@ async function procesarSheet(config) {
     }
 
     // 3. Histograma horizontal (por columna) y vertical (por fila)
-    const histX = new Uint32Array(width); // non-transparent pixels per column
     const histY = new Uint32Array(height); // non-transparent pixels per row
 
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
             const idx = (y * width + x) * 4;
             if (pixels[idx + 3] > 0) {
-                histX[x]++;
                 histY[y]++;
             }
         }

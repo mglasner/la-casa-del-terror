@@ -20,17 +20,37 @@ const FRAME_H = 40;
 // Mapeo: indices de frames detectados → orden final en el strip
 // Usar numero para frame normal, { idx, flip: true } para espejo horizontal
 const PERSONAJES = {
+    donbu: {
+        // idle(2) + run(6) + jump + fall + hit + atk1(2) + atk2(2) = 15
+        frames: [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15],
+    },
+    rose: {
+        // 15 frames limpios, mapeo directo
+        frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+    },
+    hana: {
+        // 15 frames limpios, mapeo directo
+        frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+    },
+    kira: {
+        // skip frame 14 (efecto disparo suelto) y 16 (1px ruido)
+        frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15],
+    },
+    pompom: {
+        // 15 frames limpios, mapeo directo
+        frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+    },
+    orejas: {
+        // skip frame 1 (1px ruido), 16 (zanahoria suelta), 17 (1px ruido)
+        frames: [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+    },
     lina: {
-        // idle(2) + run(4) + jump + fall + hit = 9
-        frames: [0, 1, 2, 3, 4, 5, 7, 8, 9],
+        // 16 detectados (6 en fila 1), skip frame 8 (run redundante)
+        frames: [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15],
     },
     pandajuro: {
-        // idle(2) + run(4) + jump + fall + hit = 9
-        frames: [0, 1, 2, 3, 4, 7, 8, 9, 10],
-    },
-    donbu: {
-        // idle(2) + run(6 con alternancia) + jump + fall + hit + atk1(2) + atk2(2) = 15
-        frames: [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15],
+        // 58 detectados, solo frames grandes; skip frame 47 (run redundante)
+        frames: [6, 13, 18, 23, 29, 33, 40, 42, 48, 49, 50, 51, 52, 55, 56],
     },
 };
 

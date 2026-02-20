@@ -2,7 +2,7 @@
 // Carga sprite sheets PNG (generados con IA) y los parte en frames.
 // Fallback: genera sprites procedurales si no hay sprite sheet disponible.
 //
-// Layout del strip: [idle0, idle1, run0, run1, run2, run3, jump, fall, hit]
+// Layout del strip (15 frames): [idle×2, run×6, jump, fall, hit, atk1×2, atk2×2]
 // Cada frame mide FRAME_W x FRAME_H pixeles.
 
 // --- Constantes ---
@@ -34,9 +34,14 @@ const LAYOUTS = {
 
 // Personajes con sprite sheet disponible (nombre en minusculas → archivo y layout)
 const SPRITE_SHEETS = {
-    lina: { src: 'assets/img/sprites-plat/lina.png', frames: 9 },
-    pandajuro: { src: 'assets/img/sprites-plat/pandajuro.png', frames: 9 },
     donbu: { src: 'assets/img/sprites-plat/donbu.png', frames: 15 },
+    hana: { src: 'assets/img/sprites-plat/hana.png', frames: 15 },
+    kira: { src: 'assets/img/sprites-plat/kira.png', frames: 15 },
+    pompom: { src: 'assets/img/sprites-plat/pompom.png', frames: 15 },
+    orejas: { src: 'assets/img/sprites-plat/orejas.png', frames: 15 },
+    rosé: { src: 'assets/img/sprites-plat/rose.png', frames: 15 },
+    lina: { src: 'assets/img/sprites-plat/lina.png', frames: 15 },
+    pandajuro: { src: 'assets/img/sprites-plat/pandajuro.png', frames: 15 },
 };
 
 // --- Estado ---
