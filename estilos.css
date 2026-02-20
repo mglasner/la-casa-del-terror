@@ -3755,9 +3755,9 @@ body:has(.libro-modal:not(.oculto)) .dpad-contenedor {
 }
 
 .libro-indice-activo {
-    background-color: var(--v-tenue, rgb(255 215 0 / 10%));
-    color: var(--v-color, var(--color-dorado));
-    border-left-color: var(--v-color, var(--color-dorado));
+    background-color: rgb(255 215 0 / 10%);
+    color: var(--color-dorado);
+    border-left-color: var(--color-dorado);
     font-weight: bold;
 }
 
@@ -4928,8 +4928,8 @@ body:has(.libro-modal:not(.oculto)) .dpad-contenedor {
 
     .libro-seccion-tab-activo {
         background: rgb(255 215 0 / 12%);
-        border-color: var(--v-color, var(--color-dorado));
-        color: var(--v-color, var(--color-dorado));
+        border-color: var(--color-dorado);
+        color: var(--color-dorado);
     }
 
     .libro-pagina-izq {
@@ -4946,7 +4946,7 @@ body:has(.libro-modal:not(.oculto)) .dpad-contenedor {
     .libro-scroll-hint {
         display: block;
         flex-shrink: 0;
-        color: var(--v-color, var(--color-dorado));
+        color: var(--color-dorado);
         font-size: 0.85rem;
         line-height: 1;
         padding: 4px 0;
@@ -5024,7 +5024,7 @@ body:has(.libro-modal:not(.oculto)) .dpad-contenedor {
 
     .libro-indice-activo {
         border-left-color: transparent;
-        border-bottom-color: var(--v-color, var(--color-accent));
+        border-bottom-color: var(--color-dorado);
     }
 
     /* Ocultar separadores y labels de sección (reemplazados por section tabs) */

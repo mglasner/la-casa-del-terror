@@ -379,15 +379,21 @@ export function crearLibro(opciones) {
                 listaIndice.style.visibility = 'hidden';
                 hintsActivos = false;
                 actualizarScrollHints();
-                if (itemsVisibles.length === 1) {
-                    const idx = parseInt(itemsVisibles[0].dataset.indice, 10);
-                    if (idx !== indiceActual) navegarA(idx);
-                }
             } else {
                 listaIndice.style.visibility = '';
                 listaIndice.scrollLeft = 0;
                 hintsActivos = true;
                 actualizarScrollHints();
+            }
+
+            // Navegar al primer item de la sección si la página actual no pertenece a ella
+            if (itemsVisibles.length > 0) {
+                const idxPrimero = parseInt(itemsVisibles[0].dataset.indice, 10);
+                const itemActual = listaIndice.querySelector(
+                    '.libro-indice-item[data-indice="' + indiceActual + '"]'
+                );
+                const enSeccion = itemActual && itemActual.dataset.seccion === seccionId;
+                if (!enSeccion && idxPrimero !== indiceActual) navegarA(idxPrimero);
             }
         }
     }
