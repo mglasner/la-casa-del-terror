@@ -148,3 +148,4 @@ Incrementar `CACHE_NAME` en `sw.js` para invalidar el cache en actualizaciones.
 - **Componentes**: Módulos JS que crean su propio HTML con DOM API, exportan una función `crear*(contenedor)` que retorna un objeto con métodos (mostrar, ocultar, actualizar, etc.)
 - **Habitaciones**: Módulos autocontenidos que crean/destruyen su pantalla al entrar/salir. Se comunican con juego.js mediante callbacks y eventos custom (`document.dispatchEvent`)
 - **Heroario ↔ Habitaciones**: El Heroario (`js/componentes/libroHeroes.js`) contiene descripciones de cada habitación en `HABITACIONES_HEROARIO`. Al modificar la mecánica o contenido de una habitación, verificar que las descripciones del Heroario sigan siendo consistentes
+- **Revisión pre-commit**: Después de escribir o refactorizar código, ejecutar primero los linters (`npm run lint:fix && npm run lint:css:fix && npm run format`) y luego la skill `/review-code` antes de hacer commit
