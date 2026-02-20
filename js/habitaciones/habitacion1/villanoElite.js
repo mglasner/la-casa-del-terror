@@ -211,6 +211,8 @@ export function actualizarVillanoElite() {
 
 // Si el villano toca al jugador, ataca con uno de sus ataques
 function detectarColisionElite() {
+    if (!est.activo) return;
+
     const ahora = Date.now();
     const cooldown = CONFIG.COOLDOWN_BASE / est.villanoElite.datos.velAtaque;
     if (ahora - est.villanoElite.ultimoGolpe < cooldown) return;

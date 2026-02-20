@@ -64,6 +64,8 @@ export function actualizarTrampas() {
 
 // Detecta si el jugador está sobre una trampa activa y aplica daño
 export function detectarTrampas() {
+    if (!est.activo) return;
+
     const celda = getCeldaJugador();
     const ahora = Date.now();
 
@@ -167,6 +169,7 @@ export function actualizarTrampasLentas() {
 
 // Detecta si el jugador pisa una trampa de lentitud activa
 export function detectarTrampasLentas() {
+    if (!est.activo) return;
     if (est.velocidadActual < est.velocidadBase) return;
 
     const celda = getCeldaJugador();

@@ -222,7 +222,7 @@ function detectarSalida() {
 // --- Game loop ---
 
 function loop(ahora) {
-    if (!activo) return;
+    if (!activo || !jugador.estaVivo()) return;
 
     // Medición de rendimiento para fallback de texturas
     if (ultimoFrame > 0 && frameCount > CFG.rendimiento.warmupFrames) {

@@ -57,6 +57,8 @@ function esTrampaActiva(trampa) {
 // Detecta si el jugador pisa una trampa activa y aplica daño
 // Retorna el daño aplicado (0 si no hubo)
 export function detectarTrampas3D(jugadorX, jugadorY, jugador) {
+    if (!jugador.estaVivo()) return 0;
+
     const celdaX = Math.floor(jugadorX);
     const celdaY = Math.floor(jugadorY);
     const ahora = Date.now();
