@@ -4536,15 +4536,21 @@ body:has(.libro-modal:not(.oculto)) .dpad-contenedor {
     animation: modal-aparecer 0.3s ease;
     height: calc(100dvh - 64px);
     max-width: min(700px, calc(100vw - 40px));
+    width: 100%;
     overflow: hidden;
     border-radius: 10px;
+    border: 2px solid rgb(255 215 0 / 25%);
     display: flex;
     flex-direction: column;
 }
 
-.libro-modal-cuerpo .libro-villanos {
+.libro-modal-cuerpo .libro-villanos,
+.libro-modal-cuerpo .libro-heroes {
+    border: none;
+    border-radius: 0;
     flex: 1;
     height: auto;
+    max-height: none;
     min-height: 0;
 }
 
@@ -4602,12 +4608,6 @@ body:has(.libro-modal:not(.oculto)) .dpad-contenedor {
 
 .libros-pasillo-boton .libro-boton-texto {
     font-size: 0.6rem;
-}
-
-.libro-modal-cuerpo .libro-heroes {
-    flex: 1;
-    height: auto;
-    min-height: 0;
 }
 
 /* ============================================================
@@ -5209,10 +5209,6 @@ body:has(.libro-modal:not(.oculto)) .dpad-contenedor {
 
     .deco-cuadro {
         display: none;
-    }
-
-    .libro-villanos {
-        max-height: calc(78vh - 20px);
     }
 
     .libro-detalle-contenido .avatar img {
