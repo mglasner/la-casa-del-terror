@@ -3,13 +3,7 @@
 // stomper esbirros, derrotar al boss y conseguir la llave
 
 import { CFG } from './config.js';
-import {
-    obtenerSpawns,
-    resetearMapa,
-    obtenerTile,
-    obtenerFilas,
-    obtenerColumnas,
-} from './nivel.js';
+import { obtenerSpawns, resetearMapa, obtenerFilas, obtenerColumnas } from './nivel.js';
 import { crearPantalla, actualizarHUDBoss, ocultarHUDBoss, limpiarDOM } from './domPlat.js';
 import {
     iniciarCamara,
@@ -89,11 +83,10 @@ let altoCanvas = CFG.canvas.altoBase;
 let muerto = false;
 let timeoutIds = [];
 
-// Filas de abismo precomputadas para emision de particulas
+// Filas del subsuelo para emision de particulas (desacoplado del tile ABISMO)
 let filaNiebla = -1;
 let filaOjos = -1;
 
-const T = CFG.tiles.tipos;
 const TAM = CFG.tiles.tamano;
 
 // --- Crear DOM (delegado a domPlat.js) ---
@@ -231,24 +224,22 @@ function emitirParticulasAmbientales(camaraX) {
     const frameNum = obtenerFrameCount();
     const cols = obtenerColumnas();
 
-    // Niebla del abismo: cada 5 frames, emitir en tiles visibles tipo ABISMO
+    // Niebla del abismo: cada 5 frames, emitir a lo largo del subsuelo
     if (frameNum % 5 === 0 && filaNiebla >= 0) {
-        const colInicio = Math.max(0, Math.floor(camaraX / TAM));
-        const colFin = Math.min(cols, Math.ceil((camaraX + anchoCanvas) / TAM));
+        const colInicio = Math.max(1, Math.floor(camaraX / TAM));
+        const colFin = Math.min(cols - 1, Math.ceil((camaraX + anchoCanvas) / TAM));
 
         for (let col = colInicio; col < colFin; col += 3) {
-            if (obtenerTile(filaNiebla, col) === T.ABISMO) {
-                emitirNieblaAbismo(col * TAM, filaNiebla * TAM);
-            }
+            emitirNieblaAbismo(col * TAM, filaNiebla * TAM);
         }
     }
 
     // Ojos en la oscuridad: cada ~120 frames
     if (frameNum % 120 === 0 && filaOjos >= 0) {
-        const colInicio = Math.max(0, Math.floor(camaraX / TAM));
-        const colFin = Math.min(cols, Math.ceil((camaraX + anchoCanvas) / TAM));
+        const colInicio = Math.max(1, Math.floor(camaraX / TAM));
+        const colFin = Math.min(cols - 1, Math.ceil((camaraX + anchoCanvas) / TAM));
         for (let col = colInicio; col < colFin; col += 5) {
-            if (obtenerTile(filaOjos, col) === T.ABISMO && Math.random() < 0.3) {
+            if (Math.random() < 0.3) {
                 emitirOjosAbismo(col * TAM, filaOjos * TAM);
                 break;
             }
@@ -399,26 +390,10 @@ export function iniciarHabitacion4(jugadorRef, callback, dpadRef) {
     // Obtener spawns
     const spawns = obtenerSpawns();
 
-    // Precomputar filas de abismo para particulas
-    filaNiebla = -1;
-    filaOjos = -1;
+    // Filas del subsuelo para particulas (las 2 ultimas filas interiores)
     const totalFilas = obtenerFilas();
-    for (let fila = 0; fila < totalFilas; fila++) {
-        let tieneAbismo = false;
-        for (let col = 0; col < obtenerColumnas(); col++) {
-            if (obtenerTile(fila, col) === T.ABISMO) {
-                tieneAbismo = true;
-                break;
-            }
-        }
-        if (tieneAbismo) {
-            if (filaNiebla < 0) filaNiebla = fila;
-            else if (filaOjos < 0) {
-                filaOjos = fila;
-                break;
-            }
-        }
-    }
+    filaNiebla = totalFilas - 2;
+    filaOjos = totalFilas - 1;
 
     // Crear pantalla
     iniciarDOM(!!dpadRef);

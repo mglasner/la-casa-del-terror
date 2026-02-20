@@ -69,14 +69,26 @@ export function renderizarTiles(ctx, camaraX, anchoCanvas, altoCanvas, bossVivo,
                     ctx.fillRect(px, py, TAM, TAM);
                 }
             } else if (tipo === T.ABISMO) {
-                // Fuego animado: frame temporal + offset espacial para variacion
-                const fireFrame = (Math.floor(tiempo / 150) + hashVariante(fila, col)) % 4;
+                // Fuego animado: ciclo rapido + offset espacial
+                const fireFrame = Math.floor(tiempo / 100) + hashVariante(fila, col);
                 const tex = obtenerTextura('ABISMO', fireFrame);
                 if (tex) {
                     ctx.drawImage(tex, px, py);
                 } else {
                     ctx.fillStyle = '#c03c0a';
                     ctx.fillRect(px, py, TAM, TAM);
+                }
+
+                // Resplandor hacia arriba (solo desde la primera fila de fuego)
+                const tipoArriba = obtenerTile(fila - 1, col);
+                if (tipoArriba !== T.ABISMO) {
+                    const pulso = 0.2 + Math.sin(tiempo * 0.005 + col) * 0.06;
+                    const glowGrad = ctx.createLinearGradient(px, py, px, py - TAM * 2);
+                    glowGrad.addColorStop(0, 'rgba(255,100,20,' + pulso.toFixed(2) + ')');
+                    glowGrad.addColorStop(0.5, 'rgba(255,60,10,' + (pulso * 0.3).toFixed(2) + ')');
+                    glowGrad.addColorStop(1, 'rgba(255,30,5,0)');
+                    ctx.fillStyle = glowGrad;
+                    ctx.fillRect(px, py - TAM * 2, TAM, TAM * 2);
                 }
             } else if (tipo === T.META) {
                 if (!bossVivo) {
