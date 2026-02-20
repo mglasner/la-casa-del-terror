@@ -47,6 +47,13 @@ export const CFG = {
         colorBoss: '#bb86fc',
         colorMeta: '#6bfc86',
     },
+    camara: {
+        shakeDecay: 0.9,
+    },
+    sprites: {
+        jugadorIdleVel: 30, // frames entre cada frame de idle
+        jugadorCorrerVel: 6, // frames entre cada frame de correr
+    },
     meta: {
         titulo: 'Habitacion 4 — El Abismo',
         itemInventario: 'llave-habitacion-5',

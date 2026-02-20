@@ -1,12 +1,14 @@
-// Habitación 4 — El Abismo: Jugador platformer
+// Habitacion 4 — El Abismo: Jugador platformer
 // Estados: idle, correr, saltar, caer, golpeado
 
 import { CFG } from './config.js';
 import { resolverColisionX, resolverColisionY, esAbismo, esMeta } from './fisicas.js';
 import { obtenerSpawnJugador } from './nivel.js';
+import { obtenerSpriteJugador } from './spritesPlat.js';
 
 const FIS = CFG.fisicas;
 const TAM = CFG.tiles.tamano;
+const SPR = CFG.sprites;
 
 // Estado del jugador platformer
 let x = 0;
@@ -27,6 +29,12 @@ let respawnY = 0;
 let jugadorRef = null;
 let teclasRef = {};
 
+// Estado de animacion
+let estado = 'idle'; // idle, correr, saltar, caer, golpeado
+let frameAnim = 0;
+let contadorAnim = 0;
+let estabaSuelo = false; // para detectar aterrizaje
+
 export function iniciarJugador(jugador, teclas) {
     jugadorRef = jugador;
     teclasRef = teclas;
@@ -45,10 +53,16 @@ export function iniciarJugador(jugador, teclas) {
     knockbackVx = 0;
     respawnX = x;
     respawnY = y;
+    estado = 'idle';
+    frameAnim = 0;
+    contadorAnim = 0;
+    estabaSuelo = true;
 }
 
 export function actualizarJugador() {
     if (!jugadorRef) return;
+
+    const anteriorEnSuelo = estaEnSuelo;
 
     // Input horizontal
     let inputX = 0;
@@ -64,13 +78,13 @@ export function actualizarJugador() {
         vx = inputX * FIS.velocidadJugador;
     }
 
-    // Dirección visual
+    // Direccion visual
     if (inputX !== 0) direccion = inputX;
 
-    // Resolver colisión X
+    // Resolver colision X
     x = resolverColisionX(x, y, ANCHO, ALTO, vx);
 
-    // Jump buffer: recordar intención de saltar
+    // Jump buffer: recordar intencion de saltar
     if (teclasRef['ArrowUp']) {
         jumpBufferFrames = FIS.jumpBuffer;
     } else if (jumpBufferFrames > 0) {
@@ -95,13 +109,13 @@ export function actualizarJugador() {
     vy += FIS.gravedad;
     if (vy > FIS.velocidadMaxCaida) vy = FIS.velocidadMaxCaida;
 
-    // Resolver colisión Y
+    // Resolver colision Y
     const resY = resolverColisionY(x, y, ANCHO, ALTO, vy);
     y = resY.y;
     vy = resY.vy;
     estaEnSuelo = resY.enSuelo;
 
-    // Actualizar último punto seguro en suelo
+    // Actualizar ultimo punto seguro en suelo
     if (estaEnSuelo && !detectarAbismo()) {
         respawnX = x;
         respawnY = y;
@@ -109,10 +123,43 @@ export function actualizarJugador() {
 
     // Invulnerabilidad
     if (invulFrames > 0) invulFrames--;
+
+    // Detectar aterrizaje (transicion aire→suelo)
+    estabaSuelo = anteriorEnSuelo;
+
+    // Actualizar estado de animacion
+    actualizarEstado(inputX);
+}
+
+function actualizarEstado(inputX) {
+    let nuevoEstado = 'idle';
+
+    if (invulFrames > 0 && knockbackVx !== 0) {
+        nuevoEstado = 'golpeado';
+    } else if (!estaEnSuelo && vy < 0) {
+        nuevoEstado = 'saltar';
+    } else if (!estaEnSuelo && vy >= 0) {
+        nuevoEstado = 'caer';
+    } else if (inputX !== 0) {
+        nuevoEstado = 'correr';
+    }
+
+    if (nuevoEstado !== estado) {
+        estado = nuevoEstado;
+        frameAnim = 0;
+        contadorAnim = 0;
+    } else {
+        contadorAnim++;
+        const vel = estado === 'correr' ? SPR.jugadorCorrerVel : SPR.jugadorIdleVel;
+        if (contadorAnim >= vel) {
+            contadorAnim = 0;
+            frameAnim++;
+        }
+    }
 }
 
 export function detectarAbismo() {
-    // Verificar si el centro inferior del jugador está en abismo
+    // Verificar si el centro inferior del jugador esta en abismo
     const centroX = x + ANCHO / 2;
     const pieY = y + ALTO + 2;
     return esAbismo(centroX, pieY);
@@ -125,7 +172,7 @@ export function detectarMetaTile() {
     return esMeta(centroX, centroY);
 }
 
-// Se llama solo cuando el jugador ya cayó debajo del nivel (verificado por el caller)
+// Se llama solo cuando el jugador ya cayo debajo del nivel (verificado por el caller)
 export function caerAlAbismo() {
     if (!jugadorRef || invulFrames > 0) return false;
 
@@ -137,7 +184,7 @@ export function caerAlAbismo() {
         return true;
     }
 
-    // Respawn en último punto seguro
+    // Respawn en ultimo punto seguro
     x = respawnX;
     y = respawnY;
     vy = 0;
@@ -153,7 +200,7 @@ export function recibirDano(dano, desdeX) {
     jugadorRef.recibirDano(dano);
     document.dispatchEvent(new Event('vida-cambio'));
 
-    // Knockback alejándose del origen del daño
+    // Knockback alejandose del origen del dano
     const dirKnock = desdeX < x ? 1 : -1;
     knockbackVx = FIS.knockbackX * dirKnock;
     vy = FIS.knockbackY;
@@ -176,43 +223,68 @@ export function renderizarJugador(ctx, camaraX) {
     // Parpadeo de invulnerabilidad
     if (invulFrames > 0 && Math.floor(invulFrames / 4) % 2 === 0) return;
 
-    const px = Math.round(x - camaraX);
-    const py = Math.round(y);
+    const drawX = Math.round(x - camaraX);
+    const drawY = Math.round(y);
 
-    // Cuerpo
-    ctx.fillStyle = colorJugador;
-    ctx.fillRect(px, py, ANCHO, ALTO);
-
-    // Borde más claro arriba
-    ctx.fillStyle = 'rgba(255,255,255,0.2)';
-    ctx.fillRect(px, py, ANCHO, 2);
-
-    // Ojos
-    const ojoY = py + 4;
-    ctx.fillStyle = '#fff';
-    if (direccion > 0) {
-        ctx.fillRect(px + 6, ojoY, 3, 3);
-        ctx.fillRect(px + 10, ojoY, 2, 2);
-    } else {
-        ctx.fillRect(px + 3, ojoY, 3, 3);
-        ctx.fillRect(px, ojoY, 2, 2);
+    // Intentar usar sprite
+    const sprite = obtenerSpriteJugador(estado, frameAnim);
+    if (sprite) {
+        ctx.save();
+        if (direccion < 0) {
+            // Flip horizontal
+            ctx.translate(drawX + ANCHO, drawY);
+            ctx.scale(-1, 1);
+            ctx.drawImage(sprite, 0, 0);
+        } else {
+            ctx.drawImage(sprite, drawX, drawY);
+        }
+        ctx.restore();
+        return;
     }
 
-    // Pupilas
+    // Fallback: renderizado basico
+    ctx.fillStyle = colorJugador;
+    ctx.fillRect(drawX, drawY, ANCHO, ALTO);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.fillRect(drawX, drawY, ANCHO, 2);
+
+    const ojoY = drawY + 4;
+    ctx.fillStyle = '#fff';
+    if (direccion > 0) {
+        ctx.fillRect(drawX + 6, ojoY, 3, 3);
+        ctx.fillRect(drawX + 10, ojoY, 2, 2);
+    } else {
+        ctx.fillRect(drawX + 3, ojoY, 3, 3);
+        ctx.fillRect(drawX, ojoY, 2, 2);
+    }
+
     ctx.fillStyle = '#111';
     if (direccion > 0) {
-        ctx.fillRect(px + 8, ojoY + 1, 1, 1);
-        ctx.fillRect(px + 11, ojoY + 1, 1, 1);
+        ctx.fillRect(drawX + 8, ojoY + 1, 1, 1);
+        ctx.fillRect(drawX + 11, ojoY + 1, 1, 1);
     } else {
-        ctx.fillRect(px + 4, ojoY + 1, 1, 1);
-        ctx.fillRect(px + 1, ojoY + 1, 1, 1);
+        ctx.fillRect(drawX + 4, ojoY + 1, 1, 1);
+        ctx.fillRect(drawX + 1, ojoY + 1, 1, 1);
     }
 }
 
 export function obtenerPosicion() {
-    return { x, y, ancho: ANCHO, alto: ALTO, vy, estaEnSuelo };
+    return { x, y, ancho: ANCHO, alto: ALTO, vy, vx, estaEnSuelo, direccion };
 }
 
 export function esInvulnerable() {
     return invulFrames > 0;
+}
+
+export function acabaDeAterrizar() {
+    return estaEnSuelo && !estabaSuelo;
+}
+
+export function obtenerEstado() {
+    return estado;
+}
+
+export function obtenerColor() {
+    return colorJugador;
 }

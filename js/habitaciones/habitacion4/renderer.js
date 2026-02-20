@@ -1,18 +1,42 @@
-// Habitación 4 — El Abismo: Renderizado de tiles, fondo y HUD
+// Habitacion 4 — El Abismo: Renderizado con texturas, parallax, vineta y HUD mejorado
 
 import { CFG } from './config.js';
 import { obtenerTile, obtenerFilas, obtenerColumnas } from './nivel.js';
+import { obtenerTextura, hashVariante } from './texturasTiles.js';
 
 const T = CFG.tiles.tipos;
 const TAM = CFG.tiles.tamano;
 const COL = CFG.render;
 
-export function renderizarFondo(ctx, anchoCanvas, altoCanvas) {
-    ctx.fillStyle = COL.colorCielo;
-    ctx.fillRect(0, 0, anchoCanvas, altoCanvas);
+// Vineta: offscreen canvas generado una vez
+let vinetaCanvas = null;
+
+function generarVineta(ancho, alto) {
+    const c = document.createElement('canvas');
+    c.width = ancho;
+    c.height = alto;
+    const ctx = c.getContext('2d');
+
+    const grad = ctx.createRadialGradient(
+        ancho / 2,
+        alto / 2,
+        Math.min(ancho, alto) * 0.35,
+        ancho / 2,
+        alto / 2,
+        Math.max(ancho, alto) * 0.7
+    );
+    grad.addColorStop(0, 'rgba(0,0,0,0)');
+    grad.addColorStop(1, 'rgba(0,0,0,0.4)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, ancho, alto);
+    return c;
 }
 
-export function renderizarTiles(ctx, camaraX, anchoCanvas, altoCanvas, bossVivo) {
+export function iniciarRenderer(ancho, alto) {
+    vinetaCanvas = generarVineta(ancho, alto);
+}
+
+export function renderizarTiles(ctx, camaraX, anchoCanvas, altoCanvas, bossVivo, tiempo) {
     const filas = obtenerFilas();
     const cols = obtenerColumnas();
 
@@ -27,35 +51,95 @@ export function renderizarTiles(ctx, camaraX, anchoCanvas, altoCanvas, bossVivo)
             const py = fila * TAM;
 
             if (tipo === T.SUELO) {
-                ctx.fillStyle = COL.colorSuelo;
-                ctx.fillRect(px, py, TAM, TAM);
-                // Highlight superior para profundidad
-                ctx.fillStyle = 'rgba(255,255,255,0.08)';
-                ctx.fillRect(px, py, TAM, 1);
+                const variante = hashVariante(fila, col);
+                const tex = obtenerTextura('SUELO', variante);
+                if (tex) {
+                    ctx.drawImage(tex, px, py);
+                } else {
+                    ctx.fillStyle = COL.colorSuelo;
+                    ctx.fillRect(px, py, TAM, TAM);
+                }
             } else if (tipo === T.PLATAFORMA) {
-                ctx.fillStyle = COL.colorPlataforma;
-                ctx.fillRect(px, py, TAM, TAM);
-                ctx.fillStyle = 'rgba(255,255,255,0.12)';
-                ctx.fillRect(px, py, TAM, 1);
+                const variante = hashVariante(fila, col);
+                const tex = obtenerTextura('PLATAFORMA', variante);
+                if (tex) {
+                    ctx.drawImage(tex, px, py);
+                } else {
+                    ctx.fillStyle = COL.colorPlataforma;
+                    ctx.fillRect(px, py, TAM, TAM);
+                }
             } else if (tipo === T.ABISMO) {
-                ctx.fillStyle = COL.colorAbismo;
-                ctx.fillRect(px, py, TAM, TAM);
+                const variante = hashVariante(fila, col);
+                const tex = obtenerTextura('ABISMO', variante);
+                if (tex) {
+                    ctx.drawImage(tex, px, py);
+                } else {
+                    ctx.fillStyle = COL.colorAbismo;
+                    ctx.fillRect(px, py, TAM, TAM);
+                }
             } else if (tipo === T.META) {
-                // META solo visible si boss derrotado
                 if (!bossVivo) {
-                    ctx.fillStyle = COL.colorMeta;
-                    ctx.fillRect(px, py, TAM, TAM);
-                    // Brillo pulsante
-                    const brillo = 0.3 + Math.sin(Date.now() / 200) * 0.2;
-                    ctx.fillStyle = 'rgba(107,252,134,' + brillo + ')';
-                    ctx.fillRect(px, py, TAM, TAM);
+                    renderizarPortalMeta(ctx, px, py, tiempo);
                 }
             }
         }
     }
 }
 
-export function renderizarHUD(ctx, anchoCanvas, bossVivo) {
+// Portal META animado con vortice y glow
+function renderizarPortalMeta(ctx, px, py, tiempo) {
+    const cx = px + TAM / 2;
+    const cy = py + TAM / 2;
+    const t = tiempo * 0.004;
+
+    // Glow exterior
+    const glowRadius = TAM * 0.8;
+    const glowAlpha = 0.15 + Math.sin(t) * 0.08;
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowRadius);
+    grad.addColorStop(0, 'rgba(107,252,134,' + glowAlpha.toFixed(2) + ')');
+    grad.addColorStop(0.6, 'rgba(107,252,134,' + (glowAlpha * 0.4).toFixed(2) + ')');
+    grad.addColorStop(1, 'rgba(107,252,134,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(cx - glowRadius, cy - glowRadius, glowRadius * 2, glowRadius * 2);
+
+    // Vortice: anillos concentricos rotando
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 3; i++) {
+        const radio = 3 + i * 2;
+        const angulo = t * (2 - i * 0.5) + i * 2.1;
+        const alpha = 0.3 - i * 0.08;
+        ctx.strokeStyle = 'rgba(107,252,134,' + alpha.toFixed(2) + ')';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radio, angulo, angulo + Math.PI * 1.2);
+        ctx.stroke();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.restore();
+
+    // Simbolo de llave en el centro
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(cx - 1, cy - 2, 2, 4);
+    ctx.fillRect(cx, cy - 3, 1, 1);
+    ctx.fillRect(cx - 1, cy + 1, 1, 1);
+}
+
+export function renderizarVineta(ctx) {
+    if (vinetaCanvas) {
+        ctx.drawImage(vinetaCanvas, 0, 0);
+    }
+}
+
+export function renderizarFlash(ctx, anchoCanvas, altoCanvas, flashAlpha) {
+    if (flashAlpha > 0.01) {
+        ctx.fillStyle = 'rgba(255,255,255,' + flashAlpha.toFixed(2) + ')';
+        ctx.fillRect(0, 0, anchoCanvas, altoCanvas);
+    }
+}
+
+// HUD mejorado
+export function renderizarHUD(ctx, anchoCanvas, altoCanvas, bossVivo, bossInfo) {
     // Barra semitransparente superior
     ctx.fillStyle = 'rgba(0,0,0,0.5)';
     ctx.fillRect(0, 0, anchoCanvas, 16);
@@ -69,4 +153,74 @@ export function renderizarHUD(ctx, anchoCanvas, bossVivo) {
         : '¡Boss derrotado! Busca la salida';
     ctx.fillText(texto, 4, 11);
     ctx.textAlign = 'start';
+
+    // Barra de vida del boss centrada en la parte inferior
+    if (bossVivo && bossInfo) {
+        renderizarHUDBoss(ctx, anchoCanvas, altoCanvas, bossInfo);
+    }
+}
+
+function renderizarHUDBoss(ctx, anchoCanvas, altoCanvas, info) {
+    const barraAncho = 120;
+    const barraAlto = 6;
+    const barraX = (anchoCanvas - barraAncho) / 2;
+    const barraY = altoCanvas - 12;
+    const ratio = info.vidaActual / info.vidaMax;
+
+    // Fondo decorado
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(barraX - 2, barraY - 2, barraAncho + 4, barraAlto + 4);
+
+    // Borde
+    ctx.strokeStyle = 'rgba(187,134,252,0.5)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(barraX - 2.5, barraY - 2.5, barraAncho + 5, barraAlto + 5);
+
+    // Vida
+    const colorVida = ratio > 0.33 ? '#bb86fc' : '#e94560';
+    ctx.fillStyle = colorVida;
+    ctx.fillRect(barraX, barraY, Math.round(barraAncho * ratio), barraAlto);
+
+    // Brillo en la barra
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.fillRect(barraX, barraY, Math.round(barraAncho * ratio), 2);
+
+    // Nombre del boss centrado arriba de la barra
+    ctx.fillStyle = '#fff';
+    ctx.font = '8px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(info.nombre, anchoCanvas / 2, barraY - 5);
+    ctx.textAlign = 'start';
+}
+
+// Indicador de direccion del boss fuera de pantalla
+export function renderizarIndicadorBoss(ctx, bossX, camaraX, anchoCanvas, tiempo) {
+    const screenX = bossX - camaraX;
+
+    if (screenX > anchoCanvas) {
+        // Boss a la derecha
+        const pulso = 0.6 + Math.sin(tiempo * 0.008) * 0.3;
+        ctx.fillStyle = 'rgba(187,134,252,' + pulso.toFixed(2) + ')';
+        // Flecha derecha
+        ctx.beginPath();
+        ctx.moveTo(anchoCanvas - 8, 135);
+        ctx.lineTo(anchoCanvas - 2, 140);
+        ctx.lineTo(anchoCanvas - 8, 145);
+        ctx.closePath();
+        ctx.fill();
+    } else if (screenX + 18 < 0) {
+        // Boss a la izquierda
+        const pulso = 0.6 + Math.sin(tiempo * 0.008) * 0.3;
+        ctx.fillStyle = 'rgba(187,134,252,' + pulso.toFixed(2) + ')';
+        ctx.beginPath();
+        ctx.moveTo(8, 135);
+        ctx.lineTo(2, 140);
+        ctx.lineTo(8, 145);
+        ctx.closePath();
+        ctx.fill();
+    }
+}
+
+export function limpiarRenderer() {
+    vinetaCanvas = null;
 }

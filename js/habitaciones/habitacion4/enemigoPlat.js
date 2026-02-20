@@ -1,10 +1,11 @@
-// Habitación 4 — El Abismo: Enemigos patrulla y boss
+// Habitacion 4 — El Abismo: Enemigos patrulla y boss
 // Esbirros: 1 stomp = derrotado
-// Boss: múltiples stomps, fases de velocidad, barra de vida
+// Boss: multiples stomps, fases de velocidad, barra de vida
 
 import { CFG } from './config.js';
 import { resolverColisionX, resolverColisionY, esSolido, enSuelo } from './fisicas.js';
 import { ENEMIGOS } from '../../enemigos.js';
+import { obtenerSpriteEnemigo, obtenerColorBossFase } from './spritesPlat.js';
 
 const TAM = CFG.tiles.tamano;
 const ENE = CFG.enemigos;
@@ -28,7 +29,7 @@ function crearEnemigo(col, fila, esBoss) {
     let vidaMax;
 
     if (esBoss) {
-        // Buscar un élite para el boss
+        // Buscar un elite para el boss
         const elites = Object.values(ENEMIGOS).filter(function (e) {
             return e.tier === 'elite';
         });
@@ -64,6 +65,8 @@ function crearEnemigo(col, fila, esBoss) {
         nombre,
         framesMuerte: 0,
         cooldownAtaque: 0,
+        frameAnim: 0,
+        contadorAnim: 0,
     };
 }
 
@@ -90,7 +93,7 @@ export function actualizarEnemigos() {
     for (let i = 0; i < enemigos.length; i++) {
         const e = enemigos[i];
         if (!e.vivo) {
-            // Animación de muerte
+            // Animacion de muerte
             if (e.framesMuerte > 0) {
                 e.framesMuerte--;
             }
@@ -102,7 +105,7 @@ export function actualizarEnemigos() {
         // Movimiento de patrulla
         let vel = e.velocidad;
 
-        // Boss: aumentar velocidad según fase
+        // Boss: aumentar velocidad segun fase
         if (e.esBoss && e.vidaMax > 0) {
             const ratio = e.vidaActual / e.vidaMax;
             if (ratio <= BOSS.fasesCambio[1]) {
@@ -114,10 +117,10 @@ export function actualizarEnemigos() {
 
         e.vx = vel * e.direccion;
 
-        // Colisión horizontal
+        // Colision horizontal
         const nuevaX = resolverColisionX(e.x, e.y, e.ancho, e.alto, e.vx);
         if (nuevaX === e.x && e.vx !== 0) {
-            // Chocó con pared: girar
+            // Choco con pared: girar
             e.direccion *= -1;
         } else {
             // Verificar precipicio adelante
@@ -138,6 +141,13 @@ export function actualizarEnemigos() {
         const resY = resolverColisionY(e.x, e.y, e.ancho, e.alto, e.vy);
         e.y = resY.y;
         e.vy = resY.vy;
+
+        // Animacion
+        e.contadorAnim++;
+        if (e.contadorAnim >= 10) {
+            e.contadorAnim = 0;
+            e.frameAnim = (e.frameAnim + 1) % 2;
+        }
     }
 }
 
@@ -145,71 +155,74 @@ export function renderizarEnemigos(ctx, camaraX) {
     for (let i = 0; i < enemigos.length; i++) {
         const e = enemigos[i];
 
-        // Animación de muerte: encogimiento
+        // Animacion de muerte: encogimiento
         if (!e.vivo) {
             if (e.framesMuerte > 0) {
                 const escala = e.framesMuerte / 20;
-                const px = Math.round(e.x - camaraX + (e.ancho * (1 - escala)) / 2);
-                const py = Math.round(e.y + e.alto * (1 - escala));
+                const drawX = Math.round(e.x - camaraX + (e.ancho * (1 - escala)) / 2);
+                const drawY = Math.round(e.y + e.alto * (1 - escala));
                 const w = Math.round(e.ancho * escala);
                 const h = Math.round(e.alto * escala);
                 ctx.fillStyle = e.esBoss ? COL.colorBoss : COL.colorEnemigo;
                 ctx.globalAlpha = escala;
-                ctx.fillRect(px, py, w, h);
+                ctx.fillRect(drawX, drawY, w, h);
                 ctx.globalAlpha = 1;
             }
             continue;
         }
 
-        const px = Math.round(e.x - camaraX);
-        const py = Math.round(e.y);
+        const drawX = Math.round(e.x - camaraX);
+        const drawY = Math.round(e.y);
 
-        // Cuerpo
-        ctx.fillStyle = e.esBoss ? COL.colorBoss : COL.colorEnemigo;
-        ctx.fillRect(px, py, e.ancho, e.alto);
-
-        // Highlight
-        ctx.fillStyle = 'rgba(255,255,255,0.15)';
-        ctx.fillRect(px, py, e.ancho, 2);
-
-        // Ojos
-        const ojoY = py + (e.esBoss ? 5 : 3);
-        ctx.fillStyle = '#fff';
-        if (e.direccion > 0) {
-            ctx.fillRect(px + e.ancho - 5, ojoY, 2, 2);
-            ctx.fillRect(px + e.ancho - 9, ojoY, 2, 2);
-        } else {
-            ctx.fillRect(px + 3, ojoY, 2, 2);
-            ctx.fillRect(px + 7, ojoY, 2, 2);
+        // Determinar color (boss cambia por fase)
+        let colorActual = e.esBoss ? COL.colorBoss : COL.colorEnemigo;
+        if (e.esBoss && e.vidaMax > 0) {
+            colorActual = obtenerColorBossFase(e.vidaActual / e.vidaMax);
         }
 
-        // Barra de vida del boss
-        if (e.esBoss) {
-            const barraAncho = e.ancho + 8;
-            const barraAlto = 3;
-            const barraX = px - 4;
-            const barraY = py - 8;
-            const ratio = e.vidaActual / e.vidaMax;
+        // Intentar usar sprite
+        const estadoAnim = Math.abs(e.vx) > 0.1 ? 'patrulla' : 'idle';
+        const sprite = obtenerSpriteEnemigo(
+            colorActual,
+            e.ancho,
+            e.alto,
+            e.esBoss,
+            estadoAnim,
+            e.frameAnim
+        );
 
-            // Fondo
-            ctx.fillStyle = 'rgba(0,0,0,0.6)';
-            ctx.fillRect(barraX, barraY, barraAncho, barraAlto);
+        if (sprite) {
+            ctx.save();
+            if (e.direccion < 0) {
+                ctx.translate(drawX + e.ancho, drawY);
+                ctx.scale(-1, 1);
+                ctx.drawImage(sprite, 0, 0);
+            } else {
+                ctx.drawImage(sprite, drawX, drawY);
+            }
+            ctx.restore();
+        } else {
+            // Fallback: renderizado basico
+            ctx.fillStyle = colorActual;
+            ctx.fillRect(drawX, drawY, e.ancho, e.alto);
 
-            // Vida
-            ctx.fillStyle = ratio > 0.33 ? COL.colorBoss : '#e94560';
-            ctx.fillRect(barraX, barraY, Math.round(barraAncho * ratio), barraAlto);
+            ctx.fillStyle = 'rgba(255,255,255,0.15)';
+            ctx.fillRect(drawX, drawY, e.ancho, 2);
 
-            // Nombre
+            const ojoY = drawY + (e.esBoss ? 5 : 3);
             ctx.fillStyle = '#fff';
-            ctx.font = '8px monospace';
-            ctx.textAlign = 'center';
-            ctx.fillText(e.nombre, px + e.ancho / 2, barraY - 2);
-            ctx.textAlign = 'start';
+            if (e.direccion > 0) {
+                ctx.fillRect(drawX + e.ancho - 5, ojoY, 2, 2);
+                ctx.fillRect(drawX + e.ancho - 9, ojoY, 2, 2);
+            } else {
+                ctx.fillRect(drawX + 3, ojoY, 2, 2);
+                ctx.fillRect(drawX + 7, ojoY, 2, 2);
+            }
         }
     }
 }
 
-// Obtener enemigos vivos para detección de colisiones
+// Obtener enemigos vivos para deteccion de colisiones
 export function obtenerEnemigosVivos() {
     const vivos = [];
     for (let i = 0; i < enemigos.length; i++) {
@@ -218,26 +231,39 @@ export function obtenerEnemigosVivos() {
     return vivos;
 }
 
-// Dañar enemigo por stomp
+// Danar enemigo por stomp — retorna { bossDestruido, cambioFase }
 export function stomperEnemigo(enemigo, dano) {
-    if (!enemigo.vivo) return false;
+    if (!enemigo.vivo) return { bossDestruido: false, cambioFase: false };
 
     if (enemigo.esBoss) {
+        // Detectar fase actual antes del dano
+        const ratioAntes = enemigo.vidaActual / enemigo.vidaMax;
+        let faseAntes = 0;
+        if (ratioAntes <= BOSS.fasesCambio[1]) faseAntes = 2;
+        else if (ratioAntes <= BOSS.fasesCambio[0]) faseAntes = 1;
+
         enemigo.vidaActual -= dano;
         if (enemigo.vidaActual <= 0) {
             enemigo.vidaActual = 0;
             enemigo.vivo = false;
             enemigo.framesMuerte = 20;
             bossVivo = false;
-            return true; // boss derrotado
+            return { bossDestruido: true, cambioFase: false };
         }
-        return false;
+
+        // Detectar cambio de fase
+        const ratioDespues = enemigo.vidaActual / enemigo.vidaMax;
+        let faseDespues = 0;
+        if (ratioDespues <= BOSS.fasesCambio[1]) faseDespues = 2;
+        else if (ratioDespues <= BOSS.fasesCambio[0]) faseDespues = 1;
+
+        return { bossDestruido: false, cambioFase: faseDespues > faseAntes };
     }
 
     // Esbirro: 1 stomp = derrotado
     enemigo.vivo = false;
     enemigo.framesMuerte = 20;
-    return false;
+    return { bossDestruido: false, cambioFase: false };
 }
 
 export function esBossVivo() {
@@ -249,6 +275,25 @@ export function obtenerDanoEnemigo(enemigo) {
         return 10;
     }
     return enemigo.datos.ataques[0].dano;
+}
+
+// Obtener info del boss para el HUD
+export function obtenerInfoBoss() {
+    for (let i = 0; i < enemigos.length; i++) {
+        const e = enemigos[i];
+        if (e.esBoss && e.vivo) {
+            return {
+                nombre: e.nombre,
+                vidaActual: e.vidaActual,
+                vidaMax: e.vidaMax,
+                x: e.x,
+                y: e.y,
+                ancho: e.ancho,
+                alto: e.alto,
+            };
+        }
+    }
+    return null;
 }
 
 export function limpiarEnemigos() {
