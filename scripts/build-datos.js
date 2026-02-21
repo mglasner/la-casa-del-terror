@@ -236,7 +236,7 @@ const SCHEMA_HABITACION4 = {
     ],
     enemigos: ['stompMargen', 'stompVyMin', 'cooldownAtaque'],
     boss: ['fasesCambio', 'velocidadFases'],
-    render: ['colorEnemigo', 'colorBoss'],
+    render: ['colorSuelo', 'colorPlataforma', 'colorEnemigo', 'colorBoss'],
     escalado: [
         'estaturaRef',
         'escalaMin',
@@ -255,6 +255,14 @@ const SCHEMA_HABITACION4 = {
     camara: ['shakeDecay'],
     sprites: ['jugadorIdleVel', 'jugadorCorrerVel'],
 };
+
+// Tabla de habitaciones: número → schema de validación
+const HABITACIONES = [
+    { id: 1, schema: SCHEMA_HABITACION1 },
+    { id: 2, schema: SCHEMA_HABITACION2 },
+    { id: 3, schema: SCHEMA_HABITACION3 },
+    { id: 4, schema: SCHEMA_HABITACION4 },
+];
 
 // Valida una habitación contra su schema
 function validarHabitacion(datos, archivo, schema) {
@@ -303,52 +311,17 @@ async function main() {
     writeFileSync('js/enemigos.js', enemigosFmt);
     console.log('js/enemigos.js generado');
 
-    // Habitación 1
-    const hab1Archivo = 'datos/habitacion1.yaml';
-    if (existsSync(hab1Archivo)) {
-        const hab1Yaml = readFileSync(hab1Archivo, 'utf-8');
-        const hab1Data = yaml.load(hab1Yaml);
-        validarHabitacion(hab1Data, 'habitacion1.yaml', SCHEMA_HABITACION1);
-        const hab1JS = generarConfigJS(hab1Data);
-        const hab1Fmt = await prettier.format(hab1JS, configPrettier);
-        writeFileSync('js/habitaciones/habitacion1/config.js', hab1Fmt);
-        console.log('js/habitaciones/habitacion1/config.js generado');
-    }
+    // Habitaciones
+    for (const { id, schema } of HABITACIONES) {
+        const archivo = `datos/habitacion${id}.yaml`;
+        if (!existsSync(archivo)) continue;
 
-    // Habitación 2
-    const hab2Archivo = 'datos/habitacion2.yaml';
-    if (existsSync(hab2Archivo)) {
-        const hab2Yaml = readFileSync(hab2Archivo, 'utf-8');
-        const hab2Data = yaml.load(hab2Yaml);
-        validarHabitacion(hab2Data, 'habitacion2.yaml', SCHEMA_HABITACION2);
-        const hab2JS = generarConfigJS(hab2Data);
-        const hab2Fmt = await prettier.format(hab2JS, configPrettier);
-        writeFileSync('js/habitaciones/habitacion2/config.js', hab2Fmt);
-        console.log('js/habitaciones/habitacion2/config.js generado');
-    }
-
-    // Habitación 3
-    const hab3Archivo = 'datos/habitacion3.yaml';
-    if (existsSync(hab3Archivo)) {
-        const hab3Yaml = readFileSync(hab3Archivo, 'utf-8');
-        const hab3Data = yaml.load(hab3Yaml);
-        validarHabitacion(hab3Data, 'habitacion3.yaml', SCHEMA_HABITACION3);
-        const hab3JS = generarConfigJS(hab3Data);
-        const hab3Fmt = await prettier.format(hab3JS, configPrettier);
-        writeFileSync('js/habitaciones/habitacion3/config.js', hab3Fmt);
-        console.log('js/habitaciones/habitacion3/config.js generado');
-    }
-
-    // Habitación 4
-    const hab4Archivo = 'datos/habitacion4.yaml';
-    if (existsSync(hab4Archivo)) {
-        const hab4Yaml = readFileSync(hab4Archivo, 'utf-8');
-        const hab4Data = yaml.load(hab4Yaml);
-        validarHabitacion(hab4Data, 'habitacion4.yaml', SCHEMA_HABITACION4);
-        const hab4JS = generarConfigJS(hab4Data);
-        const hab4Fmt = await prettier.format(hab4JS, configPrettier);
-        writeFileSync('js/habitaciones/habitacion4/config.js', hab4Fmt);
-        console.log('js/habitaciones/habitacion4/config.js generado');
+        const datos = yaml.load(readFileSync(archivo, 'utf-8'));
+        validarHabitacion(datos, `habitacion${id}.yaml`, schema);
+        const salida = `js/habitaciones/habitacion${id}/config.js`;
+        const formateado = await prettier.format(generarConfigJS(datos), configPrettier);
+        writeFileSync(salida, formateado);
+        console.log(`${salida} generado`);
     }
 }
 

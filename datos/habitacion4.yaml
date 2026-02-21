@@ -6,7 +6,7 @@
 
 # --- Información general de la habitación ---
 meta:
-    titulo: "Habitacion 4 — El Abismo"
+    titulo: "Habitación 4 — El Abismo"
     itemInventario: llave-habitacion-5   # ID del item que se agrega al inventario
     timeoutExito: 1500                   # ms antes de volver al pasillo tras ganar
 
@@ -54,6 +54,8 @@ boss:
 
 # --- Renderizado ---
 render:
+    colorSuelo: "#2a2a5e"        # color fallback para tiles de suelo (sin textura)
+    colorPlataforma: "#3a3a7e"   # color fallback para tiles de plataforma (sin textura)
     colorEnemigo: "#e94560"      # color de sprite para enemigos sin sprite sheet
     colorBoss: "#bb86fc"         # color de sprite para el boss sin sprite sheet
 

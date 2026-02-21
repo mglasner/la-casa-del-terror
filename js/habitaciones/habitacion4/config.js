@@ -2,7 +2,7 @@
 
 export const CFG = {
     meta: {
-        titulo: 'Habitacion 4 — El Abismo',
+        titulo: 'Habitación 4 — El Abismo',
         itemInventario: 'llave-habitacion-5',
         timeoutExito: 1500,
     },
@@ -45,6 +45,8 @@ export const CFG = {
         velocidadFases: [1, 1.4],
     },
     render: {
+        colorSuelo: '#2a2a5e',
+        colorPlataforma: '#3a3a7e',
         colorEnemigo: '#e94560',
         colorBoss: '#bb86fc',
     },
