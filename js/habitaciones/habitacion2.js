@@ -38,6 +38,9 @@ import {
     renderizarHUD,
     limpiarHUD,
 } from '../motor3d/hudPrimeraPersona.js';
+import { crearOverlayRotar } from '../componentes/overlayRotar.js';
+import { crearBarraVida } from '../componentes/barraVida.js';
+import { crearInventario } from '../componentes/inventario.js';
 
 // --- Constantes del laberinto (desde config YAML) ---
 
@@ -84,6 +87,15 @@ let ultimoFrame = 0;
 let framesLentos = 0;
 let flashDano = 0;
 
+// Landscape mobile
+let overlayRotar = null;
+let esTouchRef = false;
+let dpadRef = null;
+let hudJugadorContenedor = null;
+let hudJugadorVida = null;
+let hudJugadorVidaAnterior = -1;
+let hudJugadorInventario = null;
+
 // Pool de sprites preallocado para el loop (llave + puerta + ~15 decoraciones + ~10 trampas inactivas)
 const MAX_SPRITES_LOOP = 30;
 const _sprites = Array.from({ length: MAX_SPRITES_LOOP }, () => ({
@@ -98,9 +110,119 @@ let _spritesCount = 0;
 // Vista mutable: array cuyas entries apuntan a _sprites (se ajusta .length cada frame)
 const _spritesView = _sprites.slice();
 
+// --- Landscape mobile: escalado y fullscreen ---
+
+function calcularEscala3D() {
+    if (!canvas3D) return 1;
+    const rect = canvas3D.getBoundingClientRect();
+    const esFullscreen = !!document.fullscreenElement;
+    const margenAncho = esFullscreen ? 14 : 26;
+    const margenAbajo = esFullscreen ? 4 : 16;
+
+    const disponibleAncho = window.innerWidth - margenAncho;
+    const disponibleAlto = window.innerHeight - rect.top - margenAbajo;
+
+    const escalaX = disponibleAncho / canvas.ancho;
+    const escalaY = disponibleAlto / canvas.alto;
+
+    return Math.max(1, Math.min(escalaX, escalaY));
+}
+
+function reescalarCanvas3D() {
+    if (!canvas3D) return;
+    const escala = calcularEscala3D();
+    canvas3D.style.width = Math.floor(canvas.ancho * escala) + 'px';
+    canvas3D.style.height = Math.floor(canvas.alto * escala) + 'px';
+}
+
+// Recalcula resolución interna del canvas para landscape (llena todo el ancho)
+function redimensionarLandscape() {
+    if (!activo || !canvas3D) return;
+
+    const enLandscape = esTouchRef && window.innerWidth > window.innerHeight;
+    calcularDimensiones(enLandscape ? { landscape: true } : undefined);
+
+    // Solo redimensionar si las dimensiones cambiaron
+    if (canvas3D.width === canvas.ancho && canvas3D.height === canvas.alto) {
+        reescalarCanvas3D();
+        return;
+    }
+
+    // Aplicar nueva resolución interna
+    canvas3D.width = canvas.ancho;
+    canvas3D.height = canvas.alto;
+
+    canvasMini.width = canvas.anchoMini;
+    canvasMini.height = canvas.altoMini;
+    minimapBase = crearMinimapBase(mapa, FILAS, COLS, canvas.anchoMini, canvas.altoMini);
+
+    // Recrear gradientes (dependen de canvas.alto)
+    gradCielo = ctx3D.createLinearGradient(0, 0, 0, canvas.alto / 2);
+    gradCielo.addColorStop(0, COLORES.cieloArriba);
+    gradCielo.addColorStop(1, COLORES.cieloAbajo);
+
+    gradSuelo = ctx3D.createLinearGradient(0, canvas.alto / 2, 0, canvas.alto);
+    gradSuelo.addColorStop(0, COLORES.sueloArriba);
+    gradSuelo.addColorStop(1, COLORES.sueloAbajo);
+
+    // Actualizar variable CSS
+    const juegoEl = document.getElementById('juego');
+    juegoEl.style.setProperty('--ancho-3d', canvas.ancho + 6 + 'px');
+
+    reescalarCanvas3D();
+}
+
+function onFullscreenChange() {
+    requestAnimationFrame(function () {
+        requestAnimationFrame(redimensionarLandscape);
+    });
+}
+
+function solicitarPantallaCompleta() {
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    const el = document.documentElement;
+    if (el.requestFullscreen) {
+        el.requestFullscreen()
+            .then(function () {
+                try {
+                    screen.orientation.lock('landscape').catch(function () {});
+                } catch {
+                    // API no disponible
+                }
+            })
+            .catch(function () {
+                // Fullscreen no disponible o denegado
+            });
+    }
+}
+
+function salirPantallaCompleta() {
+    document.removeEventListener('fullscreenchange', onFullscreenChange);
+    if (document.fullscreenElement) {
+        document.exitFullscreen().catch(function () {});
+    }
+}
+
+function actualizarHUDVida() {
+    if (!hudJugadorVida) return;
+    if (jugador.vidaActual === hudJugadorVidaAnterior) return;
+    hudJugadorVidaAnterior = jugador.vidaActual;
+    hudJugadorVida.actualizar(jugador.vidaActual, jugador.vidaMax);
+}
+
+function actualizarHUDInventarioLocal() {
+    if (!hudJugadorInventario) return;
+    hudJugadorInventario.actualizar(jugador.inventario);
+}
+
 // --- Crear pantalla HTML ---
 
 function crearPantalla(esTouch) {
+    function huir() {
+        limpiarHabitacion2();
+        callbackSalir();
+    }
+
     pantalla = document.createElement('div');
     pantalla.id = 'pantalla-habitacion2';
     pantalla.className = 'habitacion-2';
@@ -118,10 +240,7 @@ function crearPantalla(esTouch) {
     imgHuir.alt = '';
     imgHuir.className = 'btn-huir-icono';
     btnHuir.appendChild(imgHuir);
-    btnHuir.addEventListener('click', function () {
-        limpiarHabitacion2();
-        callbackSalir();
-    });
+    btnHuir.addEventListener('click', huir);
 
     const titulo = document.createElement('h2');
     titulo.className = 'titulo-habitacion';
@@ -151,6 +270,29 @@ function crearPantalla(esTouch) {
 
     contenedor.appendChild(canvas3D);
     contenedor.appendChild(canvasMini);
+
+    // HUD superpuesto: vida + inventario + botón huir (landscape mobile)
+    hudJugadorContenedor = document.createElement('div');
+    hudJugadorContenedor.className = 'plat-hud-jugador';
+
+    const btnHuirCanvas = document.createElement('button');
+    btnHuirCanvas.className = 'plat-hud-huir';
+    btnHuirCanvas.title = 'Huir al pasillo';
+    btnHuirCanvas.setAttribute('aria-label', 'Huir al pasillo');
+    const imgHuirCanvas = document.createElement('img');
+    imgHuirCanvas.src = 'assets/img/icons/btn-salir.webp';
+    imgHuirCanvas.alt = '';
+    imgHuirCanvas.className = 'plat-hud-huir-icono';
+    btnHuirCanvas.appendChild(imgHuirCanvas);
+    btnHuirCanvas.addEventListener('click', huir);
+
+    hudJugadorVida = crearBarraVida({ mostrarTexto: true, claseExtra: 'barra-vida-compacta' });
+    hudJugadorInventario = crearInventario({ claseExtra: 'inventario-compacto' });
+
+    hudJugadorContenedor.appendChild(btnHuirCanvas);
+    hudJugadorContenedor.appendChild(hudJugadorVida.el);
+    hudJugadorContenedor.appendChild(hudJugadorInventario.el);
+    contenedor.appendChild(hudJugadorContenedor);
 
     // Pre-crear gradientes (no cambian entre frames)
     gradCielo = ctx3D.createLinearGradient(0, 0, 0, canvas.alto / 2);
@@ -196,6 +338,7 @@ function detectarLlave() {
 
         jugador.inventario.push(CFG.meta.itemInventario);
         document.dispatchEvent(new Event('inventario-cambio'));
+        actualizarHUDInventarioLocal();
         lanzarToast(CFG.textos.toastLlave, '\uD83D\uDD11', 'item');
     }
 }
@@ -248,6 +391,7 @@ function loop(ahora) {
     if (danoTrampa > 0) {
         flashDano = CFG.rendimiento.flashDano;
     }
+    actualizarHUDVida();
 
     // Iluminación dinámica (recalcular cada 3 frames)
     if (decoraciones && frameCount % 3 === 0) {
@@ -391,9 +535,12 @@ function onKeyUp(e) {
 
 // --- API pública ---
 
-export function iniciarHabitacion2(jugadorRef, callback, dpadRef) {
+export function iniciarHabitacion2(jugadorRef, callback, dpadArgumento) {
     jugador = jugadorRef;
     callbackSalir = callback;
+    esTouchRef = !!dpadArgumento;
+    dpadRef = dpadArgumento;
+    hudJugadorVidaAnterior = -1;
     tieneLlave = false;
     activo = true;
     frameCount = 0;
@@ -448,7 +595,7 @@ export function iniciarHabitacion2(jugadorRef, callback, dpadRef) {
     juegoEl.style.setProperty('--ancho-3d', canvas.ancho + 6 + 'px');
 
     // Crear pantalla DOM
-    crearPantalla(!!dpadRef);
+    crearPantalla(esTouchRef);
 
     // Pre-renderizar minimapa base
     minimapBase = crearMinimapBase(mapa, FILAS, COLS, canvas.anchoMini, canvas.altoMini);
@@ -462,11 +609,25 @@ export function iniciarHabitacion2(jugadorRef, callback, dpadRef) {
     document.addEventListener('keydown', onKeyDown);
     document.addEventListener('keyup', onKeyUp);
 
-    // D-pad touch
+    // D-pad touch: cruz completa a la izquierda + A/B a la derecha
     if (dpadRef) {
         dpadRef.setTeclasRef(teclas);
+        dpadRef.setModoCruzSplit();
         dpadRef.mostrar();
     }
+
+    // Overlay de rotación y pantalla completa (solo touch)
+    overlayRotar = crearOverlayRotar();
+    overlayRotar.activar(function () {
+        requestAnimationFrame(redimensionarLandscape);
+    });
+    if (esTouchRef) {
+        solicitarPantallaCompleta();
+    }
+
+    // Inicializar HUD landscape
+    actualizarHUDVida();
+    actualizarHUDInventarioLocal();
 
     // Iniciar game loop
     animacionId = requestAnimationFrame(loop);
@@ -487,6 +648,20 @@ export function limpiarHabitacion2() {
         delete teclas[k];
     });
 
+    // Salir de pantalla completa y desactivar overlay
+    if (esTouchRef) {
+        salirPantallaCompleta();
+        esTouchRef = false;
+    }
+    if (overlayRotar) {
+        overlayRotar.desactivar();
+        overlayRotar = null;
+    }
+    if (dpadRef) {
+        dpadRef.setModoCentrado();
+        dpadRef = null;
+    }
+
     // Limpiar motor 3D
     limpiarParticulas();
     limpiarTrampas3D();
@@ -494,6 +669,12 @@ export function limpiarHabitacion2() {
     texturas = null;
     decoraciones = null;
     mapaLuz = null;
+
+    // Limpiar HUD landscape
+    hudJugadorContenedor = null;
+    hudJugadorVida = null;
+    hudJugadorVidaAnterior = -1;
+    hudJugadorInventario = null;
 
     // Restaurar contenedor normal
     const juegoEl = document.getElementById('juego');

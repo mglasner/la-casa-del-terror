@@ -1,7 +1,8 @@
 // Componente: D-pad virtual para dispositivos touch
-// Soporta dos modos:
+// Soporta tres modos:
 // - Centrado (pasillo): 4 botones ▲◀▶▼ centrados abajo
 // - Dividido (platformer): izq ◀▶ movimiento / der botones A (saltar) y B (accion)
+// - CruzSplit (laberinto 3D): cruz ▲◀▶▼ a la izquierda + der A/B
 
 export function crearControlesTouch() {
     // No crear si no hay soporte touch
@@ -13,11 +14,12 @@ export function crearControlesTouch() {
             ocultar() {},
             setModoDividido() {},
             setModoCentrado() {},
+            setModoCruzSplit() {},
         };
     }
 
     let teclasRef = {};
-    let modoDividido = false;
+    let modo = 'centrado'; // 'centrado' | 'dividido' | 'cruzSplit'
 
     // Helper: crear boton touch con eventos tactiles
     function crearBoton(clase, key, texto) {
@@ -94,15 +96,13 @@ export function crearControlesTouch() {
     }
 
     function mostrar() {
-        if (modoDividido) {
-            contenedor.classList.add('oculto');
-            contIzq.classList.remove('oculto');
-            contDer.classList.remove('oculto');
-        } else {
-            contenedor.classList.remove('oculto');
-            contIzq.classList.add('oculto');
-            contDer.classList.add('oculto');
-        }
+        const esDividido = modo === 'dividido';
+        const esCentrado = modo === 'centrado';
+
+        contenedor.classList.toggle('oculto', esDividido);
+        contenedor.classList.toggle('dpad-cruz-split', modo === 'cruzSplit');
+        contIzq.classList.toggle('oculto', !esDividido);
+        contDer.classList.toggle('oculto', esCentrado);
     }
 
     function ocultar() {
@@ -112,12 +112,16 @@ export function crearControlesTouch() {
     }
 
     function setModoDividido() {
-        modoDividido = true;
+        modo = 'dividido';
     }
 
     function setModoCentrado() {
-        modoDividido = false;
+        modo = 'centrado';
     }
 
-    return { setTeclasRef, mostrar, ocultar, setModoDividido, setModoCentrado };
+    function setModoCruzSplit() {
+        modo = 'cruzSplit';
+    }
+
+    return { setTeclasRef, mostrar, ocultar, setModoDividido, setModoCentrado, setModoCruzSplit };
 }

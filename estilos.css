@@ -3667,8 +3667,14 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     }
 
     #juego.juego-inmersivo .barra-superior,
-    #juego.juego-inmersivo .cabecera-habitacion {
+    #juego.juego-inmersivo .cabecera-habitacion,
+    #juego.juego-inmersivo #laberinto3d-indicador {
         display: none;
+    }
+
+    #juego.juego-inmersivo #contenedor-3d {
+        border-width: 1px;
+        border-radius: 4px;
     }
 
     /* Mostrar HUD in-canvas en landscape mobile */

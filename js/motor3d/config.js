@@ -29,26 +29,34 @@ export const canvas = {
 };
 
 // Recalcula dimensiones usando todo el viewport disponible
-export function calcularDimensiones() {
+// opciones.landscape: true para landscape fullscreen (sin forzar 16:10)
+export function calcularDimensiones(opciones) {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
+    const landscape = opciones && opciones.landscape;
 
-    // Espacio vertical para UI: barra superior, cabecera, indicador, hint, paddings
-    const overheadV = 180;
-    const margenH = 40;
+    // Landscape fullscreen: UI oculta, márgenes mínimos, llenar pantalla
+    const overheadV = landscape ? 10 : 180;
+    const margenH = landscape ? 10 : 40;
 
     const maxAncho = Math.min(vw - margenH, 1280);
     const maxAlto = vh - overheadV;
 
-    // Aspecto 16:10 — ajustar a la dimensión limitante
-    const anchoPorAlto = Math.round(maxAlto * 1.6);
-
-    if (anchoPorAlto <= maxAncho) {
-        canvas.ancho = anchoPorAlto;
+    if (landscape) {
+        // Llenar todo el espacio sin forzar aspecto 16:10
+        canvas.ancho = maxAncho;
         canvas.alto = maxAlto;
     } else {
-        canvas.ancho = maxAncho;
-        canvas.alto = Math.round(maxAncho / 1.6);
+        // Aspecto 16:10 — ajustar a la dimensión limitante
+        const anchoPorAlto = Math.round(maxAlto * 1.6);
+
+        if (anchoPorAlto <= maxAncho) {
+            canvas.ancho = anchoPorAlto;
+            canvas.alto = maxAlto;
+        } else {
+            canvas.ancho = maxAncho;
+            canvas.alto = Math.round(maxAncho / 1.6);
+        }
     }
 
     // Mínimos razonables
