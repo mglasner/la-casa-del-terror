@@ -196,7 +196,11 @@ function victoria() {
     // Curación bonus por ganar la partida
     curar(CFG.curacion.victoriaMin, CFG.curacion.victoriaMax);
 
-    lanzarToast(CFG.textos.toastVictoria, '\uD83D\uDD11', 'item');
+    lanzarToast(
+        CFG.textos.toastVictoria,
+        '<img src="assets/img/llaves/llave-memorice.webp" alt="Llave" class="toast-llave-img">',
+        'item'
+    );
 
     setTimeout(function () {
         limpiarHabitacion3();

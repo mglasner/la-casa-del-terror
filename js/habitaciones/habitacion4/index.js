@@ -220,7 +220,11 @@ function verificarVictoria() {
         jugador.inventario.push(CFG.meta.itemInventario);
         document.dispatchEvent(new Event('inventario-cambio'));
         actualizarHUDInventario(jugador.inventario);
-        lanzarToast('\u00a1Llave obtenida! Escapando...', '\ud83d\udd11', 'exito');
+        lanzarToast(
+            '\u00a1Llave obtenida! Escapando...',
+            '<img src="assets/img/llaves/llave-abismo.webp" alt="Llave" class="toast-llave-img">',
+            'exito'
+        );
 
         timeoutIds.push(
             setTimeout(function () {
