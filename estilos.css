@@ -43,6 +43,27 @@
     --radio-boton: 8px;
 }
 
+/* Tema oscuro original para modo juego (habitaciones) */
+body.modo-juego #biblioteca {
+    display: none;
+}
+
+body.modo-juego {
+    --color-fondo: #1a1a2e;
+    --color-superficie: #16213e;
+    --color-oscuro: #0d0d1a;
+    --color-accent: #e94560;
+    --color-accent-hover: #c73652;
+    --color-texto: #e0e0e0;
+    --color-texto-secundario: #a0a0b0;
+    --color-texto-tenue: #888;
+    --color-texto-apagado: #666;
+    --color-texto-muy-apagado: #555;
+    --color-borde: #333;
+    --color-borde-claro: #444;
+    --color-dorado: #ffd700;
+}
+
 html {
     overflow: hidden;
     overscroll-behavior: none;
@@ -2685,12 +2706,11 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
 }
 
 /* ============================================================
-   LIBRO DE VILLANOS — Bestiario con índice y detalle
+   LIBRO — Layout base y estilos compartidos (índice + detalle)
    ============================================================ */
 
-/* Layout del libro — grimorio antiguo */
-.libro-villanos,
-.libro-heroes {
+/* Layout del libro — clase base para todos los libros */
+.libro {
     display: flex;
     width: 700px;
     height: 680px;
@@ -2708,11 +2728,6 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
 
 .libro-villanos {
     animation: libro-entrada 0.5s ease;
-}
-
-.libro-heroes {
-    flex: 1;
-    min-height: 0;
 }
 
 @keyframes libro-entrada {
@@ -3075,8 +3090,7 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     transition: opacity 0.3s;
 }
 
-.libro-villanos:hover .libro-esquina,
-.libro-heroes:hover .libro-esquina {
+.libro:hover .libro-esquina {
     opacity: 0.7;
 }
 
@@ -3662,8 +3676,7 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     flex-direction: column;
 }
 
-.libro-modal-cuerpo .libro-villanos,
-.libro-modal-cuerpo .libro-heroes {
+.libro-modal-cuerpo .libro {
     border: none;
     border-radius: 0;
     flex: 1;
@@ -4119,8 +4132,7 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     }
 
     /* Libro tablet */
-    .libro-villanos,
-    .libro-heroes {
+    .libro {
         max-width: 580px;
         height: 560px;
         max-height: calc(85vh - 40px);
@@ -4252,14 +4264,10 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     }
 
     /* Libro mobile */
-    .libro-villanos,
-    .libro-heroes {
+    .libro {
         flex-direction: column;
         max-width: 100%;
         position: relative;
-    }
-
-    .libro-heroes {
         flex: 1;
         min-height: 0;
     }

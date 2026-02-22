@@ -1,4 +1,4 @@
-// Libro generalizado — núcleo reutilizable para Heroario y Villanario
+// Libro generalizado — núcleo reutilizable para todos los libros
 
 import { crearElemento } from '../utils.js';
 
@@ -87,16 +87,17 @@ export function crearLibro(opciones) {
     }
 
     function clasePagina(i) {
-        if (esIntro(i)) return ' libro-en-inicio';
-        if (esExtra(i)) return ' libro-en-extra';
+        if (esIntro(i)) return 'libro-en-inicio';
+        if (esExtra(i)) return 'libro-en-extra';
         return '';
     }
 
-    const claseInicial = getClasePorIndice(0);
-    const libro = crearElemento(
-        'div',
-        claseRaiz + (claseInicial ? ' ' + claseInicial : '') + clasePagina(0)
-    );
+    // Construye el className completo del libro según el índice activo
+    function claseLibro(i) {
+        return ['libro', claseRaiz, getClasePorIndice(i), clasePagina(i)].filter(Boolean).join(' ');
+    }
+
+    const libro = crearElemento('div', claseLibro(0));
 
     // --- Página izquierda: índice ---
     const paginaIzq = crearElemento('div', 'libro-pagina libro-pagina-izq');
@@ -451,9 +452,7 @@ export function crearLibro(opciones) {
             detalleWrap.appendChild(nuevoContenido);
 
             // Propagar clase de la entidad al libro
-            const claseEntidad = getClasePorIndice(nuevoIndice);
-            libro.className =
-                claseRaiz + (claseEntidad ? ' ' + claseEntidad : '') + clasePagina(nuevoIndice);
+            libro.className = claseLibro(nuevoIndice);
 
             indiceActual = nuevoIndice;
             actualizarIndice();

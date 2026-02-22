@@ -239,6 +239,7 @@ function elegirTransicion(anterior, nuevo) {
 function ejecutarCambioEstado(anterior, nuevo, datos) {
     // Salir del estado anterior
     if (anterior === ESTADOS.JUEGO) {
+        document.body.classList.remove('modo-juego');
         const hab = habitaciones[estado.habitacionActual];
         if (hab) hab.limpiar();
         dpad.ocultar();
@@ -274,14 +275,16 @@ function ejecutarCambioEstado(anterior, nuevo, datos) {
         });
         modal.abrir();
     } else if (nuevo === ESTADOS.JUEGO) {
+        document.body.classList.add('modo-juego');
         estante.ocultar();
 
         const hab = habitaciones[datos.numero];
         if (!hab) return;
 
         estado.habitacionActual = datos.numero;
-        // Copia superficial para no mutar el singleton de PERSONAJES
-        estado.jugadorActual = Object.assign({}, PERSONAJES[datos.personaje]);
+        // Copia que preserva métodos del prototipo (recibirDano, estaVivo, curar)
+        const original = PERSONAJES[datos.personaje];
+        estado.jugadorActual = Object.assign(Object.create(Object.getPrototypeOf(original)), original);
         estado.jugadorActual.vidaActual = estado.jugadorActual.vidaMax;
         estado.jugadorActual.inventario = [];
 
