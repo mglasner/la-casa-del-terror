@@ -1,5 +1,5 @@
 // Componente: Libro de Juegos
-// Usa crearLibro() para mostrar los 4 desafíos con selector de héroe y botón Jugar
+// Usa crearLibro() para mostrar los 4 desafíos con selector de héroe en modal
 
 import { crearElemento } from '../utils.js';
 import { PERSONAJES } from '../personajes.js';
@@ -97,19 +97,14 @@ function generarPaginaJuego(juego) {
     return contenido;
 }
 
-// Genera la página de detalle de un juego: descripción larga + selector de héroe
-function generarDetalleJuego(nombre, _tabAnterior, onJugar) {
-    const entidades = adaptarJuegos();
-    const datos = entidades[nombre];
-    const juegoId = datos.juegoId;
-    const juego = JUEGOS[juegoId];
+// --- Modal de selección de héroe ---
 
-    // Usar generarPaginaJuego para el contenido descriptivo
-    const contenido = generarPaginaJuego(juego);
+function crearModalHeroe(onConfirmar) {
+    const overlay = crearElemento('div', 'modal-heroe-overlay oculto');
 
-    // Agregar selector de héroe debajo de la descripción
-    const selectorLabel = crearElemento('p', 'libro-juego-selector-label', 'Elige tu héroe:');
-    contenido.appendChild(selectorLabel);
+    const panel = crearElemento('div', 'modal-heroe');
+    panel.appendChild(crearElemento('h3', 'modal-heroe-titulo', 'Elige tu héroe'));
+    panel.appendChild(crearElemento('div', 'libro-ornamento'));
 
     const selector = crearElemento('div', 'selector-heroe');
     let heroeElegido = null;
@@ -137,22 +132,74 @@ function generarDetalleJuego(nombre, _tabAnterior, onJugar) {
                 b.classList.remove('selector-heroe-activo');
             });
             btn.classList.add('selector-heroe-activo');
-            btnJugar.disabled = false;
+            btnConfirmar.disabled = false;
         });
 
         selector.appendChild(btn);
     });
-    contenido.appendChild(selector);
+    panel.appendChild(selector);
 
-    // Botón Jugar
+    const acciones = crearElemento('div', 'modal-heroe-acciones');
+
+    const btnCancelar = crearElemento('button', 'modal-heroe-btn-cancelar', 'Volver');
+    btnCancelar.type = 'button';
+    btnCancelar.addEventListener('click', function () {
+        cerrar();
+    });
+    acciones.appendChild(btnCancelar);
+
+    const btnConfirmar = crearElemento('button', 'libro-juego-btn-jugar', 'Jugar');
+    btnConfirmar.type = 'button';
+    btnConfirmar.disabled = true;
+    btnConfirmar.addEventListener('click', function () {
+        if (heroeElegido && juegoIdActual) {
+            onConfirmar(juegoIdActual, heroeElegido);
+        }
+    });
+    acciones.appendChild(btnConfirmar);
+
+    panel.appendChild(acciones);
+    overlay.appendChild(panel);
+
+    // Cerrar al hacer click en el overlay (fuera del panel)
+    overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) cerrar();
+    });
+
+    let juegoIdActual = null;
+
+    function abrir(juegoId) {
+        juegoIdActual = juegoId;
+        // Resetear selección
+        heroeElegido = null;
+        selector.querySelectorAll('.selector-heroe-btn').forEach(function (b) {
+            b.classList.remove('selector-heroe-activo');
+        });
+        btnConfirmar.disabled = true;
+        overlay.classList.remove('oculto');
+    }
+
+    function cerrar() {
+        overlay.classList.add('oculto');
+        juegoIdActual = null;
+    }
+
+    return { overlay: overlay, abrir: abrir, cerrar: cerrar };
+}
+
+// Genera la página de detalle de un juego: descripción + botón Jugar
+function generarDetalleJuego(nombre, _tabAnterior, abrirModalHeroe) {
+    const entidades = adaptarJuegos();
+    const datos = entidades[nombre];
+    const juego = JUEGOS[datos.juegoId];
+
+    const contenido = generarPaginaJuego(juego);
+
+    // Botón Jugar que abre el modal de selección de héroe
     const btnJugar = crearElemento('button', 'libro-juego-btn-jugar', 'Jugar');
     btnJugar.type = 'button';
-    btnJugar.disabled = true;
-
     btnJugar.addEventListener('click', function () {
-        if (heroeElegido && onJugar) {
-            onJugar(datos.juegoId, heroeElegido);
-        }
+        abrirModalHeroe(datos.juegoId);
     });
     contenido.appendChild(btnJugar);
 
@@ -191,17 +238,20 @@ function generarPrologoJuegos() {
 
 /**
  * Crea el Libro de Juegos.
- * @param {HTMLElement} contenedor - Elemento donde montar (no se usa directamente, el libro se retorna)
+ * @param {HTMLElement} contenedor - Elemento donde montar
  * @param {Function} onJugar - Callback (juegoId, nombrePersonaje)
  * @returns {{ libro: HTMLElement, manejarTecladoLibro: Function, destruir: Function }}
  */
 export function crearLibroJuegos(contenedor, onJugar) {
     const entidades = adaptarJuegos();
 
+    // Modal de selección de héroe (se crea una vez, se reutiliza)
+    const modalHeroe = crearModalHeroe(onJugar);
+
     const { libro, manejarTecladoLibro } = crearLibro({
         entidades: entidades,
         generarDetalle: function (nombre, tabAnterior) {
-            return generarDetalleJuego(nombre, tabAnterior, onJugar);
+            return generarDetalleJuego(nombre, tabAnterior, modalHeroe.abrir);
         },
         claseRaiz: 'libro-juegos',
         titulo: 'Libro de Juegos',
@@ -220,6 +270,9 @@ export function crearLibroJuegos(contenedor, onJugar) {
             });
         },
     });
+
+    // Montar el modal de héroe dentro del libro
+    libro.appendChild(modalHeroe.overlay);
 
     return {
         libro: libro,
