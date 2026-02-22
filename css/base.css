@@ -90,6 +90,12 @@ body {
     box-sizing: border-box;
 }
 
+/* En modo biblioteca: sin restricción de ancho para la escena inmersiva */
+body:not(.modo-juego) #juego {
+    max-width: none;
+    padding: 0;
+}
+
 #juego.juego-inmersivo {
     max-width: none;
     padding: 10px;

@@ -1,4 +1,6 @@
-/* Biblioteca — estante homepage */
+/* Biblioteca — escena inmersiva homepage */
+
+/* --- Contenedor principal --- */
 
 #biblioteca {
     width: 100%;
@@ -6,126 +8,401 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background:
-        radial-gradient(ellipse at 50% 80%, rgb(90 58 26 / 30%) 0%, transparent 70%),
-        linear-gradient(180deg, #e8d6b8 0%, #d4c4a8 60%, #c0a888 100%);
+    background: #1a0e05 url('../../assets/img/biblioteca/sala-fondo.webp') center / cover no-repeat;
+    overflow: hidden;
+    position: relative;
 }
+
+/* Vignette sobre el fondo */
+#biblioteca::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 30%, rgb(15 8 0 / 55%) 100%);
+    pointer-events: none;
+}
+
+/* --- Escena contenedora --- */
+
+.escena-biblioteca {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 520px;
+    padding: 0 20px;
+}
+
+/* --- Animación de entrada --- */
+
+.escena-entrada .estante {
+    animation: entrada-estante 0.8s ease-out both;
+}
+
+.escena-entrada .estante-sombra-piso {
+    animation: entrada-sombra 0.8s ease-out 0.1s both;
+}
+
+@keyframes entrada-estante {
+    from {
+        opacity: 0;
+        transform: scale(0.92) translateY(25px);
+    }
+}
+
+@keyframes entrada-sombra {
+    from {
+        opacity: 0;
+    }
+}
+
+/* --- Partículas flotantes (polvo dorado) --- */
+
+.escena-particulas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
+    overflow: hidden;
+}
+
+.particula {
+    position: absolute;
+    left: var(--x);
+    bottom: -10px;
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    background: rgb(255 230 170);
+    animation: flotar var(--dur) linear var(--delay) infinite;
+}
+
+@keyframes flotar {
+    0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: var(--alpha);
+    }
+
+    90% {
+        opacity: var(--alpha);
+    }
+
+    100% {
+        transform: translateY(calc(-100vh - 20px)) translateX(var(--drift));
+        opacity: 0;
+    }
+}
+
+/* --- Overlay de luz de ventana --- */
+
+.escena-luz {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(
+        115deg,
+        rgb(255 215 130 / 10%) 0%,
+        rgb(255 200 100 / 5%) 35%,
+        transparent 60%
+    );
+    pointer-events: none;
+    z-index: 3;
+}
+
+/* --- Mueble (estante) --- */
 
 .estante {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 24px;
-    padding: 32px 40px;
-    max-width: 600px;
-    width: 90%;
+    width: 100%;
+    max-width: 440px;
+    position: relative;
+}
+
+/* Corona — moldura superior ornamental */
+.estante-corona {
+    width: calc(100% + 28px);
+    height: 12px;
+    background: linear-gradient(180deg, #a08060, #8b6b4a 40%, #7a5c3e);
+    border-radius: 6px 6px 0 0;
+    box-shadow:
+        0 -2px 6px rgb(0 0 0 / 20%),
+        inset 0 2px 0 rgb(255 255 255 / 10%),
+        inset 0 -1px 0 rgb(0 0 0 / 15%);
+    position: relative;
+}
+
+/* Filete dorado en la corona */
+.estante-corona::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 8px;
+    right: 8px;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgb(255 220 150 / 20%) 20%,
+        rgb(255 220 150 / 30%) 50%,
+        rgb(255 220 150 / 20%) 80%,
+        transparent
+    );
+}
+
+/* Encabezado */
+.estante-encabezado {
+    width: calc(100% + 20px);
+    padding: 16px 16px 12px;
+    text-align: center;
+    background: linear-gradient(180deg, #7a5c3e, #6b4e34);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%);
 }
 
 .estante-titulo {
     font-family: var(--font-display);
-    font-size: 2.2rem;
+    font-size: 2rem;
     font-weight: 700;
-    color: #5a3a1a;
+    color: #f0d8a0;
     text-shadow:
-        0 1px 0 rgb(255 255 255 / 40%),
-        0 2px 8px rgb(90 58 26 / 20%);
+        0 1px 0 rgb(0 0 0 / 40%),
+        0 0 20px rgb(200 160 80 / 25%);
     margin: 0;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
+    line-height: 1;
 }
+
+.estante-subtitulo {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    color: rgb(240 216 160 / 55%);
+    margin: 4px 0 0;
+    letter-spacing: 0.08em;
+    font-style: italic;
+}
+
+/* --- Repisa con libros --- */
 
 .estante-repisa {
     display: flex;
     justify-content: center;
-    gap: 16px;
-    padding: 20px 24px 16px;
-    background: linear-gradient(180deg, #8b6b4a 0%, #7a5c3e 40%, #6b4e34 100%);
-    border-radius: 8px 8px 12px 12px;
-    box-shadow:
-        0 6px 20px rgb(0 0 0 / 30%),
-        0 2px 0 #5a3e2a,
-        inset 0 1px 0 rgb(255 255 255 / 15%);
-    border-bottom: 4px solid #4a3020;
-    position: relative;
+    gap: 20px;
+    padding: 28px 28px 24px;
+    width: calc(100% + 20px);
+    box-sizing: border-box;
+    background: linear-gradient(180deg, #6b4e34, #5e4430 50%, #543d2a);
+    perspective: 800px;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 4%);
 }
 
-.estante-repisa::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 8px;
-    right: 8px;
-    height: 4px;
-    background: linear-gradient(90deg, transparent, rgb(0 0 0 / 15%), transparent);
-    border-radius: 0 0 4px 4px;
-}
-
+/* Cada lomo de libro */
 .estante-lomo {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    width: 80px;
-    height: 140px;
+    gap: 10px;
+    width: 90px;
+    height: 190px;
     border: none;
-    border-radius: 4px 6px 6px 4px;
+    border-radius: 3px 6px 6px 3px;
     cursor: pointer;
     position: relative;
+    transform-style: preserve-3d;
     transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease;
+        transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        box-shadow 0.35s ease;
     background:
         linear-gradient(
             90deg,
-            rgb(0 0 0 / 20%) 0%,
+            rgb(0 0 0 / 25%) 0%,
+            rgb(0 0 0 / 8%) 4px,
             transparent 8%,
             transparent 92%,
-            rgb(0 0 0 / 10%) 100%
+            rgb(0 0 0 / 12%) 100%
         ),
         linear-gradient(
             180deg,
-            color-mix(in srgb, var(--lomo-color) 90%, white) 0%,
-            var(--lomo-color) 50%,
-            color-mix(in srgb, var(--lomo-color) 80%, black) 100%
+            color-mix(in srgb, var(--lomo-color) 85%, white) 0%,
+            var(--lomo-color) 30%,
+            var(--lomo-color) 70%,
+            color-mix(in srgb, var(--lomo-color) 75%, black) 100%
         );
     box-shadow:
-        2px 2px 8px rgb(0 0 0 / 30%),
-        inset 0 0 0 1px rgb(255 255 255 / 10%);
+        2px 3px 10px rgb(0 0 0 / 40%),
+        inset 0 0 0 1px rgb(255 255 255 / 8%);
     font-family: var(--font-display);
 }
 
+/* Páginas visibles en el canto derecho */
+.estante-lomo::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    right: -3px;
+    bottom: 4px;
+    width: 3px;
+    background: linear-gradient(180deg, #f0e4d0, #e0d4c0 50%, #d0c4b0);
+    border-radius: 0 2px 2px 0;
+    box-shadow: 1px 0 3px rgb(0 0 0 / 20%);
+}
+
+/* Hover y focus: extracción 3D con glow */
 .estante-lomo:hover,
 .estante-lomo:focus-visible {
-    transform: translateY(-12px);
+    transform: rotateY(-8deg) translateY(-12px) translateZ(10px);
     box-shadow:
-        2px 8px 20px rgb(0 0 0 / 40%),
+        4px 10px 25px rgb(0 0 0 / 50%),
+        0 0 30px color-mix(in srgb, var(--lomo-color) 35%, transparent),
         inset 0 0 0 1px rgb(255 255 255 / 15%);
 }
 
 .estante-lomo:active {
-    transform: translateY(-6px);
+    transform: rotateY(-4deg) translateY(-6px) translateZ(5px);
+    transition-duration: 0.1s;
 }
 
 .estante-lomo-icono {
-    font-size: 1.4rem;
-    filter: drop-shadow(0 1px 2px rgb(0 0 0 / 30%));
+    font-size: 1.5rem;
+    filter: drop-shadow(0 2px 3px rgb(0 0 0 / 40%));
 }
 
 .estante-lomo-titulo {
     writing-mode: vertical-rl;
     text-orientation: mixed;
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     font-weight: 600;
-    color: #fff;
-    text-shadow: 0 1px 3px rgb(0 0 0 / 50%);
-    letter-spacing: 0.05em;
-    max-height: 90px;
+    color: rgb(255 255 255 / 95%);
+    text-shadow: 0 1px 4px rgb(0 0 0 / 60%);
+    letter-spacing: 0.06em;
+    max-height: 110px;
     overflow: hidden;
 }
 
-.estante-sombra {
-    width: 80%;
-    height: 8px;
-    background: radial-gradient(ellipse, rgb(0 0 0 / 15%) 0%, transparent 70%);
-    margin-top: -8px;
+/* --- Tabla de la repisa (canto frontal) --- */
+
+.estante-tabla {
+    width: calc(100% + 28px);
+    height: 12px;
+    background: linear-gradient(180deg, #8b6b4a, #7a5c3e 50%, #6b4e34);
+    box-shadow:
+        0 4px 12px rgb(0 0 0 / 30%),
+        inset 0 1px 0 rgb(255 255 255 / 8%);
+    position: relative;
+}
+
+/* Borde inferior de la tabla */
+.estante-tabla::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(180deg, #6b4e34, #5a3e2a);
+    border-radius: 0 0 2px 2px;
+}
+
+/* --- Base del mueble --- */
+
+.estante-base {
+    width: calc(100% + 16px);
+    height: 16px;
+    background: linear-gradient(180deg, #5a3e2a, #4a3020 60%, #3a2518);
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 4px 15px rgb(0 0 0 / 35%);
+    position: relative;
+}
+
+/* Patas implícitas */
+.estante-base::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 16px;
+    right: 16px;
+    height: 6px;
+    background: linear-gradient(90deg, #3a2518, transparent 15%, transparent 85%, #3a2518);
+    border-radius: 0 0 3px 3px;
+}
+
+/* --- Sombra en el piso --- */
+
+.estante-sombra-piso {
+    width: 75%;
+    max-width: 380px;
+    height: 16px;
+    background: radial-gradient(
+        ellipse at 50% 0%,
+        rgb(0 0 0 / 30%) 0%,
+        rgb(0 0 0 / 10%) 50%,
+        transparent 80%
+    );
+    margin-top: -2px;
+}
+
+/* --- Responsive --- */
+
+@media (width <= 768px) {
+    .estante-titulo {
+        font-size: 1.7rem;
+    }
+
+    .estante-subtitulo {
+        font-size: 0.78rem;
+    }
+
+    .estante-repisa {
+        gap: 16px;
+        padding: 22px 24px 18px;
+    }
+
+    .estante-lomo {
+        width: 78px;
+        height: 165px;
+    }
+
+    .estante-lomo-titulo {
+        max-height: 95px;
+        font-size: 0.74rem;
+    }
+}
+
+@media (width <= 480px) {
+    .escena-biblioteca {
+        padding: 0 12px;
+    }
+
+    .estante-titulo {
+        font-size: 1.4rem;
+    }
+
+    .estante-encabezado {
+        padding: 12px 12px 8px;
+    }
+
+    .estante-repisa {
+        gap: 12px;
+        padding: 18px 16px 14px;
+    }
+
+    .estante-lomo {
+        width: 64px;
+        height: 140px;
+    }
+
+    .estante-lomo-icono {
+        font-size: 1.3rem;
+    }
+
+    .estante-lomo-titulo {
+        max-height: 80px;
+        font-size: 0.7rem;
+    }
 }

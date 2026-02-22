@@ -1,22 +1,49 @@
 // Componente: Estante de biblioteca (homepage)
-// Renderiza un mueble de madera con lomos de libros clickeables
+// Escena inmersiva con mueble de madera, partículas flotantes y libros interactivos
 
 import { crearElemento } from '../utils.js';
 
+const TOTAL_PARTICULAS = 20;
+
 /**
- * Crea el estante de la biblioteca.
+ * Crea el estante de la biblioteca con escena inmersiva.
  * @param {HTMLElement} contenedor - Elemento donde montar el estante
- * @param {Array<{id: string, titulo: string, color: string, icono: string, onClick: Function}>} libros
+ * @param {Array<{id: string, titulo: string, color: string, icono?: string, onClick: Function}>} libros
  * @returns {{ mostrar: Function, ocultar: Function, destruir: Function }}
  */
 export function crearEstante(contenedor, libros) {
-    const el = crearElemento('div', 'estante oculto');
+    const escena = crearElemento('div', 'escena-biblioteca oculto');
 
-    // Título del mueble
-    const titulo = crearElemento('h1', 'estante-titulo', 'Biblioteca');
-    el.appendChild(titulo);
+    // Partículas de polvo flotante
+    const particulas = crearElemento('div', 'escena-particulas');
+    for (let i = 0; i < TOTAL_PARTICULAS; i++) {
+        const p = crearElemento('div', 'particula');
+        p.style.setProperty('--x', Math.random() * 100 + '%');
+        p.style.setProperty('--drift', (Math.random() - 0.5) * 60 + 'px');
+        p.style.setProperty('--dur', 15 + Math.random() * 20 + 's');
+        p.style.setProperty('--delay', -Math.random() * 20 + 's');
+        p.style.setProperty('--size', 2 + Math.random() * 3 + 'px');
+        p.style.setProperty('--alpha', 0.2 + Math.random() * 0.3);
+        particulas.appendChild(p);
+    }
+    escena.appendChild(particulas);
 
-    // Repisa con lomos
+    // Overlay de luz de ventana
+    escena.appendChild(crearElemento('div', 'escena-luz'));
+
+    // Mueble
+    const mueble = crearElemento('div', 'estante');
+
+    // Corona decorativa (moldura superior)
+    mueble.appendChild(crearElemento('div', 'estante-corona'));
+
+    // Encabezado
+    const encabezado = crearElemento('div', 'estante-encabezado');
+    encabezado.appendChild(crearElemento('h1', 'estante-titulo', 'Biblioteca'));
+    encabezado.appendChild(crearElemento('p', 'estante-subtitulo', 'de Aventuras'));
+    mueble.appendChild(encabezado);
+
+    // Repisa principal con lomos de libro
     const repisa = crearElemento('div', 'estante-repisa');
 
     libros.forEach(function (libro) {
@@ -26,15 +53,11 @@ export function crearEstante(contenedor, libros) {
         lomo.dataset.libro = libro.id;
         lomo.style.setProperty('--lomo-color', libro.color);
 
-        // Icono del libro
         if (libro.icono) {
-            const icono = crearElemento('span', 'estante-lomo-icono', libro.icono);
-            lomo.appendChild(icono);
+            lomo.appendChild(crearElemento('span', 'estante-lomo-icono', libro.icono));
         }
 
-        // Título vertical
-        const tituloLomo = crearElemento('span', 'estante-lomo-titulo', libro.titulo);
-        lomo.appendChild(tituloLomo);
+        lomo.appendChild(crearElemento('span', 'estante-lomo-titulo', libro.titulo));
 
         lomo.addEventListener('click', function () {
             if (libro.onClick) libro.onClick();
@@ -43,22 +66,40 @@ export function crearEstante(contenedor, libros) {
         repisa.appendChild(lomo);
     });
 
-    el.appendChild(repisa);
+    mueble.appendChild(repisa);
 
-    // Sombra inferior del mueble
-    el.appendChild(crearElemento('div', 'estante-sombra'));
+    // Tabla de la repisa (frente visible del estante)
+    mueble.appendChild(crearElemento('div', 'estante-tabla'));
 
-    contenedor.appendChild(el);
+    // Base del mueble
+    mueble.appendChild(crearElemento('div', 'estante-base'));
+
+    escena.appendChild(mueble);
+
+    // Sombra proyectada en el piso
+    escena.appendChild(crearElemento('div', 'estante-sombra-piso'));
+
+    contenedor.appendChild(escena);
+
+    let visible = false;
 
     return {
         mostrar: function () {
-            el.classList.remove('oculto');
+            if (visible) return;
+            visible = true;
+            escena.classList.remove('oculto');
+            escena.classList.remove('escena-entrada');
+            requestAnimationFrame(function () {
+                escena.classList.add('escena-entrada');
+            });
         },
         ocultar: function () {
-            el.classList.add('oculto');
+            visible = false;
+            escena.classList.add('oculto');
+            escena.classList.remove('escena-entrada');
         },
         destruir: function () {
-            el.remove();
+            escena.remove();
         },
     };
 }
