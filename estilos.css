@@ -1,10 +1,10 @@
 /* Estilos — Biblioteca de Aventuras */
 
-/* --- Estilos por habitación --- */
-@import url('css/habitacion1.css');
-@import url('css/habitacion2.css');
-@import url('css/habitacion3.css');
-@import url('css/habitacion4.css');
+/* --- Estilos por juego --- */
+@import url('css/laberinto.css');
+@import url('css/laberinto3d.css');
+@import url('css/memorice.css');
+@import url('css/abismo.css');
 
 /* --- Fuentes locales --- */
 
@@ -2517,27 +2517,54 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     margin-top: 4px;
 }
 
-/* --- Lista de rangos (Villanario) --- */
+/* --- Página de rangos (Villanario) --- */
 
-.libro-rangos-lista {
+.libro-rangos {
+    text-align: center;
+    padding: 20px 24px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    margin-top: 8px;
+    align-items: center;
+    height: 100%;
+}
+
+.libro-rangos-intro {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: rgb(220 205 180 / 90%);
+    margin: 4px 0 0;
+    max-width: 280px;
+}
+
+.libro-rangos-lista {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0;
+    margin-top: 10px;
     text-align: left;
+    width: 100%;
+    max-width: 300px;
 }
 
 .libro-rango-fila {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgb(255 215 0 / 8%);
+}
+
+.libro-rango-fila:last-child {
+    border-bottom: none;
 }
 
 .libro-rango-emoji {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     line-height: 1;
     flex-shrink: 0;
-    width: 28px;
+    width: 30px;
     text-align: center;
 }
 
@@ -2550,8 +2577,8 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
 .libro-rango-desc {
     font-size: 0.78rem;
     line-height: 1.45;
-    color: rgb(220 205 180 / 75%);
-    margin: 1px 0 0;
+    color: rgb(220 205 180 / 70%);
+    margin: 2px 0 0;
 }
 
 /* --- Páginas de habitaciones (descripción de juegos) --- */

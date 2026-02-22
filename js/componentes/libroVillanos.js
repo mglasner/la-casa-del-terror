@@ -213,20 +213,17 @@ const RANGOS_DESC = {
 
 // Genera la página de Rangos del Villanario
 export function generarPaginaRangos() {
-    const contenido = crearElemento('div', 'libro-detalle-contenido libro-intro');
+    const contenido = crearElemento('div', 'libro-detalle-contenido libro-rangos');
 
     contenido.appendChild(crearElemento('h2', 'libro-intro-game-titulo', 'Rangos de Villanos'));
     contenido.appendChild(crearElemento('div', 'libro-ornamento'));
-
-    const texto = crearElemento('div', 'libro-intro-texto');
-    texto.appendChild(
+    contenido.appendChild(
         crearElemento(
             'p',
-            null,
+            'libro-rangos-intro',
             'Cada villano tiene un rango que indica su poder. Conócelos antes de aventurarte:'
         )
     );
-    contenido.appendChild(texto);
 
     const lista = crearElemento('div', 'libro-rangos-lista');
     ORDEN_TIER.forEach(function (tier) {
