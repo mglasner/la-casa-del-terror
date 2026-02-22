@@ -1,4 +1,5 @@
 Lina:
+    genero: femenino
     vida: 100
     img: assets/img/personajes/lina.webp
     clase: jugador-lina
@@ -23,6 +24,7 @@ Lina:
           descripcion: Actuación final que arrasa el escenario
 
 Rosé:
+    genero: femenino
     vida: 90
     img: assets/img/personajes/rose.webp
     clase: jugador-rose
@@ -47,6 +49,7 @@ Rosé:
           descripcion: Atrapa al rival girando desde el cubo
 
 PandaJuro:
+    genero: masculino
     vida: 120
     img: assets/img/personajes/pandajuro.webp
     clase: jugador-pandajuro
@@ -71,6 +74,7 @@ PandaJuro:
           descripcion: Golpe rápido con bambú
 
 Hana:
+    genero: femenino
     vida: 95
     img: assets/img/personajes/hana.webp
     clase: jugador-hana
@@ -95,6 +99,7 @@ Hana:
           descripcion: Movimientos mortales de baile
 
 Kira:
+    genero: femenino
     vida: 95
     img: assets/img/personajes/kira.webp
     clase: jugador-kira
@@ -119,6 +124,7 @@ Kira:
           descripcion: Destello que ciega y daña
 
 DonBu:
+    genero: masculino
     vida: 140
     img: assets/img/personajes/donbu.webp
     clase: jugador-donbu
@@ -143,6 +149,7 @@ DonBu:
           descripcion: Embiste con toda su terquedad
 
 PomPom:
+    genero: femenino
     vida: 85
     img: assets/img/personajes/pompom.webp
     clase: jugador-pompom
@@ -167,6 +174,7 @@ PomPom:
           descripcion: Un abrazo maternal con la fuerza de quien carga 15 hijos
 
 Orejas:
+    genero: masculino
     vida: 110
     img: assets/img/personajes/orejas.webp
     clase: jugador-orejas

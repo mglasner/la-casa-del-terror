@@ -12,6 +12,7 @@ const ENEMIGOS = {
         ],
         {
             tier: 'elite',
+            genero: 'femenino',
             img: 'assets/img/enemigos/siniestra.webp',
             clase: 'villano-siniestra',
             descripcion:
@@ -32,6 +33,7 @@ const ENEMIGOS = {
         ],
         {
             tier: 'esbirro',
+            genero: 'masculino',
             img: 'assets/img/enemigos/trasgo.webp',
             clase: 'villano-trasgo',
             descripcion:
@@ -52,6 +54,7 @@ const ENEMIGOS = {
         ],
         {
             tier: 'elite',
+            genero: 'masculino',
             img: 'assets/img/enemigos/errante.webp',
             clase: 'villano-errante',
             descripcion:
@@ -76,6 +79,7 @@ const ENEMIGOS = {
         ],
         {
             tier: 'elite',
+            genero: 'masculino',
             img: 'assets/img/enemigos/profano.webp',
             clase: 'villano-profano',
             descripcion:
@@ -100,6 +104,7 @@ const ENEMIGOS = {
         ],
         {
             tier: 'esbirro',
+            genero: 'femenino',
             img: 'assets/img/enemigos/topete.webp',
             clase: 'villano-topete',
             descripcion:
@@ -124,6 +129,7 @@ const ENEMIGOS = {
         ],
         {
             tier: 'esbirro',
+            genero: 'femenino',
             img: 'assets/img/enemigos/pototo.webp',
             clase: 'villano-pototo',
             descripcion:
@@ -137,21 +143,22 @@ const ENEMIGOS = {
 
     'La Grotesca': new Enemigo(
         'La Grotesca',
-        200,
+        160,
         [
             {
                 nombre: 'Tela encantada',
-                dano: 22,
+                dano: 16,
                 descripcion: 'Envuelve al rival con telas encantadas',
             },
             {
                 nombre: 'Caída vertiginosa',
-                dano: 28,
+                dano: 20,
                 descripcion: 'Se lanza desde lo alto con todo su peso',
             },
         ],
         {
-            tier: 'pesadilla',
+            tier: 'elite',
+            genero: 'femenino',
             img: 'assets/img/enemigos/grotesca.webp',
             clase: 'villano-grotesca',
             descripcion:
@@ -165,21 +172,22 @@ const ENEMIGOS = {
 
     'El Disonante': new Enemigo(
         'El Disonante',
-        220,
+        170,
         [
             {
                 nombre: 'Nota discordante',
-                dano: 22,
+                dano: 16,
                 descripcion: 'Una nota tan desafinada que hace temblar los huesos',
             },
             {
                 nombre: 'Réquiem arcano',
-                dano: 28,
+                dano: 20,
                 descripcion: 'Melodía arcana que drena la energía vital',
             },
         ],
         {
-            tier: 'pesadilla',
+            tier: 'elite',
+            genero: 'masculino',
             img: 'assets/img/enemigos/disonante.webp',
             clase: 'villano-disonante',
             descripcion:
@@ -188,6 +196,64 @@ const ENEMIGOS = {
             velocidad: 4,
             velAtaque: 5,
             estatura: 1.85,
+        }
+    ),
+
+    'El Monstruo Comelón': new Enemigo(
+        'El Monstruo Comelón',
+        240,
+        [
+            {
+                nombre: 'Bocado estelar',
+                dano: 24,
+                descripcion: 'Mordisco cósmico que hace temblar el espacio',
+            },
+            {
+                nombre: 'Gran Mascada',
+                dano: 30,
+                descripcion: 'Abre sus fauces y tritura todo a su paso',
+            },
+        ],
+        {
+            tier: 'pesadilla',
+            genero: 'masculino',
+            img: 'assets/img/enemigos/comelon.webp',
+            clase: 'villano-comelon',
+            descripcion:
+                'El Monstruo Comelón es la criatura más grande y hambrienta que jamás ha flotado por el espacio. Su boca es tan descomunal que podría tragarse la Luna de un solo mordisco... y repetir con la Tierra de postre. Lleva eones vagando entre las estrellas, devorando todo lo que encuentra: planetas, asteroides, cometas e incluso alguna que otra estrella despistada. Los científicos del universo lo llaman "Evento Gastronómico de Nivel Cósmico". Él se llama a sí mismo "un poquito antojadizo".\n\nLo curioso es que El Comelón no es malvado... solo tiene un hambre infinita y cero autocontrol. Cuando La Nebulosa le señala un nuevo mundo, sus ojitos brillan como supernovas y empieza a salivar asteroides. Su estómago retumba con tal fuerza que los planetas cercanos tiemblan en sus órbitas. Dicen que en algún lugar de su panza gigante hay un planeta entero que se salvó porque El Comelón se distrajo con otro más sabroso.',
+            edad: 5000000,
+            velocidad: 3,
+            velAtaque: 4,
+            estatura: 99999.9,
+        }
+    ),
+
+    'La Nebulosa': new Enemigo(
+        'La Nebulosa',
+        230,
+        [
+            {
+                nombre: 'Niebla cósmica',
+                dano: 20,
+                descripcion: 'Envuelve al rival en oscuridad helada',
+            },
+            {
+                nombre: 'Vórtice de sombra',
+                dano: 26,
+                descripcion: 'Remolino de sombras que arrastra todo',
+            },
+        ],
+        {
+            tier: 'pesadilla',
+            genero: 'femenino',
+            img: 'assets/img/enemigos/nebulosa.webp',
+            clase: 'villano-nebulosa',
+            descripcion:
+                'La Nebulosa es una nube viviente de gas y polvo estelar que flota por el cosmos con una curiosidad insaciable. Sus ojos — dos luces brillantes que parpadean entre la bruma — son lo único constante en su forma siempre cambiante: a veces parece un remolino de colores, otras veces una cortina de humo con garras, y cuando está contenta se expande hasta cubrir lunas enteras.\n\nEs la compañera perfecta del Monstruo Comelón: mientras él devora, ella prepara el terreno envolviendo planetas en una oscuridad tan espesa que nadie ve venir lo que se acerca. Lo hace por diversión, no por maldad: para La Nebulosa, envolver un mundo en sombras es como jugar a las escondidas a escala cósmica. Su risa es un eco lejano que resuena entre las estrellas, y cuando se aburre, crea vórtices de sombra solo para ver cómo giran.',
+            edad: 3000000,
+            velocidad: 5,
+            velAtaque: 5,
+            estatura: 500,
         }
     ),
 };

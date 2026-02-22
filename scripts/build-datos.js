@@ -19,8 +19,15 @@ const CAMPOS_ENTIDAD = [
     'velAtaque',
     'estatura',
 ];
-const CAMPOS_PERSONAJE = [...CAMPOS_ENTIDAD, 'colorHud', 'colorHudClaro', 'colorPiel', 'emojiHud'];
-const CAMPOS_ENEMIGO = ['tier', ...CAMPOS_ENTIDAD];
+const CAMPOS_PERSONAJE = [
+    ...CAMPOS_ENTIDAD,
+    'genero',
+    'colorHud',
+    'colorHudClaro',
+    'colorPiel',
+    'emojiHud',
+];
+const CAMPOS_ENEMIGO = ['tier', 'genero', ...CAMPOS_ENTIDAD];
 const CAMPOS_ATAQUE = ['nombre', 'dano', 'descripcion'];
 
 // Valida que una entidad tenga todos los campos requeridos
@@ -79,6 +86,7 @@ function generarAtaque(ataque) {
 function generarDatos(datos) {
     const lineas = [
         ...(datos.tier ? [`tier: '${datos.tier}',`] : []),
+        ...(datos.genero ? [`genero: '${datos.genero}',`] : []),
         `img: '${datos.img}',`,
         `clase: '${datos.clase}',`,
         `descripcion: '${datos.descripcion.replace(/'/g, "\\'").replace(/\n/g, '\\n')}',`,
@@ -256,12 +264,30 @@ const SCHEMA_ABISMO = {
     sprites: ['jugadorIdleVel', 'jugadorCorrerVel'],
 };
 
+const SCHEMA_AJEDREZ = {
+    meta: ['titulo', 'tiempoVictoria'],
+    ia: ['retardoMovimiento', 'retardoJaque'],
+    tablero: ['tamCelda', 'tamCeldaMobile'],
+    textos: [
+        'turnoJugador',
+        'turnoIA',
+        'toastJaque',
+        'toastMate',
+        'toastTablas',
+        'toastVictoria',
+        'toastDerrota',
+        'promocion',
+    ],
+    curacion: ['victoriaMin', 'victoriaMax'],
+};
+
 // Tabla de juegos: slug → schema de validación
 const JUEGOS = [
     { slug: 'laberinto', schema: SCHEMA_LABERINTO },
     { slug: 'laberinto3d', schema: SCHEMA_LABERINTO3D },
     { slug: 'memorice', schema: SCHEMA_MEMORICE },
     { slug: 'abismo', schema: SCHEMA_ABISMO },
+    { slug: 'ajedrez', schema: SCHEMA_AJEDREZ },
 ];
 
 // Valida un juego contra su schema

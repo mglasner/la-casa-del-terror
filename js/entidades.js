@@ -27,6 +27,7 @@ class Personaje extends Entidad {
     constructor(nombre, vidaMax, ataques, datos) {
         super(nombre, vidaMax);
         this.ataques = ataques;
+        this.genero = datos.genero;
         this.img = datos.img;
         this.clase = datos.clase;
         this.descripcion = datos.descripcion;
@@ -51,6 +52,7 @@ class Enemigo extends Entidad {
             this.descripcion = datos;
         } else if (datos) {
             this.tier = datos.tier;
+            this.genero = datos.genero;
             this.img = datos.img;
             this.clase = datos.clase;
             this.descripcion = datos.descripcion || '';

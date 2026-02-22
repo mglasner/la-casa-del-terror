@@ -5,6 +5,7 @@ import { iniciarLaberinto, limpiarLaberinto } from './juegos/laberinto/index.js'
 import { iniciarLaberinto3d, limpiarLaberinto3d } from './juegos/laberinto3d/index.js';
 import { iniciarMemorice, limpiarMemorice } from './juegos/memorice/index.js';
 import { iniciarAbismo, limpiarAbismo } from './juegos/abismo/index.js';
+import { iniciarAjedrez, limpiarAjedrez } from './juegos/ajedrez/index.js';
 import { crearBarraSuperior } from './componentes/barraSuperior.js';
 import { crearModalDerrota } from './componentes/modalDerrota.js';
 import { crearModalSalir } from './componentes/modalSalir.js';
@@ -38,6 +39,7 @@ const juegos = {
     laberinto3d: { iniciar: iniciarLaberinto3d, limpiar: limpiarLaberinto3d },
     memorice: { iniciar: iniciarMemorice, limpiar: limpiarMemorice },
     abismo: { iniciar: iniciarAbismo, limpiar: limpiarAbismo },
+    ajedrez: { iniciar: iniciarAjedrez, limpiar: limpiarAjedrez },
 };
 
 // --- Estado del juego ---

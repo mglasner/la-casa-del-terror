@@ -4,7 +4,7 @@ import prettierConfig from 'eslint-config-prettier';
 
 export default [
     {
-        ignores: ['node_modules/', 'dist/'],
+        ignores: ['node_modules/', 'dist/', 'js/juegos/ajedrez/lib/'],
     },
     {
         files: ['js/**/*.js'],

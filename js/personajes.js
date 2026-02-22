@@ -15,6 +15,7 @@ const PERSONAJES = {
             },
         ],
         {
+            genero: 'femenino',
             img: 'assets/img/personajes/lina.webp',
             clase: 'jugador-lina',
             descripcion:
@@ -46,6 +47,7 @@ const PERSONAJES = {
             },
         ],
         {
+            genero: 'femenino',
             img: 'assets/img/personajes/rose.webp',
             clase: 'jugador-rose',
             descripcion:
@@ -69,6 +71,7 @@ const PERSONAJES = {
             { nombre: 'Golpe de bambú', dano: 18, descripcion: 'Golpe rápido con bambú' },
         ],
         {
+            genero: 'masculino',
             img: 'assets/img/personajes/pandajuro.webp',
             clase: 'jugador-pandajuro',
             descripcion:
@@ -96,6 +99,7 @@ const PERSONAJES = {
             { nombre: 'Coreografía letal', dano: 22, descripcion: 'Movimientos mortales de baile' },
         ],
         {
+            genero: 'femenino',
             img: 'assets/img/personajes/hana.webp',
             clase: 'jugador-hana',
             descripcion:
@@ -119,6 +123,7 @@ const PERSONAJES = {
             { nombre: 'Trampa de luz', dano: 18, descripcion: 'Destello que ciega y daña' },
         ],
         {
+            genero: 'femenino',
             img: 'assets/img/personajes/kira.webp',
             clase: 'jugador-kira',
             descripcion:
@@ -142,6 +147,7 @@ const PERSONAJES = {
             { nombre: 'Cabezazo terco', dano: 20, descripcion: 'Embiste con toda su terquedad' },
         ],
         {
+            genero: 'masculino',
             img: 'assets/img/personajes/donbu.webp',
             clase: 'jugador-donbu',
             descripcion:
@@ -173,6 +179,7 @@ const PERSONAJES = {
             },
         ],
         {
+            genero: 'femenino',
             img: 'assets/img/personajes/pompom.webp',
             clase: 'jugador-pompom',
             descripcion:
@@ -204,6 +211,7 @@ const PERSONAJES = {
             },
         ],
         {
+            genero: 'masculino',
             img: 'assets/img/personajes/orejas.webp',
             clase: 'jugador-orejas',
             descripcion:

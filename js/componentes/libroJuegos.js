@@ -51,6 +51,17 @@ const JUEGOS = {
         ],
         tip: 'Salta sobre los enemigos para hacerles daño. Usa las plataformas y no mires abajo.',
     },
+    ajedrez: {
+        nombre: 'El Ajedrez',
+        img: 'assets/img/juegos/ajedrez.webp',
+        accent: '#f0a030',
+        parrafos: [
+            'Un tablero de ajedrez mágico donde los villanos cobran vida como piezas. El Monstruo Comelón lidera el ejército oscuro como Rey, mientras La Nebulosa maniobra como Reina.',
+            'Mueve tus piezas con estrategia para dar jaque mate. Cada pieza enemiga es un villano con su propio avatar.',
+            'Elige tu nivel de dificultad y demuestra que tu mente es más poderosa que cualquier ejército.',
+        ],
+        tip: 'Piensa antes de mover. Protege a tu rey y busca debilidades en el rival.',
+    },
 };
 
 // Adaptador: convierte JUEGOS a formato de entidades para crearLibro

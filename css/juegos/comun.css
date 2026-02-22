@@ -34,6 +34,14 @@
     --juego-accent: #5eeadb;
 }
 
+.juego-ajedrez {
+    --juego-pared: #3e2e0a;
+    --juego-pared-medio: #2e1e08;
+    --juego-pared-oscuro: #1e1005;
+    --juego-borde: rgb(240 160 48 / 20%);
+    --juego-accent: #f0a030;
+}
+
 /* Cabecera: botón huir + título en una sola fila */
 .cabecera-juego {
     display: flex;

@@ -690,3 +690,61 @@
     color: #c89030;
     background-color: rgb(200 144 48 / 15%);
 }
+
+/* El Monstruo Comelón — naranja/dorado cósmico */
+.villano-comelon {
+    --v-color: #f0a030;
+    --v-oscuro: #a06810;
+    --v-glow: rgb(240 160 48 / 40%);
+    --v-tenue: rgb(240 160 48 / 12%);
+
+    border-color: #4a3008;
+    background-color: #1a1205;
+}
+
+.villano-comelon h3 {
+    color: #f0a030;
+}
+
+.villano-comelon .avatar img {
+    border-color: #a06810;
+    box-shadow: 0 0 10px rgb(240 160 48 / 40%);
+}
+
+.villano-comelon .barra-vida-relleno {
+    background: linear-gradient(90deg, #a06810, #f0a030);
+}
+
+.villano-comelon .ataque-dano {
+    color: #f0a030;
+    background-color: rgb(240 160 48 / 15%);
+}
+
+/* La Nebulosa — azul-violeta nebuloso */
+.villano-nebulosa {
+    --v-color: #7b68ee;
+    --v-oscuro: #4838a0;
+    --v-glow: rgb(123 104 238 / 40%);
+    --v-tenue: rgb(123 104 238 / 12%);
+
+    border-color: #2a1a5a;
+    background-color: #100a28;
+}
+
+.villano-nebulosa h3 {
+    color: #7b68ee;
+}
+
+.villano-nebulosa .avatar img {
+    border-color: #4838a0;
+    box-shadow: 0 0 10px rgb(123 104 238 / 40%);
+}
+
+.villano-nebulosa .barra-vida-relleno {
+    background: linear-gradient(90deg, #4838a0, #7b68ee);
+}
+
+.villano-nebulosa .ataque-dano {
+    color: #7b68ee;
+    background-color: rgb(123 104 238 / 15%);
+}
