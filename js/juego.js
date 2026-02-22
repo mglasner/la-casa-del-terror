@@ -1,4 +1,4 @@
-// Código principal — Biblioteca de aventuras
+// Código principal — El Relatario
 import { PERSONAJES } from './personajes.js';
 import { ENEMIGOS } from './enemigos.js';
 import { iniciarLaberinto, limpiarLaberinto } from './juegos/laberinto/index.js';

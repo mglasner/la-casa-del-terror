@@ -1,8 +1,8 @@
-// Service Worker — Biblioteca de Aventuras
+// Service Worker — El Relatario
 // Estrategias diferenciadas por tipo de recurso
 
-const CACHE_NAME = 'biblioteca-aventuras-v1';
-const BASE_PATH = '/mansion-de-aventuras/';
+const CACHE_NAME = 'relatario-v1';
+const BASE_PATH = '/';
 
 // Assets estáticos para precachear en instalación
 const STATIC_ASSETS = [

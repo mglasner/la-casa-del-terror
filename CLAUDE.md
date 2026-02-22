@@ -1,6 +1,6 @@
-# Biblioteca de Aventuras
+# El Relatario
 
-Plataforma narrativa interactiva con metáfora de biblioteca personal, creada como proyecto familiar para aprender HTML, CSS y JavaScript.
+Plataforma narrativa interactiva — un compendio de relatos, héroes y desafíos para contar en familia. Creada como proyecto familiar para aprender HTML, CSS y JavaScript.
 
 ## Estructura del proyecto
 
@@ -186,7 +186,7 @@ Archivo: `.github/workflows/deploy.yml`
 Push a main → GitHub Actions ejecuta npm run build → dist/ se despliega a GitHub Pages
 ```
 
-- **URL**: https://mglasner.github.io/mansion-de-aventuras/
+- **URL**: https://relatario.cl/
 - **Repo público**: requerido por GitHub Pages en plan gratuito
 
 ### Service Worker (`sw.js`)

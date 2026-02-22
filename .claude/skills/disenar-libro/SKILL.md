@@ -1,7 +1,7 @@
 ---
 name: disenar-libro
 description: >
-    Generar y optimizar ilustraciones de libros para la Biblioteca de Aventuras.
+    Generar y optimizar ilustraciones de libros para El Relatario.
     Usar cuando el usuario pida: "crear lomo", "nuevo libro", "diseñar libro",
     "imagen de lomo", "ilustración de libro", "agregar libro al estante",
     "rediseñar lomo", "portada de libro", o mencione generar/modificar las

@@ -185,7 +185,7 @@ export function generarPrologoVillanos() {
         crearElemento(
             'p',
             null,
-            'Aquí se reúnen las criaturas más astutas, traviesas y misteriosas de la Biblioteca de Aventuras. Desde pequeños esbirros hasta temibles pesadillas, cada villano tiene su propia historia.'
+            'Aquí se reúnen las criaturas más astutas, traviesas y misteriosas de El Relatario. Desde pequeños esbirros hasta temibles pesadillas, cada villano tiene su propia historia.'
         )
     );
     texto.appendChild(

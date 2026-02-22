@@ -39,8 +39,8 @@ export function crearEstante(contenedor, libros) {
 
     // Encabezado
     const encabezado = crearElemento('div', 'estante-encabezado');
-    encabezado.appendChild(crearElemento('h1', 'estante-titulo', 'Biblioteca'));
-    encabezado.appendChild(crearElemento('p', 'estante-subtitulo', 'de Aventuras'));
+    encabezado.appendChild(crearElemento('h1', 'estante-titulo', 'El Relatario'));
+    encabezado.appendChild(crearElemento('p', 'estante-subtitulo', 'un compendio de relatos'));
     mueble.appendChild(encabezado);
 
     // Repisa principal con lomos de libro

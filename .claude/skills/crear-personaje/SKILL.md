@@ -4,13 +4,13 @@ description: >
     Esta skill debe usarse cuando el usuario pide "crear villano", "crear héroe",
     "nuevo personaje", "nuevo enemigo", "agregar villano", "agregar personaje",
     "crear esbirro", "crear pesadilla", o menciona crear/agregar un personaje
-    jugable o enemigo para La Mansión de Aventuras.
+    jugable o enemigo para El Relatario.
 ---
 
 # Crear Personaje o Villano
 
 Guía el proceso completo de creación de héroes (personajes jugables) y villanos
-(enemigos) para La Mansión de Aventuras, asegurando que los datos se definan en la
+(enemigos) para El Relatario, asegurando que los datos se definan en la
 fuente de verdad correcta y que todos los assets se generen y optimicen.
 
 ## Regla Fundamental

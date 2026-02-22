@@ -1,4 +1,4 @@
-# Plan: El Ajedrez — 5to juego de la Biblioteca de Aventuras
+# Plan: El Ajedrez — 5to juego de El Relatario
 
 ## Resumen
 
@@ -689,7 +689,7 @@ const JUEGOS = [
 ## Apéndice: Cambios respecto al plan original
 
 Este plan fue actualizado para reflejar la transformación de "La Mansión de
-Aventuras" a "Biblioteca de Aventuras" (febrero 2026). Cambios principales:
+Aventuras" a "El Relatario" (febrero 2026). Cambios principales:
 
 | Aspecto | Plan original | Plan actualizado |
 |---------|---------------|------------------|
