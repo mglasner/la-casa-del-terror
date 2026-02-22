@@ -2711,6 +2711,11 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
 
 /* Layout del libro — clase base para todos los libros */
 .libro {
+    --v-color: rgb(230 200 160 / 95%);
+    --v-oscuro: rgb(180 155 120);
+    --v-glow: rgb(230 200 160 / 30%);
+    --v-tenue: rgb(230 200 160 / 10%);
+
     display: flex;
     width: 700px;
     height: 680px;
@@ -2724,6 +2729,7 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
         0 8px 32px rgb(0 0 0 / 50%),
         0 0 18px var(--v-glow, rgb(233 69 96 / 15%));
     transition: box-shadow 0.5s;
+    background-color: #18120d;
 }
 
 .libro-villanos {
@@ -2775,7 +2781,7 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     overflow: hidden;
 }
 
-/* Tintado del villano en página derecha */
+/* Tintado suave en página derecha */
 .libro-pagina-der::before {
     content: '';
     position: absolute;
@@ -2932,7 +2938,7 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     line-height: 1;
 }
 
-/* Contenido del villano */
+/* Contenido del detalle */
 .libro-detalle-wrap {
     flex: 1;
     min-height: 0;
@@ -3846,98 +3852,6 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     margin-top: -8px;
 }
 
-/* --- Modal de preview de libro --- */
-
-.modal-previa {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-previa-fondo {
-    position: absolute;
-    inset: 0;
-    background: rgb(0 0 0 / 50%);
-    backdrop-filter: blur(4px);
-}
-
-.modal-previa-caja {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    padding: 32px 40px;
-    background: linear-gradient(135deg, #f5ead6 0%, #efe0c8 100%);
-    border-radius: 16px;
-    box-shadow: 0 12px 40px rgb(0 0 0 / 30%);
-    max-width: 320px;
-    width: 85%;
-    animation: modal-previa-entrada 0.3s ease;
-}
-
-@keyframes modal-previa-entrada {
-    from {
-        opacity: 0;
-        transform: scale(0.9) translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
-}
-
-.modal-previa-portada {
-    width: 160px;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 4px 16px rgb(0 0 0 / 25%);
-    background: var(--color-oscuro);
-}
-
-.modal-previa-titulo {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #5a3a1a;
-    margin: 0;
-    text-align: center;
-}
-
-.modal-previa-subtitulo {
-    font-size: 0.9rem;
-    color: var(--color-texto-secundario);
-    margin: 0;
-    text-align: center;
-}
-
-.modal-previa-btn {
-    padding: 10px 32px;
-    border: none;
-    border-radius: var(--radio-boton);
-    background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
-    color: #fff;
-    font-family: var(--font-body);
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition:
-        transform 0.15s ease,
-        box-shadow 0.15s ease;
-    box-shadow: 0 2px 8px rgb(200 134 74 / 40%);
-}
-
-.modal-previa-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgb(200 134 74 / 50%);
-}
-
 /* --- Libro de Juegos (detalle de juego) --- */
 
 .libro-juego-detalle {
@@ -4427,13 +4341,13 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
         padding: 12px;
     }
 
-    /* Fondo plano del personaje solo cuando hay uno activo (no en Bienvenida ni habitaciones) */
-    :not(.libro-en-inicio, .libro-en-extra) > .libro-pagina-der {
+    /* Fondo plano del personaje/villano cuando hay uno activo (no en Bienvenida ni habitaciones) */
+    .libro:not(.libro-en-inicio, .libro-en-extra) > .libro-pagina-der {
         background: none;
         background-color: inherit;
     }
 
-    :not(.libro-en-inicio, .libro-en-extra) > .libro-pagina-der::before {
+    .libro:not(.libro-en-inicio, .libro-en-extra) > .libro-pagina-der::before {
         display: none;
     }
 

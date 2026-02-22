@@ -12,7 +12,6 @@ import { crearTransicion } from './componentes/transicion.js';
 import { crearControlesTouch } from './componentes/controlesTouch.js';
 import { crearToast } from './componentes/toast.js';
 import { crearEstante } from './componentes/estante.js';
-import { crearModalPrevia } from './componentes/modalPrevia.js';
 import { crearLibroJuegos } from './componentes/libroJuegos.js';
 import { crearModalLibro } from './componentes/modalLibro.js';
 import { crearLibro } from './componentes/libro.js';
@@ -74,39 +73,10 @@ const toast = crearToast();
 // --- Configuración de libros del estante ---
 
 const LIBROS_ESTANTE = [
-    {
-        id: 'heroario',
-        titulo: 'Heroario',
-        color: '#c8a050',
-        icono: '\u2694\uFE0F',
-        portada: 'assets/img/portada-heroario.webp',
-        subtitulo: 'La enciclopedia de los héroes',
-    },
-    {
-        id: 'villanario',
-        titulo: 'Villanario',
-        color: '#8b3a62',
-        icono: '\uD83D\uDC7E',
-        portada: 'assets/img/portada-villanario.webp',
-        subtitulo: 'La enciclopedia de villanos',
-    },
-    {
-        id: 'juegos',
-        titulo: 'Libro de Juegos',
-        color: '#4a7c59',
-        icono: '\uD83C\uDFAE',
-        portada: 'assets/img/portada-juegos.webp',
-        subtitulo: 'Los desafíos te esperan',
-    },
+    { id: 'heroario', titulo: 'Heroario', color: '#c8a050', icono: '\u2694\uFE0F' },
+    { id: 'villanario', titulo: 'Villanario', color: '#8b3a62', icono: '\uD83D\uDC7E' },
+    { id: 'juegos', titulo: 'Libro de Juegos', color: '#4a7c59', icono: '\uD83C\uDFAE' },
 ];
-
-// --- Modal de preview ---
-
-const modalPrevia = crearModalPrevia(contenedorJuego);
-
-modalPrevia.onAbrir(function (libroId) {
-    cambiarEstado(ESTADOS.LIBRO, { libroId: libroId });
-});
 
 // --- Estante (homepage) ---
 
@@ -119,12 +89,7 @@ const estante = crearEstante(
             color: cfg.color,
             icono: cfg.icono,
             onClick: function () {
-                modalPrevia.mostrar({
-                    id: cfg.id,
-                    portada: cfg.portada,
-                    titulo: cfg.titulo,
-                    subtitulo: cfg.subtitulo,
-                });
+                cambiarEstado(ESTADOS.LIBRO, { libroId: cfg.id });
             },
         };
     })
@@ -231,8 +196,7 @@ document.addEventListener('jugador-muerto', function () {
 // --- Máquina de estados: transiciones centralizadas ---
 
 function elegirTransicion(anterior, nuevo) {
-    if (nuevo === ESTADOS.JUEGO) return 'iris';
-    if (anterior === ESTADOS.JUEGO) return 'iris';
+    if (nuevo === ESTADOS.JUEGO || anterior === ESTADOS.JUEGO) return 'iris';
     return 'fade';
 }
 
@@ -284,7 +248,10 @@ function ejecutarCambioEstado(anterior, nuevo, datos) {
         estado.habitacionActual = datos.numero;
         // Copia que preserva métodos del prototipo (recibirDano, estaVivo, curar)
         const original = PERSONAJES[datos.personaje];
-        estado.jugadorActual = Object.assign(Object.create(Object.getPrototypeOf(original)), original);
+        estado.jugadorActual = Object.assign(
+            Object.create(Object.getPrototypeOf(original)),
+            original
+        );
         estado.jugadorActual.vidaActual = estado.jugadorActual.vidaMax;
         estado.jugadorActual.inventario = [];
 

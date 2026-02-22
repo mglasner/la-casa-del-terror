@@ -30,7 +30,6 @@ mansion-de-aventuras/
 │   ├── utils.js              # Utilidades compartidas
 │   ├── componentes/          # Componentes UI (crean su propio HTML desde JS)
 │   │   ├── estante.js        # Homepage: mueble con lomos de libros
-│   │   ├── modalPrevia.js    # Preview de portada antes de abrir libro
 │   │   ├── libroJuegos.js    # Libro de Juegos con selector de héroe
 │   │   ├── modalLibro.js     # Modal reutilizable para mostrar libros
 │   │   ├── libro.js          # Motor genérico de libro (índice + detalle)
@@ -67,10 +66,10 @@ mansion-de-aventuras/
 ## Flujo de navegación
 
 ```text
-Estante (homepage) → Preview modal → Libro abierto (modal)
-                                         ↓ (Libro de Juegos)
-                                    Elegir héroe + Jugar → Juego (fullscreen)
-                                         ↑ (ganar/perder/huir)
+Estante (homepage) → Libro abierto (modal)
+                         ↓ (Libro de Juegos)
+                    Elegir héroe + Jugar → Juego (fullscreen)
+                         ↑ (ganar/perder/huir)
 ```
 
 **Estados de la state machine** (`js/juego.js`):
