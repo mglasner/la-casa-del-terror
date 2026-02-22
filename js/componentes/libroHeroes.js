@@ -95,7 +95,7 @@ export function generarIntro() {
         crearElemento(
             'p',
             null,
-            'Aqu\u00ed se re\u00fanen los h\u00e9roes m\u00e1s valientes de la El Relatario. Cada uno tiene una historia \u00fanica y habilidades especiales que lo hacen diferente.'
+            'Aqu\u00ed se re\u00fanen los h\u00e9roes m\u00e1s valientes de El Relatario. Cada uno tiene una historia \u00fanica y habilidades especiales que lo hacen diferente.'
         )
     );
     texto.appendChild(
