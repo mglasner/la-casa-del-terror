@@ -2,8 +2,8 @@
 
 export const CFG = {
     meta: {
-        titulo: 'Habitación 4 — El Abismo',
-        itemInventario: 'llave-habitacion-5',
+        titulo: 'El Abismo',
+        itemInventario: '',
         timeoutExito: 1500,
     },
     canvas: {

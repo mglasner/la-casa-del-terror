@@ -1,4 +1,4 @@
-// Habitación 1 — El Laberinto
+// El Laberinto — Laberinto 2D procedural
 // El jugador debe encontrar la llave y volver a la salida
 // El laberinto se genera aleatoriamente cada vez
 
@@ -18,18 +18,18 @@ import { iniciarTrasgo, actualizarTrasgo, renderizarTrasgo } from './trasgo.js';
 import { iniciarCountdown, actualizarVillanoElite, limpiarVillanoElite } from './villanoElite.js';
 import { lanzarToast } from '../../componentes/toast.js';
 
-import { crearPantallaHabitacion } from '../../componentes/pantallaHabitacion.js';
+import { crearPantallaJuego } from '../../componentes/pantallaJuego.js';
 import { crearElemento, crearGameLoop } from '../../utils.js';
 
 // --- Crear pantalla HTML ---
 
 function crearPantalla(esTouch) {
-    const { pantalla } = crearPantallaHabitacion(
-        'pantalla-habitacion1',
-        'habitacion-1',
+    const { pantalla } = crearPantallaJuego(
+        'pantalla-laberinto',
+        'juego-laberinto',
         CFG.meta.titulo,
         function () {
-            limpiarHabitacion1();
+            limpiarLaberinto();
             est.callbackSalir();
         }
     );
@@ -77,12 +77,12 @@ function crearPantalla(esTouch) {
 // --- Funciones principales ---
 
 /**
- * Inicia la Habitacion 1 (El Laberinto).
+ * Inicia El Laberinto.
  * @param {Object} jugadorRef - Personaje seleccionado
  * @param {Function} callback - Callback para volver al Libro de Juegos
  * @param {Object} [dpadRef] - Controles touch D-pad
  */
-export function iniciarHabitacion1(jugadorRef, callback, dpadRef) {
+export function iniciarLaberinto(jugadorRef, callback, dpadRef) {
     est.jugador = jugadorRef;
     est.callbackSalir = callback;
     est.tieneLlave = false;
@@ -333,7 +333,7 @@ function detectarSalida() {
         lanzarToast(CFG.textos.mensajeExito, '🚪', 'exito');
 
         setTimeout(function () {
-            limpiarHabitacion1();
+            limpiarLaberinto();
             est.callbackSalir();
         }, CFG.meta.timeoutExito);
     }
@@ -377,7 +377,7 @@ function onKeyDown(e) {
         est.teclas[e.key] = true;
     }
     if (e.key === 'Escape') {
-        limpiarHabitacion1();
+        limpiarLaberinto();
         est.callbackSalir();
     }
 }
@@ -388,8 +388,8 @@ function onKeyUp(e) {
 
 // --- Limpieza ---
 
-/** Limpia y destruye la Habitacion 1 */
-export function limpiarHabitacion1() {
+/** Limpia y destruye El Laberinto */
+export function limpiarLaberinto() {
     est.activo = false;
     if (est.timerAparicion) {
         clearTimeout(est.timerAparicion);

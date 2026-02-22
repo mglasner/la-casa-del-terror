@@ -5,7 +5,7 @@
 import { mezclar } from '../laberinto.js';
 import { lanzarToast } from '../componentes/toast.js';
 import { FOV, canvas } from './config.js';
-import { CFG } from '../habitaciones/habitacion2/config.js';
+import { CFG } from '../juegos/laberinto3d/config.js';
 import { notificarVidaCambio, notificarJugadorMuerto } from '../eventos.js';
 
 // --- Estado del módulo ---

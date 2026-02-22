@@ -1,9 +1,9 @@
-// Habitacion 4 — El Abismo: Creacion del DOM (pantalla, canvas, cabecera, HUD jugador, HUD boss)
+// El Abismo: Creacion del DOM (pantalla, canvas, cabecera, HUD jugador, HUD boss)
 
 import { CFG } from './config.js';
 import { crearBarraVida } from '../../componentes/barraVida.js';
 import { crearInventario } from '../../componentes/inventario.js';
-import { crearPantallaHabitacion } from '../../componentes/pantallaHabitacion.js';
+import { crearPantallaJuego } from '../../componentes/pantallaJuego.js';
 import { crearElemento } from '../../utils.js';
 
 // Referencias a overlay del boss
@@ -39,9 +39,9 @@ export function crearPantalla(esTouch, onHuir) {
     const anchoCanvas = CFG.canvas.anchoBase;
     const altoCanvas = CFG.canvas.altoBase;
 
-    const { pantalla } = crearPantallaHabitacion(
-        'pantalla-habitacion4',
-        'habitacion-4',
+    const { pantalla } = crearPantallaJuego(
+        'pantalla-abismo',
+        'juego-abismo',
         CFG.meta.titulo,
         onHuir
     );

@@ -26,7 +26,7 @@ export function detectarLlave() {
     }
 }
 
-export function detectarSalida(limpiarHabitacion2) {
+export function detectarSalida(limpiarLaberinto3d) {
     if (!est.tieneLlave) return;
 
     const celdaX = Math.floor(est.posicion.x);
@@ -39,7 +39,7 @@ export function detectarSalida(limpiarHabitacion2) {
         lanzarToast(CFG.textos.mensajeExito, '\uD83D\uDEAA', 'exito');
 
         setTimeout(function () {
-            limpiarHabitacion2();
+            limpiarLaberinto3d();
             est.callbackSalir();
         }, CFG.meta.timeoutExito);
     }

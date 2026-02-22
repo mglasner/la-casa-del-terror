@@ -176,7 +176,7 @@ export function crearLibro(opciones) {
         listaIndice.appendChild(sep);
     }
 
-    // Items de páginas extras (habitaciones, etc.)
+    // Items de páginas extras (juegos, etc.)
     if (paginasExtras.length > 0) {
         if (tituloExtras) {
             const labelExtras = crearElemento('li', 'libro-indice-seccion');

@@ -49,7 +49,7 @@
     --radio-boton: 8px;
 }
 
-/* Tema oscuro original para modo juego (habitaciones) */
+/* Tema oscuro para modo juego */
 body.modo-juego #biblioteca {
     display: none;
 }
@@ -1193,42 +1193,42 @@ h1 {
     border-color: #d4a052;
 }
 
-/* --- Paletas por habitación --- */
+/* --- Paletas por juego --- */
 
-.habitacion-1 {
-    --hab-pared: #3d2560;
-    --hab-pared-medio: #2a1845;
-    --hab-pared-oscuro: #201035;
-    --hab-borde: rgb(100 60 150 / 25%);
-    --hab-accent: #bb86fc;
+.juego-laberinto {
+    --juego-pared: #3d2560;
+    --juego-pared-medio: #2a1845;
+    --juego-pared-oscuro: #201035;
+    --juego-borde: rgb(100 60 150 / 25%);
+    --juego-accent: #bb86fc;
 }
 
-.habitacion-2 {
-    --hab-pared: #1a3e1a;
-    --hab-pared-medio: #102e10;
-    --hab-pared-oscuro: #0d240d;
-    --hab-borde: rgb(60 150 80 / 20%);
-    --hab-accent: #6bfc86;
+.juego-laberinto3d {
+    --juego-pared: #1a3e1a;
+    --juego-pared-medio: #102e10;
+    --juego-pared-oscuro: #0d240d;
+    --juego-borde: rgb(60 150 80 / 20%);
+    --juego-accent: #6bfc86;
 }
 
-.habitacion-3 {
-    --hab-pared: #3e1a1a;
-    --hab-pared-medio: #2e1010;
-    --hab-pared-oscuro: #240d0d;
-    --hab-borde: rgb(150 60 60 / 20%);
-    --hab-accent: #e94560;
+.juego-memorice {
+    --juego-pared: #3e1a1a;
+    --juego-pared-medio: #2e1010;
+    --juego-pared-oscuro: #240d0d;
+    --juego-borde: rgb(150 60 60 / 20%);
+    --juego-accent: #e94560;
 }
 
-.habitacion-4 {
-    --hab-pared: #1a1a3e;
-    --hab-pared-medio: #10102e;
-    --hab-pared-oscuro: #0d0d24;
-    --hab-borde: rgb(60 80 150 / 20%);
-    --hab-accent: #5eeadb;
+.juego-abismo {
+    --juego-pared: #1a1a3e;
+    --juego-pared-medio: #10102e;
+    --juego-pared-oscuro: #0d0d24;
+    --juego-borde: rgb(60 80 150 / 20%);
+    --juego-accent: #5eeadb;
 }
 
 /* Cabecera: botón huir + título en una sola fila */
-.cabecera-habitacion {
+.cabecera-juego {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1237,7 +1237,7 @@ h1 {
     justify-content: center;
 }
 
-.titulo-habitacion {
+.titulo-juego {
     font-family: var(--font-display);
     color: var(--color-accent);
     font-size: 1.3rem;
@@ -1619,7 +1619,7 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     }
 
     #juego.juego-inmersivo .barra-superior,
-    #juego.juego-inmersivo .cabecera-habitacion {
+    #juego.juego-inmersivo .cabecera-juego {
         display: none;
     }
 }
@@ -1642,7 +1642,7 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     align-items: flex-end;
 }
 
-/* En modo inmersivo (habitaciones 3D) el juego es full-width */
+/* En modo inmersivo (juegos 3D/platformer) el juego es full-width */
 #juego.juego-inmersivo ~ .toast-contenedor {
     right: 10px;
 }
@@ -2423,7 +2423,7 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     color: rgb(220 205 180 / 70%);
 }
 
-/* Variables de color para páginas sin entidad activa (inicio y habitaciones) */
+/* Variables de color para páginas sin entidad activa (inicio y juegos) */
 .libro-en-inicio,
 .libro-en-extra {
     --v-color: rgb(230 200 160 / 95%);
@@ -2581,8 +2581,8 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     margin: 2px 0 0;
 }
 
-/* --- Páginas de habitaciones (descripción de juegos) --- */
-.libro-habitacion {
+/* --- Páginas de juegos (descripción de desafíos) --- */
+.libro-juego {
     text-align: center;
     padding: 16px 20px;
     display: flex;
@@ -2591,7 +2591,7 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     height: 100%;
 }
 
-.libro-habitacion-img {
+.libro-juego-img {
     width: 100px;
     height: 100px;
     border-radius: 50%;
@@ -2601,7 +2601,7 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     margin-bottom: 8px;
 }
 
-.libro-habitacion-icono {
+.libro-juego-icono {
     width: 100px;
     height: 100px;
     border-radius: 50%;
@@ -2614,7 +2614,7 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     margin-bottom: 8px;
 }
 
-.libro-habitacion-nombre {
+.libro-juego-nombre {
     font-family: var(--font-display);
     font-size: 1.3rem;
     color: white;
@@ -2622,32 +2622,20 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     line-height: 1.3;
 }
 
-.libro-habitacion-nivel {
-    display: inline-block;
-    background: rgb(255 215 0 / 12%);
-    color: var(--color-dorado);
-    font-family: var(--font-display);
-    font-size: 0.68rem;
-    padding: 2px 12px;
-    border-radius: 10px;
-    letter-spacing: 0.06em;
-    margin-bottom: 6px;
-}
-
-.libro-habitacion-desc {
+.libro-juego-desc {
     display: flex;
     flex-direction: column;
     gap: 10px;
     max-width: 280px;
 }
 
-.libro-habitacion-desc p {
+.libro-juego-desc p {
     font-size: 0.84rem;
     line-height: 1.55;
     color: rgb(220 205 180 / 90%);
 }
 
-.libro-habitacion-tip {
+.libro-juego-tip {
     background: rgb(255 215 0 / 8%);
     border-left: 2px solid rgb(255 215 0 / 30%);
     padding: 8px 12px;
@@ -2660,7 +2648,7 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
     margin-top: 4px;
 }
 
-.libro-habitacion-tip-icono {
+.libro-juego-tip-icono {
     margin-right: 4px;
 }
 
@@ -3492,7 +3480,7 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
         padding: 12px;
     }
 
-    /* Fondo plano del personaje/villano cuando hay uno activo (no en Bienvenida ni habitaciones) */
+    /* Fondo plano del personaje/villano cuando hay uno activo (no en Bienvenida ni juegos) */
     .libro:not(.libro-en-inicio, .libro-en-extra) > .libro-pagina-der {
         background: none;
         background-color: inherit;
@@ -3568,30 +3556,30 @@ body:has(.libro-modal:not(.oculto)) .dpad-der-contenedor {
         right: 6px;
     }
 
-    .libro-habitacion {
+    .libro-juego {
         padding: 10px 14px;
     }
 
-    .libro-habitacion-img {
+    .libro-juego-img {
         width: 80px;
         height: 80px;
     }
 
-    .libro-habitacion-icono {
+    .libro-juego-icono {
         width: 80px;
         height: 80px;
         font-size: 2rem;
     }
 
-    .libro-habitacion-nombre {
+    .libro-juego-nombre {
         font-size: 1.05rem;
     }
 
-    .libro-habitacion-desc p {
+    .libro-juego-desc p {
         font-size: 0.78rem;
     }
 
-    .libro-habitacion-tip {
+    .libro-juego-tip {
         font-size: 0.72rem;
         padding: 6px 10px;
     }

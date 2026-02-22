@@ -1,5 +1,4 @@
-// Habitación 2 — El Laberinto 3D
-// Vista pseudo-3D con raycasting estilo Doom
+// El Laberinto 3D — Vista pseudo-3D con raycasting estilo Doom
 // El jugador debe encontrar la llave y volver a la salida
 
 import { CFG } from './config.js';
@@ -42,7 +41,7 @@ import {
 import { crearModoInmersivo } from '../../componentes/modoInmersivo.js';
 import { crearBarraVida } from '../../componentes/barraVida.js';
 import { crearInventario } from '../../componentes/inventario.js';
-import { crearPantallaHabitacion } from '../../componentes/pantallaHabitacion.js';
+import { crearPantallaJuego } from '../../componentes/pantallaJuego.js';
 import { crearElemento, crearGameLoop } from '../../utils.js';
 
 // Pool de sprites preallocado para el loop (llave + puerta + ~15 decoraciones + ~10 trampas inactivas)
@@ -152,13 +151,13 @@ function actualizarHUDVida() {
 
 function crearPantalla(esTouch) {
     function huir() {
-        limpiarHabitacion2();
+        limpiarLaberinto3d();
         est.callbackSalir();
     }
 
-    const { pantalla } = crearPantallaHabitacion(
-        'pantalla-habitacion2',
-        'habitacion-2',
+    const { pantalla } = crearPantallaJuego(
+        'pantalla-laberinto3d',
+        'juego-laberinto3d',
         CFG.meta.titulo,
         huir
     );
@@ -259,7 +258,7 @@ function loop(ahora) {
     // Movimiento
     moverJugador(est.teclas, est.posicion, est.mapa, FILAS, COLS);
     detectarLlave();
-    detectarSalida(limpiarHabitacion2);
+    detectarSalida(limpiarLaberinto3d);
 
     // Trampas de fuego
     const danoTrampa = detectarTrampas3D(est.posicion.x, est.posicion.y, est.jugador);
@@ -391,7 +390,7 @@ function onKeyDown(e) {
         est.teclas[e.key] = true;
     }
     if (e.key === 'Escape') {
-        limpiarHabitacion2();
+        limpiarLaberinto3d();
         est.callbackSalir();
     }
 }
@@ -403,12 +402,12 @@ function onKeyUp(e) {
 // --- API pública ---
 
 /**
- * Inicia la Habitacion 2 (El Laberinto 3D).
+ * Inicia El Laberinto 3D.
  * @param {Object} jugadorRef - Personaje seleccionado
  * @param {Function} callback - Callback para volver al Libro de Juegos
  * @param {Object} [dpadArgumento] - Controles touch D-pad
  */
-export function iniciarHabitacion2(jugadorRef, callback, dpadArgumento) {
+export function iniciarLaberinto3d(jugadorRef, callback, dpadArgumento) {
     est.jugador = jugadorRef;
     est.callbackSalir = callback;
     est.modoInmersivo = crearModoInmersivo(redimensionarLandscape);
@@ -514,8 +513,8 @@ export function iniciarHabitacion2(jugadorRef, callback, dpadArgumento) {
     gameLoop2.iniciar();
 }
 
-/** Limpia y destruye la Habitacion 2 */
-export function limpiarHabitacion2() {
+/** Limpia y destruye El Laberinto 3D */
+export function limpiarLaberinto3d() {
     est.activo = false;
     gameLoop2.detener();
 

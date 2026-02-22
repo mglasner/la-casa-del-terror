@@ -1,5 +1,5 @@
 // Eventos globales del juego
-// Centraliza los dispatchEvent para comunicacion habitaciones → juego.js
+// Centraliza los dispatchEvent para comunicacion juegos → juego.js
 
 /** Notifica a juego.js que la vida del jugador cambio (actualiza barra superior) */
 export function notificarVidaCambio() {

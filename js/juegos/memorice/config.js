@@ -3,7 +3,7 @@
 export const CFG = {
     meta: {
         titulo: 'El Memorice',
-        itemInventario: 'llave-habitacion-4',
+        itemInventario: '',
         tiempoVictoria: 2000,
     },
     tablero: {

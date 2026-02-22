@@ -1,12 +1,12 @@
 # ============================================
-# Configuración de la Habitación 3 — El Memorice
+# Configuración de El Memorice
 # El jugador voltea cartas para encontrar pares de héroes y villanos
 # ============================================
 
-# --- Información general de la habitación ---
+# --- Información general del juego ---
 meta:
     titulo: "El Memorice"
-    itemInventario: llave-habitacion-4   # ID del item que se agrega al inventario
+    itemInventario: ""
     tiempoVictoria: 2000                 # ms antes de volver al pasillo
 
 # --- Dimensiones del tablero ---

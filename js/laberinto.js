@@ -1,5 +1,5 @@
 // Módulo compartido de generación de laberintos
-// Usado por habitacion1 (2D) y habitacion2 (3D)
+// Usado por El Laberinto (2D) y El Laberinto 3D
 
 // Mezcla un array in-place (Fisher-Yates)
 export function mezclar(arr) {

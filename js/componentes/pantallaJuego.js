@@ -1,23 +1,23 @@
-// Componente reutilizable para crear la pantalla base de una habitacion
+// Componente reutilizable para crear la pantalla base de un juego
 // Encapsula el boilerplate comun: div pantalla, cabecera con boton huir y titulo
 
 import { crearElemento } from '../utils.js';
 
 /**
- * Crea la estructura base de una pantalla de habitacion.
- * @param {string} id - ID del div pantalla (ej: 'pantalla-habitacion1')
- * @param {string} clase - Clase CSS del div (ej: 'habitacion-1')
+ * Crea la estructura base de una pantalla de juego.
+ * @param {string} id - ID del div pantalla (ej: 'pantalla-laberinto')
+ * @param {string} clase - Clase CSS del div (ej: 'juego-laberinto')
  * @param {string} titulo - Texto del titulo h2
  * @param {Function} onHuir - Callback al pulsar boton huir o Esc
  * @returns {{ pantalla: HTMLElement }}
  */
-export function crearPantallaHabitacion(id, clase, titulo, onHuir) {
+export function crearPantallaJuego(id, clase, titulo, onHuir) {
     const pantalla = document.createElement('div');
     pantalla.id = id;
     pantalla.className = clase;
 
     // Cabecera: boton huir + titulo
-    const cabecera = crearElemento('div', 'cabecera-habitacion');
+    const cabecera = crearElemento('div', 'cabecera-juego');
 
     const btnHuir = document.createElement('button');
     btnHuir.className = 'btn-huir';
@@ -30,7 +30,7 @@ export function crearPantallaHabitacion(id, clase, titulo, onHuir) {
     btnHuir.appendChild(imgHuir);
     btnHuir.addEventListener('click', onHuir);
 
-    const tituloEl = crearElemento('h2', 'titulo-habitacion', titulo);
+    const tituloEl = crearElemento('h2', 'titulo-juego', titulo);
 
     cabecera.appendChild(btnHuir);
     cabecera.appendChild(tituloEl);

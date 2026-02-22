@@ -1,4 +1,4 @@
-// Habitación 3 — El Memorice
+// El Memorice — Juego de memoria
 // El jugador voltea cartas para encontrar pares de héroes y villanos
 
 import { CFG } from './config.js';
@@ -6,7 +6,7 @@ import { generarTablero } from './tablero.js';
 import { crearCarta } from './carta.js';
 import { lanzarToast } from '../../componentes/toast.js';
 import { notificarVidaCambio, notificarJugadorMuerto } from '../../eventos.js';
-import { crearPantallaHabitacion } from '../../componentes/pantallaHabitacion.js';
+import { crearPantallaJuego } from '../../componentes/pantallaJuego.js';
 import { crearElemento } from '../../utils.js';
 
 // --- Estado del módulo ---
@@ -29,9 +29,9 @@ const totalPares = CFG.tablero.numHeroes + CFG.tablero.numVillanos;
 // --- Crear pantalla HTML ---
 
 function crearPantalla() {
-    ({ pantalla } = crearPantallaHabitacion(
-        'pantalla-habitacion3',
-        'habitacion-3',
+    ({ pantalla } = crearPantallaJuego(
+        'pantalla-memorice',
+        'juego-memorice',
         CFG.meta.titulo,
         huir
     ));
@@ -175,7 +175,7 @@ function victoria() {
     lanzarToast(CFG.textos.toastVictoria, '\u2728', 'exito');
 
     setTimeout(function () {
-        limpiarHabitacion3();
+        limpiarMemorice();
         callbackSalir();
     }, CFG.meta.tiempoVictoria);
 }
@@ -188,7 +188,7 @@ function derrota() {
 }
 
 function huir() {
-    limpiarHabitacion3();
+    limpiarMemorice();
     callbackSalir();
 }
 
@@ -203,12 +203,12 @@ function onKeyDown(e) {
 // --- API pública ---
 
 /**
- * Inicia la Habitacion 3 (El Memorice).
+ * Inicia El Memorice.
  * @param {Object} jugadorRef - Personaje seleccionado
  * @param {Function} callback - Callback para volver al Libro de Juegos
  * @param {Object} [dpadRef] - Controles touch D-pad (se oculta en este modo)
  */
-export function iniciarHabitacion3(jugadorRef, callback, dpadRef) {
+export function iniciarMemorice(jugadorRef, callback, dpadRef) {
     jugador = jugadorRef;
     callbackSalir = callback;
     primeraCarta = null;
@@ -235,8 +235,8 @@ export function iniciarHabitacion3(jugadorRef, callback, dpadRef) {
     document.addEventListener('keydown', onKeyDown);
 }
 
-/** Limpia y destruye la Habitacion 3 */
-export function limpiarHabitacion3() {
+/** Limpia y destruye El Memorice */
+export function limpiarMemorice() {
     document.removeEventListener('keydown', onKeyDown);
 
     if (pantalla) {

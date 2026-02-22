@@ -11,7 +11,7 @@ mansion-de-aventuras/
 │       ├── personajes/       # Avatares (.webp) de los personajes jugables
 │       ├── enemigos/         # Avatares (.webp) de los enemigos
 │       ├── sprites-plat/     # Sprite sheets PNG para el platformer
-│       ├── habitaciones/     # Ilustraciones de juegos para el Heroario
+│       ├── juegos/           # Ilustraciones de juegos para el Libro de Juegos
 │       └── icons/            # Favicon e iconos PWA
 ├── css/                      # Estilos por juego (@import desde estilos.css)
 │   ├── laberinto.css         # El Laberinto (laberinto 2D)
@@ -21,10 +21,10 @@ mansion-de-aventuras/
 ├── datos/                    # Fuente de verdad en YAML (genera JS via build-datos)
 │   ├── personajes.yaml       # Personajes jugables: stats, colores, descripciones
 │   ├── enemigos.yaml         # Enemigos organizados en tiers
-│   ├── habitacion1.yaml      # Config del laberinto 2D
-│   ├── habitacion2.yaml      # Config del laberinto 3D
-│   ├── habitacion3.yaml      # Config del memorice
-│   └── habitacion4.yaml      # Config del platformer
+│   ├── laberinto.yaml        # Config del laberinto 2D
+│   ├── laberinto3d.yaml      # Config del laberinto 3D
+│   ├── memorice.yaml         # Config del memorice
+│   └── abismo.yaml           # Config del platformer
 ├── js/
 │   ├── entidades.js          # Clases base: Entidad, Personaje, Enemigo
 │   ├── personajes.js         # ⚙️ Generado desde datos/personajes.yaml
@@ -41,12 +41,12 @@ mansion-de-aventuras/
 │   │   ├── libroHeroes.js    # Heroario (contenido y páginas)
 │   │   ├── libroVillanos.js  # Villanario (contenido y páginas)
 │   │   └── ...               # barraSuperior, modalSalir, modalDerrota, etc.
-│   ├── habitaciones/         # 4 juegos autocontenidos
-│   │   ├── habitacion1/      # El Laberinto (laberinto 2D)
-│   │   ├── habitacion2/      # El Laberinto 3D (raycasting)
-│   │   ├── habitacion3/      # El Memorice (memoria)
-│   │   └── habitacion4/      # El Abismo (platformer 2D)
-│   └── motor3d/              # Motor raycasting estilo Doom para hab2
+│   ├── juegos/               # 4 juegos autocontenidos
+│   │   ├── laberinto/        # El Laberinto (laberinto 2D)
+│   │   ├── laberinto3d/      # El Laberinto 3D (raycasting)
+│   │   ├── memorice/         # El Memorice (memoria)
+│   │   └── abismo/           # El Abismo (platformer 2D)
+│   └── motor3d/              # Motor raycasting estilo Doom para El Laberinto 3D
 ├── scripts/
 │   ├── build-datos.js        # YAML → JS (personajes, enemigos, configs)
 │   ├── build-html.js         # Reescribe rutas para producción
@@ -152,7 +152,7 @@ esbuild genera la carpeta `dist/` con todo optimizado:
 
 | Paso          | Entrada                           | Salida                                                             |
 | ------------- | --------------------------------- | ------------------------------------------------------------------ |
-| `build:datos` | `datos/*.yaml`                    | `js/personajes.js`, `js/enemigos.js`, `js/habitaciones/*/config.js` |
+| `build:datos` | `datos/*.yaml`                    | `js/personajes.js`, `js/enemigos.js`, `js/juegos/*/config.js`       |
 | `build:js`    | `js/juego.js` + todos sus imports | `dist/juego.min.js` (1 archivo)                                    |
 | `build:css`   | `estilos.css`                     | `dist/estilos.min.css`                                             |
 | `build:html`  | `index.html`, `assets/`, `sw.js`  | `dist/index.html` (rutas reescritas), `dist/assets/`, `dist/sw.js` |

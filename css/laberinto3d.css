@@ -1,6 +1,6 @@
-/* --- Habitación 2: El Laberinto 3D --- */
+/* --- El Laberinto 3D --- */
 
-#pantalla-habitacion2 {
+#pantalla-laberinto3d {
     position: relative;
     display: flex;
     flex-direction: column;

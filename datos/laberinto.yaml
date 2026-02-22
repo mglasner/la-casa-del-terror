@@ -1,12 +1,12 @@
 # ============================================
-# Configuración de la Habitación 1 — El Laberinto
+# Configuración de El Laberinto
 # El jugador debe encontrar la llave y volver a la salida
 # ============================================
 
-# --- Información general de la habitación ---
+# --- Información general del juego ---
 meta:
-    titulo: "Habitación 1 — El Laberinto"
-    itemInventario: llave-habitacion-2       # ID del item que se agrega al inventario
+    titulo: "El Laberinto"
+    itemInventario: ""
     timeoutExito: 1500                       # ms antes de volver al pasillo tras escapar
 
 # --- Textos mostrados en pantalla ---

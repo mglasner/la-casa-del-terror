@@ -1,13 +1,13 @@
 # ============================================
-# Configuración de la Habitación 2 — El Laberinto 3D
+# Configuración de El Laberinto 3D
 # Vista pseudo-3D con raycasting estilo Doom
 # El jugador debe encontrar la llave y volver a la salida
 # ============================================
 
-# --- Información general de la habitación ---
+# --- Información general del juego ---
 meta:
-    titulo: "Habitación 2 — El Laberinto 3D"
-    itemInventario: llave-habitacion-3       # ID del item que se agrega al inventario
+    titulo: "El Laberinto 3D"
+    itemInventario: ""
     timeoutExito: 1500                       # ms antes de volver al pasillo tras escapar
 
 # --- Textos mostrados en pantalla ---
@@ -19,7 +19,7 @@ textos:
 
 # --- Dimensiones del laberinto ---
 # ⚠ filas y columnas deben ser IMPARES para que el algoritmo de generación funcione.
-# Un laberinto más pequeño que el de habitación 1 (13×13 vs 17×17) porque la vista 3D
+# Un laberinto más pequeño que El Laberinto (13×13 vs 17×17) porque la vista 3D
 # ya es más difícil de navegar.
 laberinto:
     filas: 13                # alto del grid (celdas)

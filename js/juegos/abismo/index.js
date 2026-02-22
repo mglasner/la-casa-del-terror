@@ -1,4 +1,4 @@
-// Habitacion 4 — El Abismo
+// El Abismo — Platformer 2D
 // Platformer 2D side-scrolling: saltar plataformas, evitar abismos,
 // stomper esbirros, derrotar al boss y conseguir la llave
 
@@ -91,7 +91,7 @@ function iniciarDOM(esTouch) {
 
     const dom = crearPantalla(esTouch, function () {
         const salir = est.callbackSalir;
-        limpiarHabitacion4();
+        limpiarAbismo();
         salir();
     });
 
@@ -206,7 +206,7 @@ function verificarVictoria() {
         const salir = est.callbackSalir;
         est.timeoutIds.push(
             setTimeout(function () {
-                limpiarHabitacion4();
+                limpiarAbismo();
                 salir();
             }, CFG.meta.timeoutExito)
         );
@@ -362,7 +362,7 @@ function onKeyDown(e) {
     }
     if (e.key === 'Escape') {
         const salir = est.callbackSalir;
-        limpiarHabitacion4();
+        limpiarAbismo();
         salir();
     }
 }
@@ -374,12 +374,12 @@ function onKeyUp(e) {
 // --- API publica ---
 
 /**
- * Inicia la Habitacion 4 (El Abismo).
+ * Inicia El Abismo.
  * @param {Object} jugadorRef - Personaje seleccionado
  * @param {Function} callback - Callback para volver al Libro de Juegos
  * @param {Object} [dpadArgumento] - Controles touch D-pad
  */
-export function iniciarHabitacion4(jugadorRef, callback, dpadArgumento) {
+export function iniciarAbismo(jugadorRef, callback, dpadArgumento) {
     est.jugador = jugadorRef;
     est.callbackSalir = callback;
     est.activo = true;
@@ -455,8 +455,8 @@ export function iniciarHabitacion4(jugadorRef, callback, dpadArgumento) {
     gameLoop4.iniciar();
 }
 
-/** Limpia y destruye la Habitacion 4 */
-export function limpiarHabitacion4() {
+/** Limpia y destruye El Abismo */
+export function limpiarAbismo() {
     est.activo = false;
 
     // Cancelar timeouts pendientes (toast boss, victoria)

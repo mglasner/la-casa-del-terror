@@ -1,10 +1,10 @@
 // Código principal — Biblioteca de aventuras
 import { PERSONAJES } from './personajes.js';
 import { ENEMIGOS } from './enemigos.js';
-import { iniciarHabitacion1, limpiarHabitacion1 } from './habitaciones/habitacion1/index.js';
-import { iniciarHabitacion2, limpiarHabitacion2 } from './habitaciones/habitacion2/index.js';
-import { iniciarHabitacion3, limpiarHabitacion3 } from './habitaciones/habitacion3/index.js';
-import { iniciarHabitacion4, limpiarHabitacion4 } from './habitaciones/habitacion4/index.js';
+import { iniciarLaberinto, limpiarLaberinto } from './juegos/laberinto/index.js';
+import { iniciarLaberinto3d, limpiarLaberinto3d } from './juegos/laberinto3d/index.js';
+import { iniciarMemorice, limpiarMemorice } from './juegos/memorice/index.js';
+import { iniciarAbismo, limpiarAbismo } from './juegos/abismo/index.js';
 import { crearBarraSuperior } from './componentes/barraSuperior.js';
 import { crearModalDerrota } from './componentes/modalDerrota.js';
 import { crearModalSalir } from './componentes/modalSalir.js';
@@ -32,24 +32,24 @@ const ESTADOS = {
     JUEGO: 'JUEGO',
 };
 
-// Registro dinámico de habitaciones: { "1": { iniciar, limpiar }, ... }
-const habitaciones = {};
+// Registro de juegos: { "laberinto": { iniciar, limpiar }, ... }
+const juegos = {};
 
-function registrarHabitacion(numero, modulo) {
-    habitaciones[numero] = modulo;
+function registrarJuego(juegoId, modulo) {
+    juegos[juegoId] = modulo;
 }
 
-registrarHabitacion('1', { iniciar: iniciarHabitacion1, limpiar: limpiarHabitacion1 });
-registrarHabitacion('2', { iniciar: iniciarHabitacion2, limpiar: limpiarHabitacion2 });
-registrarHabitacion('3', { iniciar: iniciarHabitacion3, limpiar: limpiarHabitacion3 });
-registrarHabitacion('4', { iniciar: iniciarHabitacion4, limpiar: limpiarHabitacion4 });
+registrarJuego('laberinto', { iniciar: iniciarLaberinto, limpiar: limpiarLaberinto });
+registrarJuego('laberinto3d', { iniciar: iniciarLaberinto3d, limpiar: limpiarLaberinto3d });
+registrarJuego('memorice', { iniciar: iniciarMemorice, limpiar: limpiarMemorice });
+registrarJuego('abismo', { iniciar: iniciarAbismo, limpiar: limpiarAbismo });
 
 // --- Estado del juego ---
 
 const estado = {
     estadoActual: ESTADOS.BIBLIOTECA,
     jugadorActual: null, // instancia de Personaje
-    habitacionActual: null, // número de la habitación activa
+    juegoActual: null, // id del juego activo ('laberinto', 'laberinto3d', etc.)
     libroActivo: null, // id del libro abierto ('heroario', 'villanario', 'juegos')
 };
 
@@ -142,16 +142,16 @@ function crearVillanarioModal() {
 }
 
 function crearJuegosModal() {
-    const juegos = crearLibroJuegos(contenedorJuego, function (numeroJuego, nombrePersonaje) {
+    const libJuegos = crearLibroJuegos(contenedorJuego, function (juegoId, nombrePersonaje) {
         // Desactivar onCerrar antes de cerrar para que no corrompa el estado
         const modalJuegos = librosCache['juegos'];
         if (modalJuegos) {
             modalJuegos.onCerrar(null);
             modalJuegos.cerrar();
         }
-        iniciarJuego(numeroJuego, nombrePersonaje);
+        iniciarJuego(juegoId, nombrePersonaje);
     });
-    const modal = crearModalLibro(juegos.libro, juegos.manejarTecladoLibro);
+    const modal = crearModalLibro(libJuegos.libro, libJuegos.manejarTecladoLibro);
     contenedorJuego.appendChild(modal.overlay);
     return modal;
 }
@@ -184,10 +184,10 @@ document.addEventListener('vida-cambio', function () {
 document.addEventListener('jugador-muerto', function () {
     if (!estado.jugadorActual) return;
 
-    const pantallaHabitacion = estado.habitacionActual
-        ? document.getElementById('pantalla-habitacion' + estado.habitacionActual)
+    const pantallaJuego = estado.juegoActual
+        ? document.getElementById('pantalla-' + estado.juegoActual)
         : null;
-    const contenedorModal = pantallaHabitacion || contenedorJuego;
+    const contenedorModal = pantallaJuego || contenedorJuego;
     modalDerrota.mostrar(estado.jugadorActual.nombre, contenedorModal);
 });
 
@@ -202,10 +202,10 @@ function ejecutarCambioEstado(anterior, nuevo, datos) {
     // Salir del estado anterior
     if (anterior === ESTADOS.JUEGO) {
         document.body.classList.remove('modo-juego');
-        const hab = habitaciones[estado.habitacionActual];
-        if (hab) hab.limpiar();
+        const juegoRegistrado = juegos[estado.juegoActual];
+        if (juegoRegistrado) juegoRegistrado.limpiar();
         dpad.ocultar();
-        estado.habitacionActual = null;
+        estado.juegoActual = null;
         estado.jugadorActual = null;
         barra.ocultar();
     }
@@ -240,10 +240,10 @@ function ejecutarCambioEstado(anterior, nuevo, datos) {
         document.body.classList.add('modo-juego');
         estante.ocultar();
 
-        const hab = habitaciones[datos.numero];
-        if (!hab) return;
+        const juegoRegistrado = juegos[datos.juegoId];
+        if (!juegoRegistrado) return;
 
-        estado.habitacionActual = datos.numero;
+        estado.juegoActual = datos.juegoId;
         // Copia que preserva métodos del prototipo (recibirDano, estaVivo, curar)
         const original = PERSONAJES[datos.personaje];
         estado.jugadorActual = Object.assign(
@@ -255,7 +255,7 @@ function ejecutarCambioEstado(anterior, nuevo, datos) {
 
         barra.mostrar(estado.jugadorActual);
 
-        hab.iniciar(
+        juegoRegistrado.iniciar(
             estado.jugadorActual,
             function () {
                 // Al salir del juego, volver al Libro de Juegos
@@ -284,8 +284,8 @@ function cambiarEstado(nuevo, datos) {
 
 // --- Iniciar un juego ---
 
-function iniciarJuego(numeroJuego, nombrePersonaje) {
-    cambiarEstado(ESTADOS.JUEGO, { numero: numeroJuego, personaje: nombrePersonaje });
+function iniciarJuego(juegoId, nombrePersonaje) {
+    cambiarEstado(ESTADOS.JUEGO, { juegoId: juegoId, personaje: nombrePersonaje });
 }
 
 // --- Modal de salir (desde dentro de un juego) ---

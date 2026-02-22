@@ -1,13 +1,13 @@
 # ============================================
-# Configuración de la Habitación 4 — El Abismo
+# Configuración de El Abismo
 # Platformer 2D en canvas: el jugador salta entre plataformas,
 # derrota enemigos con stomp y enfrenta al boss final
 # ============================================
 
-# --- Información general de la habitación ---
+# --- Información general del juego ---
 meta:
-    titulo: "Habitación 4 — El Abismo"
-    itemInventario: llave-habitacion-5   # ID del item que se agrega al inventario
+    titulo: "El Abismo"
+    itemInventario: ""
     timeoutExito: 1500                   # ms antes de volver al pasillo tras ganar
 
 # --- Dimensiones del canvas ---

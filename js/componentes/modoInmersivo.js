@@ -1,4 +1,4 @@
-// Componente: Modo inmersivo para habitaciones landscape
+// Componente: Modo inmersivo para juegos landscape
 // Encapsula detección mobile (pointer: coarse), pantalla completa y overlay de rotación.
 // Solo solicita fullscreen en dispositivos mobile reales, no en desktop con touch.
 

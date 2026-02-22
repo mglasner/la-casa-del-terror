@@ -93,7 +93,7 @@ character across all frames.
 ## Paso 4: Registrar en el código
 
 Agregar entrada en `SPRITE_SHEETS` (o `ENEMY_SPRITE_SHEETS` para enemigos) de
-`js/habitaciones/habitacion4/spritesPlat.js`:
+`js/juegos/abismo/spritesPlat.js`:
 
 ```js
 const SPRITE_SHEETS = {

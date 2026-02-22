@@ -7,10 +7,9 @@ import { crearLibro } from './libro.js';
 
 // Datos de los 4 juegos con descripciones completas
 const JUEGOS = {
-    1: {
+    laberinto: {
         nombre: 'El Laberinto',
-        nivel: 1,
-        img: 'assets/img/habitaciones/habitacion1.webp',
+        img: 'assets/img/juegos/laberinto.webp',
         accent: '#bb86fc',
         parrafos: [
             '¡Bienvenido al laberinto más enredado de todos! Sus pasillos oscuros esconden una llave mágica que necesitas para escapar.',
@@ -19,10 +18,9 @@ const JUEGOS = {
         ],
         tip: 'Explora cada rincón. La llave podría estar donde menos lo esperas.',
     },
-    2: {
+    laberinto3d: {
         nombre: 'El Laberinto 3D',
-        nivel: 2,
-        img: 'assets/img/habitaciones/habitacion2.webp',
+        img: 'assets/img/juegos/laberinto3d.webp',
         accent: '#6bfc86',
         parrafos: [
             '¡El laberinto ha cobrado vida en tres dimensiones! Las paredes se alzan a tu alrededor y el camino se vuelve aún más confuso.',
@@ -31,22 +29,20 @@ const JUEGOS = {
         ],
         tip: 'Mantén la calma y recuerda por dónde viniste.',
     },
-    3: {
+    memorice: {
         nombre: 'El Memorice',
-        nivel: 3,
-        img: 'assets/img/habitaciones/habitacion3.webp',
+        img: 'assets/img/juegos/memorice.webp',
         accent: '#e94560',
         parrafos: [
-            'En esta habitación encontrarás un tablero con cartas misteriosas boca abajo. Cada par de cartas esconde un secreto.',
+            'En esta sala encontrarás un tablero con cartas misteriosas boca abajo. Cada par de cartas esconde un secreto.',
             'Encuentra todos los pares para desbloquear el pasaje. ¡Pero cuidado! Cada intento fallido despierta la curiosidad de los villanos.',
             '¡Buenas noticias! Cada par que descubras te devuelve un poco de vida. ¡Es el momento perfecto para recuperarte!',
         ],
         tip: 'Tu mejor arma aquí es la memoria. Concéntrate y recuerda cada carta.',
     },
-    4: {
+    abismo: {
         nombre: 'El Abismo',
-        nivel: 4,
-        img: 'assets/img/habitaciones/habitacion4.webp',
+        img: 'assets/img/juegos/abismo.webp',
         accent: '#5eeadb',
         parrafos: [
             'Un abismo sin fondo se extiende ante ti. Plataformas flotantes son tu único camino. ¡Un paso en falso y caerás al vacío!',
@@ -60,43 +56,42 @@ const JUEGOS = {
 // Adaptador: convierte JUEGOS a formato de entidades para crearLibro
 function adaptarJuegos() {
     const entidades = {};
-    Object.keys(JUEGOS).forEach(function (num) {
-        const j = JUEGOS[num];
+    Object.keys(JUEGOS).forEach(function (juegoId) {
+        const j = JUEGOS[juegoId];
         entidades[j.nombre] = {
             img: j.img,
-            clase: 'juego-' + num,
-            numero: num,
+            clase: 'juego-' + juegoId,
+            juegoId: juegoId,
             accent: j.accent,
         };
     });
     return entidades;
 }
 
-// Genera la página descriptiva de un juego (imagen, nombre, nivel, párrafos, tip)
-function generarPaginaHabitacion(hab) {
-    const contenido = crearElemento('div', 'libro-detalle-contenido libro-habitacion');
+// Genera la página descriptiva de un juego (imagen, nombre, párrafos, tip)
+function generarPaginaJuego(juego) {
+    const contenido = crearElemento('div', 'libro-detalle-contenido libro-juego');
 
-    if (hab.img) {
+    if (juego.img) {
         const img = document.createElement('img');
-        img.src = hab.img;
-        img.alt = hab.nombre;
-        img.className = 'libro-habitacion-img';
+        img.src = juego.img;
+        img.alt = juego.nombre;
+        img.className = 'libro-juego-img';
         contenido.appendChild(img);
     }
 
-    contenido.appendChild(crearElemento('h3', 'libro-habitacion-nombre', hab.nombre));
-    contenido.appendChild(crearElemento('span', 'libro-habitacion-nivel', 'Nivel ' + hab.nivel));
+    contenido.appendChild(crearElemento('h3', 'libro-juego-nombre', juego.nombre));
     contenido.appendChild(crearElemento('div', 'libro-ornamento'));
 
-    const desc = crearElemento('div', 'libro-habitacion-desc');
-    hab.parrafos.forEach(function (texto) {
+    const desc = crearElemento('div', 'libro-juego-desc');
+    juego.parrafos.forEach(function (texto) {
         desc.appendChild(crearElemento('p', null, texto));
     });
     contenido.appendChild(desc);
 
-    const tip = crearElemento('div', 'libro-habitacion-tip');
-    tip.appendChild(crearElemento('span', 'libro-habitacion-tip-icono', '\uD83D\uDCA1'));
-    tip.appendChild(document.createTextNode(hab.tip));
+    const tip = crearElemento('div', 'libro-juego-tip');
+    tip.appendChild(crearElemento('span', 'libro-juego-tip-icono', '\uD83D\uDCA1'));
+    tip.appendChild(document.createTextNode(juego.tip));
     contenido.appendChild(tip);
 
     return contenido;
@@ -106,11 +101,11 @@ function generarPaginaHabitacion(hab) {
 function generarDetalleJuego(nombre, _tabAnterior, onJugar) {
     const entidades = adaptarJuegos();
     const datos = entidades[nombre];
-    const numJuego = datos.numero;
-    const juego = JUEGOS[numJuego];
+    const juegoId = datos.juegoId;
+    const juego = JUEGOS[juegoId];
 
-    // Usar generarPaginaHabitacion para el contenido descriptivo
-    const contenido = generarPaginaHabitacion(juego);
+    // Usar generarPaginaJuego para el contenido descriptivo
+    const contenido = generarPaginaJuego(juego);
 
     // Agregar selector de héroe debajo de la descripción
     const selectorLabel = crearElemento('p', 'libro-juego-selector-label', 'Elige tu héroe:');
@@ -156,7 +151,7 @@ function generarDetalleJuego(nombre, _tabAnterior, onJugar) {
 
     btnJugar.addEventListener('click', function () {
         if (heroeElegido && onJugar) {
-            onJugar(datos.numero, heroeElegido);
+            onJugar(datos.juegoId, heroeElegido);
         }
     });
     contenido.appendChild(btnJugar);
@@ -197,7 +192,7 @@ function generarPrologoJuegos() {
 /**
  * Crea el Libro de Juegos.
  * @param {HTMLElement} contenedor - Elemento donde montar (no se usa directamente, el libro se retorna)
- * @param {Function} onJugar - Callback (numeroJuego, nombrePersonaje)
+ * @param {Function} onJugar - Callback (juegoId, nombrePersonaje)
  * @returns {{ libro: HTMLElement, manejarTecladoLibro: Function, destruir: Function }}
  */
 export function crearLibroJuegos(contenedor, onJugar) {
@@ -218,9 +213,10 @@ export function crearLibroJuegos(contenedor, onJugar) {
             generarContenido: generarPrologoJuegos,
         },
         ordenar: function (nombres) {
-            // Mantener orden por número de juego
+            // Mantener orden por id de juego
+            const orden = Object.keys(JUEGOS);
             return nombres.slice().sort(function (a, b) {
-                return entidades[a].numero - entidades[b].numero;
+                return orden.indexOf(entidades[a].juegoId) - orden.indexOf(entidades[b].juegoId);
             });
         },
     });

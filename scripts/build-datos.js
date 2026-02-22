@@ -1,7 +1,7 @@
 // Script de build: convierte datos/*.yaml → JS generado
 // - personajes.yaml → js/personajes.js
 // - enemigos.yaml   → js/enemigos.js
-// - habitacion*.yaml → js/habitaciones/habitacion*/config.js
+// - {laberinto,laberinto3d,memorice,abismo}.yaml → js/juegos/{slug}/config.js
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import yaml from 'js-yaml';
@@ -123,11 +123,11 @@ function generarJS(datos, clase, importPath) {
     ].join('\n');
 }
 
-// --- Habitaciones: YAML → config.js ---
+// --- Juegos: YAML → config.js ---
 
 // Schema de validación: sección → campos requeridos
-const SCHEMA_HABITACION1 = {
-    meta: ['titulo', 'itemInventario', 'timeoutExito'],
+const SCHEMA_LABERINTO = {
+    meta: ['titulo', 'timeoutExito'],
     textos: [
         'indicadorBusqueda',
         'indicadorLlaveObtenida',
@@ -191,8 +191,8 @@ const SCHEMA_HABITACION1 = {
     render: ['tamCeldaBase'],
 };
 
-const SCHEMA_HABITACION2 = {
-    meta: ['titulo', 'itemInventario', 'timeoutExito'],
+const SCHEMA_LABERINTO3D = {
+    meta: ['titulo', 'timeoutExito'],
     textos: ['indicadorBusqueda', 'indicadorLlaveObtenida', 'toastLlave', 'mensajeExito'],
     laberinto: ['filas', 'columnas', 'atajos'],
     trampasFuego: [
@@ -209,8 +209,8 @@ const SCHEMA_HABITACION2 = {
     rendimiento: ['warmupFrames', 'umbralFrameLento', 'framesLentosParaFallback', 'flashDano'],
 };
 
-const SCHEMA_HABITACION3 = {
-    meta: ['titulo', 'itemInventario', 'tiempoVictoria'],
+const SCHEMA_MEMORICE = {
+    meta: ['titulo', 'tiempoVictoria'],
     tablero: ['filas', 'columnas', 'numHeroes', 'numVillanos'],
     intentos: ['max', 'alerta', 'margenAdvertencia'],
     curacion: ['parMin', 'parMax', 'victoriaMin', 'victoriaMax'],
@@ -218,8 +218,8 @@ const SCHEMA_HABITACION3 = {
     textos: ['indicador', 'toastMatch', 'toastVictoria', 'toastAdvertencia', 'toastCuracion'],
 };
 
-const SCHEMA_HABITACION4 = {
-    meta: ['titulo', 'itemInventario', 'timeoutExito'],
+const SCHEMA_ABISMO = {
+    meta: ['titulo', 'timeoutExito'],
     canvas: ['anchoBase', 'altoBase'],
     tiles: ['tamano', 'tipos'],
     fisicas: [
@@ -256,16 +256,16 @@ const SCHEMA_HABITACION4 = {
     sprites: ['jugadorIdleVel', 'jugadorCorrerVel'],
 };
 
-// Tabla de habitaciones: número → schema de validación
-const HABITACIONES = [
-    { id: 1, schema: SCHEMA_HABITACION1 },
-    { id: 2, schema: SCHEMA_HABITACION2 },
-    { id: 3, schema: SCHEMA_HABITACION3 },
-    { id: 4, schema: SCHEMA_HABITACION4 },
+// Tabla de juegos: slug → schema de validación
+const JUEGOS = [
+    { slug: 'laberinto', schema: SCHEMA_LABERINTO },
+    { slug: 'laberinto3d', schema: SCHEMA_LABERINTO3D },
+    { slug: 'memorice', schema: SCHEMA_MEMORICE },
+    { slug: 'abismo', schema: SCHEMA_ABISMO },
 ];
 
-// Valida una habitación contra su schema
-function validarHabitacion(datos, archivo, schema) {
+// Valida un juego contra su schema
+function validarJuego(datos, archivo, schema) {
     const errores = [];
 
     for (const [seccion, campos] of Object.entries(schema)) {
@@ -285,7 +285,7 @@ function validarHabitacion(datos, archivo, schema) {
     }
 }
 
-// Genera JS de config para una habitación (objeto plano exportado)
+// Genera JS de config para un juego (objeto plano exportado)
 function generarConfigJS(datos) {
     return `${CABECERA}\nexport const CFG = ${JSON.stringify(datos, null, 4)};\n`;
 }
@@ -311,14 +311,14 @@ async function main() {
     writeFileSync('js/enemigos.js', enemigosFmt);
     console.log('js/enemigos.js generado');
 
-    // Habitaciones
-    for (const { id, schema } of HABITACIONES) {
-        const archivo = `datos/habitacion${id}.yaml`;
+    // Juegos
+    for (const { slug, schema } of JUEGOS) {
+        const archivo = `datos/${slug}.yaml`;
         if (!existsSync(archivo)) continue;
 
         const datos = yaml.load(readFileSync(archivo, 'utf-8'));
-        validarHabitacion(datos, `habitacion${id}.yaml`, schema);
-        const salida = `js/habitaciones/habitacion${id}/config.js`;
+        validarJuego(datos, `${slug}.yaml`, schema);
+        const salida = `js/juegos/${slug}/config.js`;
         const formateado = await prettier.format(generarConfigJS(datos), configPrettier);
         writeFileSync(salida, formateado);
         console.log(`${salida} generado`);

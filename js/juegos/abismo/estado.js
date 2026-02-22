@@ -1,9 +1,9 @@
-// Estado compartido de la Habitación 4
+// Estado compartido de El Abismo
 // Agrupa todas las variables de estado del módulo en un solo objeto
 
 import { CFG } from './config.js';
 
-// Snapshot para resetear estado en limpiarHabitacion4
+// Snapshot para resetear estado en limpiarAbismo
 const valoresIniciales = {
     pantalla: null,
     ctx: null,
