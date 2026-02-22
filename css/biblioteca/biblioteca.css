@@ -114,55 +114,42 @@
     z-index: 3;
 }
 
-/* --- Mueble (estante) --- */
+/* --- Mueble (vitrina semi-transparente) --- */
 
 .estante {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-width: 440px;
+    max-width: 460px;
     position: relative;
+    background: rgb(40 25 12 / 22%);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgb(180 140 80 / 20%);
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-/* Corona — moldura superior ornamental */
+/* Corona — línea decorativa dorada */
 .estante-corona {
-    width: calc(100% + 28px);
-    height: 12px;
-    background: linear-gradient(180deg, #a08060, #8b6b4a 40%, #7a5c3e);
-    border-radius: 6px 6px 0 0;
-    box-shadow:
-        0 -2px 6px rgb(0 0 0 / 20%),
-        inset 0 2px 0 rgb(255 255 255 / 10%),
-        inset 0 -1px 0 rgb(0 0 0 / 15%);
-    position: relative;
-}
-
-/* Filete dorado en la corona */
-.estante-corona::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 8px;
-    right: 8px;
-    height: 2px;
+    width: 100%;
+    height: 3px;
     background: linear-gradient(
         90deg,
         transparent,
-        rgb(255 220 150 / 20%) 20%,
-        rgb(255 220 150 / 30%) 50%,
-        rgb(255 220 150 / 20%) 80%,
+        rgb(200 160 80 / 50%) 20%,
+        rgb(220 180 100 / 60%) 50%,
+        rgb(200 160 80 / 50%) 80%,
         transparent
     );
 }
 
 /* Encabezado */
 .estante-encabezado {
-    width: calc(100% + 20px);
+    width: 100%;
     padding: 16px 16px 12px;
     text-align: center;
-    background: linear-gradient(180deg, #7a5c3e, #6b4e34);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%);
+    background: rgb(60 35 15 / 60%);
 }
 
 .estante-titulo {
@@ -192,24 +179,27 @@
 .estante-repisa {
     display: flex;
     justify-content: center;
-    gap: 20px;
-    padding: 28px 28px 24px;
-    width: calc(100% + 20px);
+    gap: 24px;
+    padding: 28px 24px 20px;
+    width: 100%;
     box-sizing: border-box;
-    background: linear-gradient(180deg, #6b4e34, #5e4430 50%, #543d2a);
+    background: rgb(50 30 15 / 50%);
     perspective: 800px;
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 4%);
+}
+
+/* Contenedor de cada libro: lomo + etiqueta */
+.estante-libro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }
 
 /* Cada lomo de libro */
 .estante-lomo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 90px;
+    width: 105px;
     height: 190px;
+    padding: 0;
     border: none;
     border-radius: 3px 6px 6px 3px;
     cursor: pointer;
@@ -218,26 +208,10 @@
     transition:
         transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
         box-shadow 0.35s ease;
-    background:
-        linear-gradient(
-            90deg,
-            rgb(0 0 0 / 25%) 0%,
-            rgb(0 0 0 / 8%) 4px,
-            transparent 8%,
-            transparent 92%,
-            rgb(0 0 0 / 12%) 100%
-        ),
-        linear-gradient(
-            180deg,
-            color-mix(in srgb, var(--lomo-color) 85%, white) 0%,
-            var(--lomo-color) 30%,
-            var(--lomo-color) 70%,
-            color-mix(in srgb, var(--lomo-color) 75%, black) 100%
-        );
     box-shadow:
         2px 3px 10px rgb(0 0 0 / 40%),
         inset 0 0 0 1px rgb(255 255 255 / 8%);
-    font-family: var(--font-display);
+    background: var(--lomo-color);
 }
 
 /* Páginas visibles en el canto derecho */
@@ -268,83 +242,75 @@
     transition-duration: 0.1s;
 }
 
-.estante-lomo-icono {
-    font-size: 1.5rem;
-    filter: drop-shadow(0 2px 3px rgb(0 0 0 / 40%));
+/* Imagen completa del lomo (cubre todo el botón) */
+.estante-lomo-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+    transition: filter 0.3s ease;
 }
 
+.estante-lomo:hover .estante-lomo-img,
+.estante-lomo:focus-visible .estante-lomo-img {
+    filter: brightness(1.15);
+}
+
+/* Etiqueta del libro — debajo del lomo */
 .estante-lomo-titulo {
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    font-size: 0.78rem;
+    font-family: var(--font-display);
+    font-size: 0.72rem;
     font-weight: 600;
-    color: rgb(255 255 255 / 95%);
-    text-shadow: 0 1px 4px rgb(0 0 0 / 60%);
-    letter-spacing: 0.06em;
-    max-height: 110px;
-    overflow: hidden;
+    font-variant: small-caps;
+    letter-spacing: 0.1em;
+    line-height: 1.3;
+    text-align: center;
+    max-width: 110px;
+    color: rgb(220 190 130 / 90%);
+    text-shadow: 0 0 12px rgb(200 160 80 / 30%);
+    transition: color 0.3s ease;
+}
+
+/* Brillo del título al hacer hover en el libro */
+.estante-libro:hover .estante-lomo-titulo {
+    color: rgb(240 216 160);
+    text-shadow:
+        0 0 8px rgb(200 160 80 / 40%),
+        0 0 20px rgb(200 160 80 / 15%);
 }
 
 /* --- Tabla de la repisa (canto frontal) --- */
 
 .estante-tabla {
-    width: calc(100% + 28px);
-    height: 12px;
-    background: linear-gradient(180deg, #8b6b4a, #7a5c3e 50%, #6b4e34);
-    box-shadow:
-        0 4px 12px rgb(0 0 0 / 30%),
-        inset 0 1px 0 rgb(255 255 255 / 8%);
-    position: relative;
-}
-
-/* Borde inferior de la tabla */
-.estante-tabla::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(180deg, #6b4e34, #5a3e2a);
-    border-radius: 0 0 2px 2px;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(180deg, rgb(140 110 75 / 60%), rgb(100 75 50 / 40%));
+    box-shadow: 0 3px 8px rgb(0 0 0 / 20%);
 }
 
 /* --- Base del mueble --- */
 
 .estante-base {
-    width: calc(100% + 16px);
-    height: 16px;
-    background: linear-gradient(180deg, #5a3e2a, #4a3020 60%, #3a2518);
-    border-radius: 0 0 4px 4px;
-    box-shadow: 0 4px 15px rgb(0 0 0 / 35%);
-    position: relative;
-}
-
-/* Patas implícitas */
-.estante-base::after {
-    content: '';
-    position: absolute;
-    bottom: -6px;
-    left: 16px;
-    right: 16px;
-    height: 6px;
-    background: linear-gradient(90deg, #3a2518, transparent 15%, transparent 85%, #3a2518);
-    border-radius: 0 0 3px 3px;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(180deg, rgb(0 0 0 / 15%), rgb(0 0 0 / 30%));
 }
 
 /* --- Sombra en el piso --- */
 
 .estante-sombra-piso {
-    width: 75%;
-    max-width: 380px;
-    height: 16px;
+    width: 70%;
+    max-width: 360px;
+    height: 12px;
     background: radial-gradient(
         ellipse at 50% 0%,
-        rgb(0 0 0 / 30%) 0%,
-        rgb(0 0 0 / 10%) 50%,
+        rgb(0 0 0 / 25%) 0%,
+        rgb(0 0 0 / 8%) 50%,
         transparent 80%
     );
-    margin-top: -2px;
+    margin-top: -1px;
 }
 
 /* --- Responsive --- */
@@ -359,18 +325,22 @@
     }
 
     .estante-repisa {
-        gap: 16px;
-        padding: 22px 24px 18px;
+        gap: 18px;
+        padding: 22px 20px 16px;
     }
 
     .estante-lomo {
-        width: 78px;
+        width: 90px;
         height: 165px;
     }
 
+    .estante-libro {
+        gap: 8px;
+    }
+
     .estante-lomo-titulo {
-        max-height: 95px;
-        font-size: 0.74rem;
+        font-size: 0.68rem;
+        max-width: 95px;
     }
 }
 
@@ -389,20 +359,21 @@
 
     .estante-repisa {
         gap: 12px;
-        padding: 18px 16px 14px;
+        padding: 18px 14px 12px;
     }
 
     .estante-lomo {
-        width: 64px;
+        width: 74px;
         height: 140px;
     }
 
-    .estante-lomo-icono {
-        font-size: 1.3rem;
+    .estante-libro {
+        gap: 6px;
     }
 
     .estante-lomo-titulo {
-        max-height: 80px;
-        font-size: 0.7rem;
+        font-size: 0.62rem;
+        max-width: 80px;
+        letter-spacing: 0.06em;
     }
 }

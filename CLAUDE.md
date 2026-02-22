@@ -12,6 +12,7 @@ mansion-de-aventuras/
 │       ├── enemigos/         # Avatares (.webp) de los enemigos
 │       ├── sprites-plat/     # Sprite sheets PNG para el platformer
 │       ├── juegos/           # Ilustraciones de juegos para el Libro de Juegos
+│       ├── biblioteca/       # Fondo e imágenes de la homepage (sala-fondo, lomos)
 │       └── icons/            # Favicon e iconos PWA
 ├── css/                      # Estilos modulares (@import desde estilos.css)
 │   ├── base.css              # Variables, fuentes, reset, dark mode, .oculto

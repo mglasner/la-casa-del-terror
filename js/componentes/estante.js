@@ -8,7 +8,7 @@ const TOTAL_PARTICULAS = 20;
 /**
  * Crea el estante de la biblioteca con escena inmersiva.
  * @param {HTMLElement} contenedor - Elemento donde montar el estante
- * @param {Array<{id: string, titulo: string, color: string, icono?: string, onClick: Function}>} libros
+ * @param {Array<{id: string, titulo: string, color: string, img?: string, onClick: Function}>} libros
  * @returns {{ mostrar: Function, ocultar: Function, destruir: Function }}
  */
 export function crearEstante(contenedor, libros) {
@@ -47,23 +47,27 @@ export function crearEstante(contenedor, libros) {
     const repisa = crearElemento('div', 'estante-repisa');
 
     libros.forEach(function (libro) {
-        const lomo = document.createElement('button');
+        // Contenedor: lomo + etiqueta debajo
+        const columna = crearElemento('div', 'estante-libro');
+
+        const lomo = crearElemento('button', 'estante-lomo');
         lomo.type = 'button';
-        lomo.className = 'estante-lomo';
         lomo.dataset.libro = libro.id;
         lomo.style.setProperty('--lomo-color', libro.color);
 
-        if (libro.icono) {
-            lomo.appendChild(crearElemento('span', 'estante-lomo-icono', libro.icono));
+        if (libro.img) {
+            const img = crearElemento('img', 'estante-lomo-img');
+            img.src = libro.img;
+            img.alt = libro.titulo;
+            img.draggable = false;
+            lomo.appendChild(img);
         }
 
-        lomo.appendChild(crearElemento('span', 'estante-lomo-titulo', libro.titulo));
+        lomo.addEventListener('click', libro.onClick);
 
-        lomo.addEventListener('click', function () {
-            if (libro.onClick) libro.onClick();
-        });
-
-        repisa.appendChild(lomo);
+        columna.appendChild(lomo);
+        columna.appendChild(crearElemento('span', 'estante-lomo-titulo', libro.titulo));
+        repisa.appendChild(columna);
     });
 
     mueble.appendChild(repisa);

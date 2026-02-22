@@ -33,16 +33,12 @@ const ESTADOS = {
 };
 
 // Registro de juegos: { "laberinto": { iniciar, limpiar }, ... }
-const juegos = {};
-
-function registrarJuego(juegoId, modulo) {
-    juegos[juegoId] = modulo;
-}
-
-registrarJuego('laberinto', { iniciar: iniciarLaberinto, limpiar: limpiarLaberinto });
-registrarJuego('laberinto3d', { iniciar: iniciarLaberinto3d, limpiar: limpiarLaberinto3d });
-registrarJuego('memorice', { iniciar: iniciarMemorice, limpiar: limpiarMemorice });
-registrarJuego('abismo', { iniciar: iniciarAbismo, limpiar: limpiarAbismo });
+const juegos = {
+    laberinto: { iniciar: iniciarLaberinto, limpiar: limpiarLaberinto },
+    laberinto3d: { iniciar: iniciarLaberinto3d, limpiar: limpiarLaberinto3d },
+    memorice: { iniciar: iniciarMemorice, limpiar: limpiarMemorice },
+    abismo: { iniciar: iniciarAbismo, limpiar: limpiarAbismo },
+};
 
 // --- Estado del juego ---
 
@@ -67,9 +63,24 @@ const toast = crearToast();
 // --- Configuración de libros del estante ---
 
 const LIBROS_ESTANTE = [
-    { id: 'heroario', titulo: 'Heroario', color: '#c8a050', icono: '\u2694\uFE0F' },
-    { id: 'villanario', titulo: 'Villanario', color: '#8b3a62', icono: '\uD83D\uDC7E' },
-    { id: 'juegos', titulo: 'Libro de Juegos', color: '#4a7c59', icono: '\uD83C\uDFAE' },
+    {
+        id: 'heroario',
+        titulo: 'Heroario',
+        color: '#c8a050',
+        img: 'assets/img/biblioteca/lomo-heroario.webp',
+    },
+    {
+        id: 'villanario',
+        titulo: 'Villanario',
+        color: '#8b3a62',
+        img: 'assets/img/biblioteca/lomo-villanario.webp',
+    },
+    {
+        id: 'juegos',
+        titulo: 'Libro de Juegos',
+        color: '#4a7c59',
+        img: 'assets/img/biblioteca/lomo-juegos.webp',
+    },
 ];
 
 // --- Estante (homepage) ---
@@ -81,7 +92,7 @@ const estante = crearEstante(
             id: cfg.id,
             titulo: cfg.titulo,
             color: cfg.color,
-            icono: cfg.icono,
+            img: cfg.img,
             onClick: function () {
                 cambiarEstado(ESTADOS.LIBRO, { libroId: cfg.id });
             },
@@ -94,9 +105,8 @@ const estante = crearEstante(
 const librosCache = {};
 
 function crearHeroarioModal() {
-    const entidades = adaptarEntidades();
     const heroario = crearLibro({
-        entidades: entidades,
+        entidades: adaptarEntidades(),
         generarDetalle: generarDetalleHeroe,
         claseRaiz: 'libro-heroes',
         titulo: 'Heroario',
@@ -149,26 +159,27 @@ function crearJuegosModal() {
             modalJuegos.onCerrar(null);
             modalJuegos.cerrar();
         }
-        iniciarJuego(juegoId, nombrePersonaje);
+        cambiarEstado(ESTADOS.JUEGO, { juegoId, personaje: nombrePersonaje });
     });
     const modal = crearModalLibro(libJuegos.libro, libJuegos.manejarTecladoLibro);
     contenedorJuego.appendChild(modal.overlay);
     return modal;
 }
 
+const fabricaModales = {
+    heroario: crearHeroarioModal,
+    villanario: crearVillanarioModal,
+    juegos: crearJuegosModal,
+};
+
 function obtenerModalLibro(libroId) {
     if (librosCache[libroId]) return librosCache[libroId];
 
-    let modal;
-    if (libroId === 'heroario') {
-        modal = crearHeroarioModal();
-    } else if (libroId === 'villanario') {
-        modal = crearVillanarioModal();
-    } else if (libroId === 'juegos') {
-        modal = crearJuegosModal();
-    }
+    const crear = fabricaModales[libroId];
+    if (!crear) return undefined;
 
-    if (modal) librosCache[libroId] = modal;
+    const modal = crear();
+    librosCache[libroId] = modal;
     return modal;
 }
 
@@ -193,11 +204,6 @@ document.addEventListener('jugador-muerto', function () {
 
 // --- Máquina de estados: transiciones centralizadas ---
 
-function elegirTransicion(anterior, nuevo) {
-    if (nuevo === ESTADOS.JUEGO || anterior === ESTADOS.JUEGO) return 'iris';
-    return 'fade';
-}
-
 function ejecutarCambioEstado(anterior, nuevo, datos) {
     // Salir del estado anterior
     if (anterior === ESTADOS.JUEGO) {
@@ -218,11 +224,9 @@ function ejecutarCambioEstado(anterior, nuevo, datos) {
         estado.libroActivo = null;
     } else if (nuevo === ESTADOS.LIBRO) {
         estante.mostrar(); // El estante permanece visible detrás del modal
+        estado.libroActivo = datos.libroId;
 
-        const libroId = datos.libroId;
-        estado.libroActivo = libroId;
-
-        const modal = obtenerModalLibro(libroId);
+        const modal = obtenerModalLibro(datos.libroId);
         if (!modal) {
             // libroId desconocido: volver a BIBLIOTECA
             estado.estadoActual = ESTADOS.BIBLIOTECA;
@@ -269,23 +273,16 @@ function ejecutarCambioEstado(anterior, nuevo, datos) {
 function cambiarEstado(nuevo, datos) {
     const anterior = estado.estadoActual;
 
-    // Transiciones solo entre juego y otros estados
+    // Transiciones solo entre juego y otros estados (iris)
     if (nuevo === ESTADOS.JUEGO || anterior === ESTADOS.JUEGO) {
-        const estilo = elegirTransicion(anterior, nuevo);
         toast.limpiar();
-        transicion.ejecutar(estilo, function () {
+        transicion.ejecutar('iris', function () {
             ejecutarCambioEstado(anterior, nuevo, datos);
         });
     } else {
         // Cambios entre BIBLIOTECA y LIBRO son instantáneos (modal)
         ejecutarCambioEstado(anterior, nuevo, datos);
     }
-}
-
-// --- Iniciar un juego ---
-
-function iniciarJuego(juegoId, nombrePersonaje) {
-    cambiarEstado(ESTADOS.JUEGO, { juegoId: juegoId, personaje: nombrePersonaje });
 }
 
 // --- Modal de salir (desde dentro de un juego) ---
