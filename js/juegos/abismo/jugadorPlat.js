@@ -44,6 +44,7 @@ let estado = 'idle'; // idle, correr, saltar, caer, golpeado
 let frameAnim = 0;
 let contadorAnim = 0;
 let estabaSuelo = false; // para detectar aterrizaje
+let yAnterior = 0; // posicion Y del frame anterior (para validar stomp "desde arriba")
 
 export function iniciarJugador(jugador, teclas) {
     jugadorRef = jugador;
@@ -76,11 +77,13 @@ export function iniciarJugador(jugador, teclas) {
     frameAnim = 0;
     contadorAnim = 0;
     estabaSuelo = true;
+    yAnterior = y;
 }
 
 export function actualizarJugador() {
     if (!jugadorRef) return;
 
+    yAnterior = y;
     const anteriorEnSuelo = estaEnSuelo;
 
     // Input horizontal
@@ -205,8 +208,8 @@ export function recibirDano(dano, desdeX) {
     return false;
 }
 
-export function aplicarStompRebote() {
-    vy = FIS.fuerzaStompRebote;
+export function aplicarStompRebote(saltandoActivo) {
+    vy = saltandoActivo ? FIS.fuerzaStompReboteAlto : FIS.fuerzaStompReboteBajo;
 }
 
 export function renderizarJugador(ctx, camaraX) {
@@ -264,7 +267,7 @@ export function renderizarJugador(ctx, camaraX) {
 }
 
 export function obtenerPosicion() {
-    return { x, y, ancho, alto, vy, vx, estaEnSuelo, direccion };
+    return { x, y, ancho, alto, vy, vx, estaEnSuelo, direccion, yAnterior };
 }
 
 export function esInvulnerable() {

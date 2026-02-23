@@ -34,7 +34,8 @@ fisicas:
     velocidadMaxCaida: 8         # velocidad máxima de caída (px/frame)
     velocidadJugador: 2.5        # velocidad horizontal base (px/frame)
     fuerzaSalto: -7.5            # impulso vertical al saltar (negativo = arriba)
-    fuerzaStompRebote: -5        # rebote al hacer stomp sobre un enemigo
+    fuerzaStompReboteBajo: -3    # rebote bajo al hacer stomp (sin input de salto)
+    fuerzaStompReboteAlto: -6    # rebote alto al hacer stomp (con input de salto)
     coyoteTime: 6                # frames de gracia para saltar tras dejar el suelo
     jumpBuffer: 6                # frames de buffer para input de salto anticipado
     invulnerabilidad: 60         # frames de invulnerabilidad tras recibir daño
@@ -43,9 +44,11 @@ fisicas:
 
 # --- Enemigos (esbirros) ---
 enemigos:
-    stompMargen: 4               # px de margen para detectar stomp (pisada desde arriba)
+    stompMargen: 2               # px de margen para detectar stomp (pisada desde arriba)
     stompVyMin: 2                # vy mínima para stomp (evita kills al caminar entre personajes de distinta estatura)
     cooldownAtaque: 60           # frames de cooldown entre ataques del enemigo
+    invulStomp: 30               # frames de invulnerabilidad del boss tras recibir stomp
+    stunStomp: 10                # frames de stun del boss tras recibir stomp
 
 # --- Boss ---
 boss:

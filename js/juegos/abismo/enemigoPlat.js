@@ -33,16 +33,8 @@ const ELITES = Object.values(ENEMIGOS).filter(function (e) {
 
 // --- Clase Enemigo Platformer ---
 
-function crearEnemigo(col, fila, esBossFlag, datosEnemigo) {
-    // Usar datos proporcionados directamente
-    const datos = datosEnemigo || null;
-    let vidaMax;
-
-    if (esBossFlag) {
-        vidaMax = datos ? datos.vidaMax : 100;
-    } else {
-        vidaMax = 1; // 1 stomp = derrotado
-    }
+function crearEnemigo(col, fila, esBossFlag, datos) {
+    const vidaMax = esBossFlag ? (datos ? datos.vidaMax : 100) : 1;
 
     // Determinar nombre legible
     let nombre = 'Esbirro';
@@ -53,7 +45,10 @@ function crearEnemigo(col, fila, esBossFlag, datosEnemigo) {
     }
 
     // Calcular escala y dimensiones desde estatura del enemigo
-    const estatura = datos ? datos.estatura : esBossFlag ? 1.8 : 1.0;
+    let estatura = 1.0;
+    if (datos) estatura = datos.estatura;
+    else if (esBossFlag) estatura = 1.8;
+
     const escalaEne = calcularEscala(estatura);
     const hb = calcularHitbox(escalaEne);
     const sd = calcularSpriteDrawSize(escalaEne);
@@ -84,6 +79,8 @@ function crearEnemigo(col, fila, esBossFlag, datosEnemigo) {
         nombre,
         framesMuerte: 0,
         cooldownAtaque: 0,
+        invulStomp: 0,
+        stunFrames: 0,
         frameAnim: 0,
         contadorAnim: 0,
     };
@@ -130,6 +127,18 @@ export function actualizarEnemigos() {
         }
 
         if (e.cooldownAtaque > 0) e.cooldownAtaque--;
+        if (e.invulStomp > 0) e.invulStomp--;
+        if (e.stunFrames > 0) {
+            e.stunFrames--;
+            // Durante stun: solo aplicar gravedad, no patrullar
+            e.vx = 0;
+            e.vy += CFG.fisicas.gravedad;
+            if (e.vy > CFG.fisicas.velocidadMaxCaida) e.vy = CFG.fisicas.velocidadMaxCaida;
+            const resY = resolverColisionY(e.x, e.y, e.ancho, e.alto, e.vy);
+            e.y = resY.y;
+            e.vy = resY.vy;
+            continue;
+        }
 
         // Movimiento de patrulla
         let vel = e.velocidad;
@@ -215,11 +224,14 @@ export function renderizarEnemigos(ctx, camaraX) {
             continue;
         }
 
+        // Parpadeo de invulnerabilidad post-stomp (igual que el jugador)
+        if (e.invulStomp > 0 && Math.floor(e.invulStomp / 4) % 2 === 0) continue;
+
         const hitboxX = Math.round(e.x - camaraX);
         const hitboxY = Math.round(e.y);
 
-        // Estado de animacion
-        const estadoAnim = Math.abs(e.vx) > 0.1 ? 'patrulla' : 'idle';
+        // Estado de animacion (stun o quieto → idle, moviéndose → patrulla)
+        const estadoAnim = e.stunFrames <= 0 && Math.abs(e.vx) > 0.1 ? 'patrulla' : 'idle';
 
         // Intentar sprite sheet primero
         const spriteSheet = obtenerSpriteEnemigoSheet(e.nombre, estadoAnim, e.frameAnim);
@@ -294,18 +306,31 @@ export function obtenerEnemigosVivos() {
     return vivos;
 }
 
+// Fase del boss segun ratio de vida (0 = sano, 1 = herido, 2 = critico)
+function faseBoss(ratio) {
+    if (ratio <= BOSS.fasesCambio[1]) return 2;
+    if (ratio <= BOSS.fasesCambio[0]) return 1;
+    return 0;
+}
+
+const SIN_EFECTO = { bossDestruido: false, cambioFase: false, bloqueado: false };
+const BLOQUEADO = { bossDestruido: false, cambioFase: false, bloqueado: true };
+
 // Danar enemigo por stomp — retorna { bossDestruido, cambioFase }
 export function stomperEnemigo(enemigo, dano) {
-    if (!enemigo.vivo) return { bossDestruido: false, cambioFase: false };
+    if (!enemigo.vivo) return SIN_EFECTO;
 
     if (enemigo.esBoss) {
-        // Detectar fase actual antes del dano
-        const ratioAntes = enemigo.vidaActual / enemigo.vidaMax;
-        let faseAntes = 0;
-        if (ratioAntes <= BOSS.fasesCambio[1]) faseAntes = 2;
-        else if (ratioAntes <= BOSS.fasesCambio[0]) faseAntes = 1;
+        // Boss con invulnerabilidad post-stomp: ignorar si aun esta protegido
+        if (enemigo.invulStomp > 0) return BLOQUEADO;
 
+        const faseAntes = faseBoss(enemigo.vidaActual / enemigo.vidaMax);
         enemigo.vidaActual -= dano;
+
+        // Activar invulnerabilidad y stun post-stomp
+        enemigo.invulStomp = CFG.enemigos.invulStomp;
+        enemigo.stunFrames = CFG.enemigos.stunStomp;
+
         if (enemigo.vidaActual <= 0) {
             enemigo.vidaActual = 0;
             enemigo.vivo = false;
@@ -314,19 +339,14 @@ export function stomperEnemigo(enemigo, dano) {
             return { bossDestruido: true, cambioFase: false };
         }
 
-        // Detectar cambio de fase
-        const ratioDespues = enemigo.vidaActual / enemigo.vidaMax;
-        let faseDespues = 0;
-        if (ratioDespues <= BOSS.fasesCambio[1]) faseDespues = 2;
-        else if (ratioDespues <= BOSS.fasesCambio[0]) faseDespues = 1;
-
+        const faseDespues = faseBoss(enemigo.vidaActual / enemigo.vidaMax);
         return { bossDestruido: false, cambioFase: faseDespues > faseAntes };
     }
 
     // Esbirro: 1 stomp = derrotado
     enemigo.vivo = false;
     enemigo.framesMuerte = 20;
-    return { bossDestruido: false, cambioFase: false };
+    return SIN_EFECTO;
 }
 
 export function esBossVivo() {

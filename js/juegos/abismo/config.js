@@ -28,7 +28,8 @@ export const CFG = {
         velocidadMaxCaida: 8,
         velocidadJugador: 2.5,
         fuerzaSalto: -7.5,
-        fuerzaStompRebote: -5,
+        fuerzaStompReboteBajo: -3,
+        fuerzaStompReboteAlto: -6,
         coyoteTime: 6,
         jumpBuffer: 6,
         invulnerabilidad: 60,
@@ -36,9 +37,11 @@ export const CFG = {
         knockbackY: -4,
     },
     enemigos: {
-        stompMargen: 4,
+        stompMargen: 2,
         stompVyMin: 2,
         cooldownAtaque: 60,
+        invulStomp: 30,
+        stunStomp: 10,
     },
     boss: {
         fasesCambio: [0.66, 0.33],

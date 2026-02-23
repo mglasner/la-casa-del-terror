@@ -139,31 +139,34 @@ function procesarStomp(e, resultado) {
 function verificarColisionesEnemigos() {
     const jug = obtenerPosicion();
     const vivos = obtenerEnemigosVivos();
+    const jugRect = { x: jug.x, y: jug.y, ancho: jug.ancho, alto: jug.alto };
+    const pieJugador = jug.y + jug.alto;
+    const pieAnterior = jug.yAnterior + jug.alto;
 
     for (let i = 0; i < vivos.length; i++) {
         const e = vivos[i];
-
-        const jugRect = { x: jug.x, y: jug.y, ancho: jug.ancho, alto: jug.alto };
         const eneRect = { x: e.x, y: e.y, ancho: e.ancho, alto: e.alto };
 
         if (!aabbColision(jugRect, eneRect)) continue;
 
-        // Stomp: pie del jugador sobre mitad superior del enemigo + cayendo con fuerza
-        // Se exige vy minima porque con escalado proporcional un personaje alto
-        // (ej: PandaJuro 1.70m) tiene los pies a la altura de la mitad de un
-        // enemigo bajo (ej: Trasgo 0.60m) estando en el mismo suelo, y la
-        // gravedad residual del frame (vy > 0) gatillaba stomp al caminar.
-        const pieJugador = jug.y + jug.alto;
+        // Stomp: requiere 3 condiciones simultáneas:
+        // 1. Cayendo con fuerza suficiente (vy >= stompVyMin)
+        // 2. Pies sobre la mitad superior del enemigo (con margen)
+        // 3. En el frame anterior los pies no habían pasado la base del enemigo
+        //    (valida que el jugador viene genuinamente "desde arriba")
         const mitadEnemigo = e.y + e.alto / 2;
 
         if (
             jug.vy >= CFG.enemigos.stompVyMin &&
-            pieJugador <= mitadEnemigo + CFG.enemigos.stompMargen
+            pieJugador <= mitadEnemigo + CFG.enemigos.stompMargen &&
+            pieAnterior <= e.y + e.alto
         ) {
             const dano = est.jugador.ataques[0] ? est.jugador.ataques[0].dano : 10;
             const resultado = stomperEnemigo(e, dano);
-            aplicarStompRebote();
-            procesarStomp(e, resultado);
+            // Rebote para no caer dentro del enemigo (siempre, aunque esté protegido)
+            aplicarStompRebote(est.teclasRef['ArrowUp']);
+            // Feedback visual solo si el stomp conectó (no bloqueado por invulnerabilidad)
+            if (!resultado.bloqueado) procesarStomp(e, resultado);
         } else if (!esInvulnerable() && e.cooldownAtaque <= 0) {
             // Colision lateral: dano al jugador
             const dano = obtenerDanoEnemigo(e);
