@@ -7,10 +7,10 @@ export const CFG = {
         timeoutExito: 1500,
     },
     textos: {
-        indicadorBusqueda: 'Encuentra la llave',
-        indicadorLlaveObtenida: '¡Llave obtenida! Vuelve a la salida',
-        toastLlave: '¡Llave encontrada!',
-        mensajeExito: '¡Escapaste con la llave!',
+        indicadorBusqueda: 'Encuentra el cofre del tesoro',
+        indicadorLlaveObtenida: '¡Tesoro encontrado! Escapa del laberinto',
+        toastLlave: '¡Encontraste el cofre del tesoro!',
+        mensajeExito: '¡Escapaste con el tesoro!',
     },
     laberinto: {
         filas: 13,

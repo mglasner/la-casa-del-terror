@@ -6,7 +6,7 @@ export const VELOCIDAD_MOV = 0.06;
 export const VELOCIDAD_GIRO = 0.04;
 export const RADIO_COLISION = 0.2;
 
-// Paleta de colores (bosque encantado)
+// Paleta de colores por defecto (sin zonas activas)
 export const COLORES = {
     paredNS: { r: 26, g: 62, b: 30 },
     paredEO: { r: 37, g: 85, b: 42 },
@@ -17,6 +17,34 @@ export const COLORES = {
     minimapaFondo: '#060e06',
     minimapaParedes: '#2a5e2a',
 };
+
+// Paleta de colores por zona temática
+export const COLORES_ZONA = [
+    // Zona 0 — Mazmorra (cálido ocre)
+    {
+        cieloArriba: '#0a0804',
+        cieloAbajo: '#1a1208',
+        sueloArriba: '#1a1408',
+        sueloAbajo: '#0a0804',
+        tinte: 'rgba(180,140,60,0.04)',
+    },
+    // Zona 1 — Cueva (frío azul-gris)
+    {
+        cieloArriba: '#04080c',
+        cieloAbajo: '#0a1520',
+        sueloArriba: '#0a1218',
+        sueloAbajo: '#040810',
+        tinte: 'rgba(80,120,160,0.05)',
+    },
+    // Zona 2 — Profundidades (violeta oscuro)
+    {
+        cieloArriba: '#08040c',
+        cieloAbajo: '#140a1e',
+        sueloArriba: '#120a18',
+        sueloAbajo: '#06030a',
+        tinte: 'rgba(120,60,180,0.06)',
+    },
+];
 
 // Estado mutable del canvas (se recalcula al redimensionar)
 export const canvas = {

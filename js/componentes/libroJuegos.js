@@ -24,7 +24,7 @@ const JUEGOS = {
         accent: '#6bfc86',
         parrafos: [
             '¡El laberinto ha cobrado vida en tres dimensiones! Las paredes se alzan a tu alrededor y el camino se vuelve aún más confuso.',
-            'Esta vez no ves el mapa completo. Solo puedes ver lo que hay frente a ti. ¿Podrás encontrar la salida sin perderte?',
+            'Un cofre del tesoro se esconde en lo más profundo del laberinto. Solo puedes ver lo que hay frente a ti. ¿Podrás encontrarlo y escapar?',
             'Ten cuidado con los enemigos que acechan en los pasillos, ¡pueden hacerte daño!',
         ],
         tip: 'Mantén la calma y recuerda por dónde viniste.',

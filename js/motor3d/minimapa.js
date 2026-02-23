@@ -50,7 +50,7 @@ export function renderizarMinimapa(ctx, base, datos) {
     );
     ctx.fill();
 
-    // Llave (dorada con pseudo-glow sin shadowBlur)
+    // Cofre del tesoro (dorado con pseudo-glow sin shadowBlur)
     if (!datos.tieneLlave) {
         const lx = (datos.llaveCol + 0.5) * tamCelda;
         const ly = (datos.llaveFila + 0.5) * tamCelda;

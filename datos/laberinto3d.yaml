@@ -1,7 +1,7 @@
 # ============================================
 # Configuración de El Laberinto 3D
 # Vista pseudo-3D con raycasting estilo Doom
-# El jugador debe encontrar la llave y volver a la salida
+# El jugador debe encontrar el cofre del tesoro y volver a la salida
 # ============================================
 
 # --- Información general del juego ---
@@ -12,10 +12,10 @@ meta:
 
 # --- Textos mostrados en pantalla ---
 textos:
-    indicadorBusqueda: "Encuentra la llave"
-    indicadorLlaveObtenida: "¡Llave obtenida! Vuelve a la salida"
-    toastLlave: "¡Llave encontrada!"
-    mensajeExito: "¡Escapaste con la llave!"
+    indicadorBusqueda: "Encuentra el cofre del tesoro"
+    indicadorLlaveObtenida: "¡Tesoro encontrado! Escapa del laberinto"
+    toastLlave: "¡Encontraste el cofre del tesoro!"
+    mensajeExito: "¡Escapaste con el tesoro!"
 
 # --- Dimensiones del laberinto ---
 # ⚠ filas y columnas deben ser IMPARES para que el algoritmo de generación funcione.

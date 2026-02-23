@@ -1,7 +1,7 @@
 // Motor 3D — Raycaster DDA con texture mapping e iluminación
 
 import { FOV, TEX_SIZE, COLORES, canvas } from './config.js';
-import { obtenerTextura } from './texturas.js';
+import { obtenerTextura, obtenerTexturaZona } from './texturas.js';
 
 // zBuffer preallocado (se redimensiona si cambia numRayos)
 let _zBuffer = new Float64Array(320);
@@ -20,7 +20,10 @@ const LUT_TINTE = Array.from(
 
 // Renderiza la vista 3D con raycasting DDA
 // Retorna el zBuffer para sprites
-export function renderizar3D(ctx, jugador, mapa, filas, cols, grad, texturas, mapaLuz) {
+// opciones.zonas: Uint8Array con zona por celda (opcional)
+// opciones.tinte: string CSS de tinte ambiental por zona (opcional)
+export function renderizar3D(ctx, jugador, mapa, filas, cols, grad, texturas, mapaLuz, opciones) {
+    const { zonas = null, tinte = null } = opciones || {};
     const { ancho, alto, numRayos, anchoFranja } = canvas;
     const mitadAlto = alto / 2;
 
@@ -116,18 +119,22 @@ export function renderizar3D(ctx, jugador, mapa, filas, cols, grad, texturas, ma
 
             // Columna de la textura a dibujar
             const texX = Math.min(Math.floor(wallX * TEX_SIZE), TEX_SIZE - 1);
-            const tex = obtenerTextura(mapX, mapY, texturas);
+            const tex = zonas
+                ? obtenerTexturaZona(mapX, mapY, texturas, zonas, cols)
+                : obtenerTextura(mapX, mapY, texturas);
 
             // Dibujar franja de textura (1px de ancho del source, estirado al alto de la pared)
+            // Los overlays de humedad/musgo ya están horneados en la textura
             ctx.drawImage(tex, texX, 0, 1, TEX_SIZE, screenX, inicioY, anchoFranja, alturaPared);
 
             // Calcular brillo (distancia + iluminación dinámica)
             let brillo = Math.min(1, 1.5 / distPerp);
+            let luzLocal = 0;
 
             if (mapaLuz) {
                 const lx = Math.min(cols - 1, Math.max(0, mapX));
                 const ly = Math.min(filas - 1, Math.max(0, mapY));
-                const luzLocal = mapaLuz[ly * cols + lx];
+                luzLocal = mapaLuz[ly * cols + lx];
                 brillo = luzLocal * Math.min(1, 1.5 / distPerp);
             }
 
@@ -142,15 +149,10 @@ export function renderizar3D(ctx, jugador, mapa, filas, cols, grad, texturas, ma
             }
 
             // Tinte cálido naranja cerca de antorchas (LUT sin string concat)
-            if (mapaLuz) {
-                const lx = Math.min(cols - 1, Math.max(0, mapX));
-                const ly = Math.min(filas - 1, Math.max(0, mapY));
-                const luzLocal = mapaLuz[ly * cols + lx];
-                if (luzLocal > 0.3) {
-                    const tinteIdx = Math.min(100, Math.round((luzLocal - 0.3) * 100));
-                    ctx.fillStyle = LUT_TINTE[tinteIdx];
-                    ctx.fillRect(screenX, inicioY, anchoFranja, alturaPared);
-                }
+            if (luzLocal > 0.3) {
+                const tinteIdx = Math.min(100, Math.round((luzLocal - 0.3) * 100));
+                ctx.fillStyle = LUT_TINTE[tinteIdx];
+                ctx.fillRect(screenX, inicioY, anchoFranja, alturaPared);
             }
         } else {
             // --- Fallback: colores sólidos (sin texturas) ---
@@ -162,6 +164,12 @@ export function renderizar3D(ctx, jugador, mapa, filas, cols, grad, texturas, ma
             ctx.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
             ctx.fillRect(screenX, inicioY, anchoFranja, alturaPared);
         }
+    }
+
+    // Tinte ambiental por zona (una sola pasada sobre toda la vista)
+    if (tinte) {
+        ctx.fillStyle = tinte;
+        ctx.fillRect(0, 0, ancho, alto);
     }
 
     return _zBuffer;

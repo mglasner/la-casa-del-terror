@@ -41,27 +41,46 @@ function dibujarSprite(ctx, sprite, zBuffer, jugadorX, jugadorY, angulo) {
     const z = sprite.z !== undefined ? sprite.z : 0.5;
     const screenY = canvas.alto / 2 - (z - 0.5) * alturaPared;
 
-    // Pseudo-glow sin shadowBlur (mucho más rápido)
-    // Sprites con sinBrillo=true se dibujan sin la capa de glow (más nítidos)
-    if (!sprite.sinBrillo) {
-        ctx.save();
-        ctx.globalAlpha = 0.25;
-        ctx.font = Math.floor(fontSize * 1.4) + 'px serif';
+    // Sprite con imagen (ctx.drawImage) o emoji (ctx.fillText)
+    const img = sprite.imagen;
+    const usarImagen = img && img.complete && img.naturalWidth > 0;
+
+    if (usarImagen) {
+        const tamano = fontSize * 1.2;
+
+        // Pseudo-glow: imagen más grande con transparencia
+        if (!sprite.sinBrillo) {
+            ctx.save();
+            ctx.globalAlpha = 0.25;
+            const tamGlow = tamano * 1.4;
+            ctx.drawImage(img, screenX - tamGlow / 2, screenY - tamGlow / 2, tamGlow, tamGlow);
+            ctx.restore();
+        }
+
+        ctx.drawImage(img, screenX - tamano / 2, screenY - tamano / 2, tamano, tamano);
+    } else {
+        // Pseudo-glow sin shadowBlur (mucho más rápido)
+        // Sprites con sinBrillo=true se dibujan sin la capa de glow (más nítidos)
+        if (!sprite.sinBrillo) {
+            ctx.save();
+            ctx.globalAlpha = 0.25;
+            ctx.font = Math.floor(fontSize * 1.4) + 'px serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(sprite.emoji, screenX, screenY);
+            ctx.restore();
+        }
+
+        // Sprite principal
+        ctx.font = Math.floor(fontSize) + 'px serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(sprite.emoji, screenX, screenY);
-        ctx.restore();
     }
-
-    // Sprite principal
-    ctx.font = Math.floor(fontSize) + 'px serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(sprite.emoji, screenX, screenY);
 }
 
 // Renderiza todos los sprites ordenados por distancia (más lejanos primero)
-// sprites = [{ x, y, emoji, color, z? }, ...]
+// sprites = [{ x, y, emoji, color, z?, imagen?, escala?, sinBrillo? }, ...]
 export function renderizarSprites(ctx, sprites, zBuffer, jugadorX, jugadorY, angulo) {
     sprites.sort(function (a, b) {
         const da = (a.x - jugadorX) ** 2 + (a.y - jugadorY) ** 2;

@@ -5,6 +5,9 @@ import { FOV, canvas } from './config.js';
 const POOL_SIZE = 250;
 const RADIO_CULLING = 6;
 
+// Probabilidad de emitir niebla por zona (mazmorra → cueva → profundidades)
+const PROB_NIEBLA = [0.25, 0.35, 0.5];
+
 // Pool preasignado (evita GC)
 const pool = [];
 for (let i = 0; i < POOL_SIZE; i++) {
@@ -162,6 +165,40 @@ function emitirHumoAntorcha(antorcha) {
     p.tamano = 2.5 + Math.random() * 1;
 }
 
+// Emite destello de cristal (zona 2 — Profundidades)
+function emitirDestello(jugadorX, jugadorY) {
+    const p = obtenerLibre();
+    if (!p) return;
+
+    // Posición aleatoria cercana al jugador (radio 0.3-2.8 celdas)
+    const ang = Math.random() * Math.PI * 2;
+    const dist = 0.3 + Math.random() * 2.5;
+
+    p.activa = true;
+    p.x = jugadorX + Math.cos(ang) * dist;
+    p.y = jugadorY + Math.sin(ang) * dist;
+    p.z = 0.15 + Math.random() * 0.7; // Altura variada
+    p.vx = (Math.random() - 0.5) * 0.0005;
+    p.vy = (Math.random() - 0.5) * 0.0005;
+    p.vz = 0.001 + Math.random() * 0.002; // Flota suavemente
+    p.vida = 40 + Math.floor(Math.random() * 30);
+    p.vidaMax = p.vida;
+    p.tipo = 'destello';
+
+    // Color cyan o violeta aleatorio
+    if (Math.random() > 0.5) {
+        p.r = 80;
+        p.g = 200;
+        p.b = 220;
+    } else {
+        p.r = 140;
+        p.g = 80;
+        p.b = 200;
+    }
+    p.alpha = 0.5 + Math.random() * 0.3;
+    p.tamano = 1.5 + Math.random() * 1;
+}
+
 // Emite partícula de niebla baja
 function emitirNiebla(jugadorX, jugadorY) {
     const p = obtenerLibre();
@@ -189,7 +226,8 @@ function emitirNiebla(jugadorX, jugadorY) {
 }
 
 // Actualiza todas las partículas y emite nuevas
-export function actualizarParticulas(ahora, antorchas, jugadorX, jugadorY) {
+// zona: zona actual del jugador (0/1/2) para efectos diferenciados
+export function actualizarParticulas(ahora, antorchas, jugadorX, jugadorY, zona) {
     // Emitir gotas
     for (const emisor of emisoresGotas) {
         if (ahora - emisor.cooldown > emisor.intervalo) {
@@ -228,9 +266,15 @@ export function actualizarParticulas(ahora, antorchas, jugadorX, jugadorY) {
         }
     }
 
-    // Emitir niebla baja (~0.3 por frame)
-    if (Math.random() < 0.3) {
+    // Emitir niebla baja (más densa en zona 2)
+    const probNiebla = PROB_NIEBLA[zona] ?? 0.25;
+    if (Math.random() < probNiebla) {
         emitirNiebla(jugadorX, jugadorY);
+    }
+
+    // Destellos de cristal solo en zona 2 (Profundidades)
+    if (zona === 2 && Math.random() < 0.15) {
+        emitirDestello(jugadorX, jugadorY);
     }
 
     // Actualizar partículas activas
@@ -255,6 +299,10 @@ export function actualizarParticulas(ahora, antorchas, jugadorX, jugadorY) {
             // Niebla: fade in/out suave
             const fadeIn = Math.min(1, (1 - vidaRatio) * 3);
             p.alpha = fadeIn * vidaRatio * 0.12;
+        } else if (p.tipo === 'destello') {
+            // Destello: pulso brillante que se desvanece
+            const pulso = Math.sin(vidaRatio * Math.PI);
+            p.alpha = pulso * 0.7;
         } else {
             p.alpha = vidaRatio * 0.6;
         }
@@ -338,6 +386,14 @@ export function renderizarParticulas(ctx, zBuffer, jugadorX, jugadorY, angulo) {
             ctx.beginPath();
             ctx.arc(screenX, screenY, tamano, 0, Math.PI * 2);
             ctx.fill();
+        } else if (p.tipo === 'destello') {
+            // Destellos de cristal: glow aditivo
+            ctx.save();
+            ctx.globalCompositeOperation = 'lighter';
+            ctx.beginPath();
+            ctx.arc(screenX, screenY, tamano, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
         } else {
             ctx.fillRect(screenX - tamano / 2, screenY - tamano / 2, tamano, tamano);
         }

@@ -1,15 +1,15 @@
 // El Laberinto 3D — Vista pseudo-3D con raycasting estilo Doom
-// El jugador debe encontrar la llave y volver a la salida
+// El jugador debe encontrar el cofre del tesoro y volver a la salida
 
 import { CFG } from './config.js';
 import { est, FILAS, COLS, ATAJOS, actualizarHUDInventarioLocal } from './estado.js';
 import { detectarLlave, detectarSalida } from './deteccion.js';
 import { generarMapa, encontrarPuntoLejano } from '../../laberinto.js';
-import { FOV, canvas, calcularDimensiones, COLORES } from '../../motor3d/config.js';
+import { FOV, canvas, calcularDimensiones, COLORES, COLORES_ZONA } from '../../motor3d/config.js';
 import { moverJugador } from '../../motor3d/colisiones.js';
 import { crearMinimapBase, renderizarMinimapa } from '../../motor3d/minimapa.js';
 import { renderizarSprites } from '../../motor3d/sprites.js';
-import { generarTexturas } from '../../motor3d/texturas.js';
+import { generarTexturas, calcularZonas } from '../../motor3d/texturas.js';
 import { renderizar3D } from '../../motor3d/raycaster.js';
 import {
     generarDecoraciones,
@@ -44,7 +44,7 @@ import { crearInventario } from '../../componentes/inventario.js';
 import { crearPantallaJuego } from '../../componentes/pantallaJuego.js';
 import { crearElemento, crearGameLoop } from '../../utils.js';
 
-// Pool de sprites preallocado para el loop (llave + puerta + ~15 decoraciones + ~10 trampas inactivas)
+// Pool de sprites preallocado para el loop (cofre + puerta + ~15 decoraciones + ~10 trampas inactivas)
 const MAX_SPRITES_LOOP = 30;
 const _sprites = Array.from({ length: MAX_SPRITES_LOOP }, () => ({
     x: 0,
@@ -53,6 +53,8 @@ const _sprites = Array.from({ length: MAX_SPRITES_LOOP }, () => ({
     emoji: '',
     color: '',
     sinBrillo: false,
+    imagen: null,
+    escala: undefined,
 }));
 let _spritesCount = 0;
 // Vista mutable: array cuyas entries apuntan a _sprites (se ajusta .length cada frame)
@@ -69,6 +71,8 @@ function copiarSprites(resultado, offset) {
         dst.emoji = src.emoji;
         dst.color = src.color;
         dst.sinBrillo = src.sinBrillo || false;
+        dst.imagen = src.imagen || null;
+        dst.escala = src.escala || undefined;
     }
     return offset;
 }
@@ -98,14 +102,16 @@ function reescalarCanvas3D() {
     est.canvas3D.style.height = Math.floor(canvas.alto * escala) + 'px';
 }
 
-function crearGradientes() {
+function crearGradientes(zona) {
+    const paleta = zona !== undefined ? COLORES_ZONA[zona] : COLORES;
+
     est.gradCielo = est.ctx3D.createLinearGradient(0, 0, 0, canvas.alto / 2);
-    est.gradCielo.addColorStop(0, COLORES.cieloArriba);
-    est.gradCielo.addColorStop(1, COLORES.cieloAbajo);
+    est.gradCielo.addColorStop(0, paleta.cieloArriba);
+    est.gradCielo.addColorStop(1, paleta.cieloAbajo);
 
     est.gradSuelo = est.ctx3D.createLinearGradient(0, canvas.alto / 2, 0, canvas.alto);
-    est.gradSuelo.addColorStop(0, COLORES.sueloArriba);
-    est.gradSuelo.addColorStop(1, COLORES.sueloAbajo);
+    est.gradSuelo.addColorStop(0, paleta.sueloArriba);
+    est.gradSuelo.addColorStop(1, paleta.sueloAbajo);
 }
 
 // Recalcula resolución interna del canvas para landscape (llena todo el ancho)
@@ -131,7 +137,7 @@ function redimensionarLandscape() {
     est.minimapBase = crearMinimapBase(est.mapa, FILAS, COLS, canvas.anchoMini, canvas.altoMini);
 
     // Recrear gradientes (dependen de canvas.alto)
-    crearGradientes();
+    crearGradientes(est.zonaActual);
 
     // Actualizar variable CSS
     const juegoEl = document.getElementById('juego');
@@ -208,8 +214,8 @@ function crearPantalla(esTouch) {
     est.hudJugadorContenedor.appendChild(est.hudJugadorInventario.el);
     contenedor.appendChild(est.hudJugadorContenedor);
 
-    // Pre-crear gradientes (no cambian entre frames)
-    crearGradientes();
+    // Pre-crear gradientes para zona inicial
+    crearGradientes(0);
 
     est.mensajeExito = document.createElement('p');
     est.mensajeExito.id = 'laberinto3d-mensaje';
@@ -267,11 +273,27 @@ function loop(ahora) {
     }
     actualizarHUDVida();
 
-    // Iluminación dinámica (recalcular cada 3 frames)
+    // Iluminación dinámica (recalcular cada 3 frames, con luz ambiental por zona)
     if (est.decoraciones && est.frameCount % 3 === 0) {
-        est.mapaLuz = precalcularMapaLuz(FILAS, COLS, est.decoraciones.antorchas, ahora);
+        est.mapaLuz = precalcularMapaLuz(
+            FILAS,
+            COLS,
+            est.decoraciones.antorchas,
+            ahora,
+            est.mapaZonas
+        );
     }
     est.frameCount++;
+
+    // Detectar cambio de zona y actualizar gradientes (antes de partículas y render)
+    if (est.mapaZonas) {
+        const celdaIdx = Math.floor(est.posicion.y) * COLS + Math.floor(est.posicion.x);
+        const nuevaZona = est.mapaZonas[celdaIdx] || 0;
+        if (nuevaZona !== est.zonaActual) {
+            est.zonaActual = nuevaZona;
+            crearGradientes(nuevaZona);
+        }
+    }
 
     // Actualizar decoraciones y partículas
     if (est.decoraciones) {
@@ -281,9 +303,13 @@ function loop(ahora) {
         ahora,
         est.decoraciones ? est.decoraciones.antorchas : [],
         est.posicion.x,
-        est.posicion.y
+        est.posicion.y,
+        est.zonaActual
     );
     actualizarFuegoTrampas(est.posicion.x, est.posicion.y);
+
+    // Tinte ambiental de la zona actual
+    const tinteZona = est.mapaZonas ? COLORES_ZONA[est.zonaActual].tinte : null;
 
     // Renderizar vista 3D
     const zBuffer = renderizar3D(
@@ -294,7 +320,8 @@ function loop(ahora) {
         COLS,
         { cielo: est.gradCielo, suelo: est.gradSuelo },
         est.usarTexturas ? est.texturas : null,
-        est.mapaLuz
+        est.mapaLuz,
+        { zonas: est.mapaZonas, tinte: tinteZona }
     );
 
     // Sprites: objetos del juego + decoraciones (reutilizar array preallocado)
@@ -304,10 +331,12 @@ function loop(ahora) {
         const s = _sprites[_spritesCount++];
         s.x = est.llaveCol + 0.5;
         s.y = est.llaveFila + 0.5;
-        s.emoji = '\uD83D\uDD11';
+        s.emoji = '\uD83D\uDCE6';
         s.color = '#ffd700';
-        s.z = undefined;
+        s.z = 0.15;
         s.sinBrillo = false;
+        s.imagen = est.cofreImg;
+        s.escala = 1.2;
     }
 
     const sPuerta = _sprites[_spritesCount++];
@@ -317,6 +346,8 @@ function loop(ahora) {
     sPuerta.color = est.tieneLlave ? '#44ff44' : '#444444';
     sPuerta.z = undefined;
     sPuerta.sinBrillo = false;
+    sPuerta.imagen = null;
+    sPuerta.escala = undefined;
 
     // Agregar decoraciones como sprites
     if (est.decoraciones) {
@@ -431,7 +462,7 @@ export function iniciarLaberinto3d(jugadorRef, callback, dpadArgumento) {
     est.entradaFila = FILAS - 2;
     est.entradaCol = 1;
 
-    // Colocar llave en el punto más lejano
+    // Colocar cofre en el punto más lejano
     const puntoLlave = encontrarPuntoLejano(est.mapa, FILAS, COLS, est.entradaFila, est.entradaCol);
     est.llaveFila = puntoLlave[0];
     est.llaveCol = puntoLlave[1];
@@ -445,11 +476,19 @@ export function iniciarLaberinto3d(jugadorRef, callback, dpadArgumento) {
     est.avatarImg = new Image();
     est.avatarImg.src = est.jugador.img;
 
+    // Imagen del cofre para sprite 3D
+    est.cofreImg = new Image();
+    est.cofreImg.src = 'assets/img/llaves/cofre-laberinto3d.webp';
+
     // Generar texturas procedurales (una vez)
     est.texturas = generarTexturas();
 
-    // Generar decoraciones ambientales
-    est.decoraciones = generarDecoraciones(est.mapa, FILAS, COLS);
+    // Calcular zonas temáticas (BFS desde la entrada)
+    est.mapaZonas = calcularZonas(est.mapa, FILAS, COLS, est.entradaFila, est.entradaCol);
+    est.zonaActual = 0;
+
+    // Generar decoraciones ambientales (con densidad de antorchas por zona)
+    est.decoraciones = generarDecoraciones(est.mapa, FILAS, COLS, est.mapaZonas);
 
     // Generar trampas de fuego
     generarTrampas3D(
@@ -483,7 +522,7 @@ export function iniciarLaberinto3d(jugadorRef, callback, dpadArgumento) {
     // Resetear indicador
     est.indicador.replaceChildren();
     const imgIndicador = document.createElement('img');
-    imgIndicador.src = 'assets/img/llaves/llave-laberinto3d.webp';
+    imgIndicador.src = 'assets/img/llaves/cofre-laberinto3d-icono.webp';
     imgIndicador.alt = '';
     imgIndicador.className = 'indicador-llave-img';
     est.indicador.appendChild(imgIndicador);
@@ -542,6 +581,8 @@ export function limpiarLaberinto3d() {
     est.texturas = null;
     est.decoraciones = null;
     est.mapaLuz = null;
+    est.mapaZonas = null;
+    est.zonaActual = 0;
 
     // Limpiar HUD landscape
     est.hudJugadorContenedor = null;
@@ -567,4 +608,5 @@ export function limpiarLaberinto3d() {
     est.gradCielo = null;
     est.gradSuelo = null;
     est.avatarImg = null;
+    est.cofreImg = null;
 }

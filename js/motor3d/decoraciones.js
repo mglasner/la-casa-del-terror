@@ -42,8 +42,12 @@ function hashPos(x, y, seed) {
     return (h & 0x7fffffff) / 0x7fffffff;
 }
 
+// Densidad de antorchas por zona (zona 0 = más luz, zona 2 = casi oscuridad)
+const DENSIDAD_ANTORCHAS = [0.2, 0.08, 0.03];
+
 // Genera todas las decoraciones del laberinto
-export function generarDecoraciones(mapa, filas, cols) {
+// zonas: Uint8Array opcional con zona por celda (si se pasa, modula densidad de antorchas)
+export function generarDecoraciones(mapa, filas, cols, zonas) {
     const antorchas = [];
     const telaranas = [];
     const murcielagos = [];
@@ -54,7 +58,7 @@ export function generarDecoraciones(mapa, filas, cols) {
     _filas = filas;
     _cols = cols;
 
-    // --- Antorchas: ~15% de paredes junto a corredores ---
+    // --- Antorchas: densidad variable por zona (3%-20%) ---
     const candidatasAntorcha = [];
     const dirs = [
         [-1, 0],
@@ -71,7 +75,10 @@ export function generarDecoraciones(mapa, filas, cols) {
             for (const [df, dc] of dirs) {
                 if (esCorredor(mapa, f + df, c + dc, filas, cols)) {
                     const h = hashPos(c, f, 7777 + df * 100 + dc * 10);
-                    if (h < 0.15) {
+                    // Densidad variable por zona
+                    const zona = zonas ? zonas[f * cols + c] || 0 : 0;
+                    const densidad = zonas ? DENSIDAD_ANTORCHAS[zona] : 0.15;
+                    if (h < densidad) {
                         candidatasAntorcha.push({
                             // Posicionar en el corredor, 0.05u desde la pared
                             x: c + dc + 0.5 - dc * 0.45,
@@ -139,7 +146,7 @@ export function generarDecoraciones(mapa, filas, cols) {
         }
     }
 
-    // --- Ratas: en corredores aleatorios (no cerca de entrada/llave) ---
+    // --- Ratas: en corredores aleatorios (no cerca de entrada/cofre) ---
     const candidatasRata = [];
     for (let f = 2; f < filas - 2; f++) {
         for (let c = 2; c < cols - 2; c++) {

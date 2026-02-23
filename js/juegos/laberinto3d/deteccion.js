@@ -1,4 +1,4 @@
-// Habitación 2 — Detección de llave y salida
+// Detección de cofre del tesoro y salida
 
 import { CFG } from './config.js';
 import { est, actualizarHUDInventarioLocal } from './estado.js';
@@ -15,7 +15,7 @@ export function detectarLlave() {
         est.tieneLlave = true;
         est.indicador.replaceChildren();
         const imgObtenida = document.createElement('img');
-        imgObtenida.src = 'assets/img/llaves/llave-laberinto3d.webp';
+        imgObtenida.src = 'assets/img/llaves/cofre-laberinto3d-icono.webp';
         imgObtenida.alt = '';
         imgObtenida.className = 'indicador-llave-img';
         est.indicador.appendChild(imgObtenida);
@@ -23,7 +23,7 @@ export function detectarLlave() {
         est.indicador.classList.add('llave-obtenida');
 
         actualizarHUDInventarioLocal();
-        lanzarToast(CFG.textos.toastLlave, '\uD83D\uDD11', 'item');
+        lanzarToast(CFG.textos.toastLlave, '\u2728', 'item');
     }
 }
 

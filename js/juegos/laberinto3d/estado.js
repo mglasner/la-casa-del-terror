@@ -1,4 +1,4 @@
-// Estado compartido de la Habitación 2
+// Estado compartido de El Laberinto 3D
 // Agrupa las variables de estado del laberinto 3D
 
 import { CFG } from './config.js';
@@ -27,6 +27,9 @@ export const est = {
     activo: false,
     teclas: {},
 
+    // Imagen del cofre (sprite 3D)
+    cofreImg: null,
+
     // Referencias DOM
     pantalla: null,
     canvas3D: null,
@@ -44,6 +47,8 @@ export const est = {
     texturas: null,
     decoraciones: null,
     mapaLuz: null,
+    mapaZonas: null,
+    zonaActual: 0,
     frameCount: 0,
     usarTexturas: true,
     ultimoFrame: 0,

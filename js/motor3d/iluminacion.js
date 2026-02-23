@@ -4,19 +4,30 @@ const LUZ_AMBIENTAL = 0.15;
 const RADIO_LUZ = 3;
 const RADIO_LUZ_SQ = RADIO_LUZ * RADIO_LUZ;
 
+// Luz ambiental por zona: mazmorra (más luz) → profundidades (muy oscuro)
+const LUZ_AMBIENTAL_ZONA = [0.18, 0.12, 0.08];
+
 // Buffer preallocado (se redimensiona si cambia el tamaño del mapa)
 let _mapaLuz = new Float32Array(0);
 
 // Precalcula el mapa de luz para todo el laberinto
 // Retorna Float32Array[filas * cols] con valores de brillo (0.0 - 1.0+)
-export function precalcularMapaLuz(filas, cols, antorchas, tiempo) {
+// zonas: Uint8Array opcional con zona por celda
+export function precalcularMapaLuz(filas, cols, antorchas, tiempo, zonas) {
     const tamano = filas * cols;
     if (_mapaLuz.length < tamano) {
         _mapaLuz = new Float32Array(tamano);
     }
 
-    // Luz ambiental base en todas las celdas
-    _mapaLuz.fill(LUZ_AMBIENTAL);
+    // Luz ambiental base (variable por zona si disponible)
+    if (zonas) {
+        for (let i = 0; i < tamano; i++) {
+            const z = zonas[i];
+            _mapaLuz[i] = z < 3 ? LUZ_AMBIENTAL_ZONA[z] : LUZ_AMBIENTAL;
+        }
+    } else {
+        _mapaLuz.fill(LUZ_AMBIENTAL);
+    }
 
     // Contribución de cada antorcha
     for (const antorcha of antorchas) {
