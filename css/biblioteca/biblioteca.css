@@ -179,8 +179,8 @@
 .estante-repisa {
     display: flex;
     justify-content: center;
-    gap: 24px;
-    padding: 28px 24px 20px;
+    gap: 20px;
+    padding: 28px 28px 20px;
     width: 100%;
     box-sizing: border-box;
     background: rgb(50 30 15 / 50%);
@@ -197,8 +197,8 @@
 
 /* Cada lomo de libro */
 .estante-lomo {
-    width: 105px;
-    height: 190px;
+    width: 95px;
+    height: 180px;
     padding: 0;
     border: none;
     border-radius: 3px 6px 6px 3px;
@@ -359,13 +359,13 @@
     }
 
     .estante-repisa {
-        gap: 12px;
+        gap: 10px;
         padding: 18px 14px 12px;
     }
 
     .estante-lomo {
-        width: 74px;
-        height: 140px;
+        width: 68px;
+        height: 130px;
     }
 
     .estante-libro {
@@ -373,8 +373,8 @@
     }
 
     .estante-lomo-titulo {
-        font-size: 0.62rem;
-        max-width: 80px;
+        font-size: 0.6rem;
+        max-width: 72px;
         letter-spacing: 0.06em;
     }
 }

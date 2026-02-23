@@ -11,6 +11,7 @@
 @import url('css/componentes/dpad.css');
 @import url('css/componentes/overlay-rotar.css');
 @import url('css/componentes/toast.css');
+@import url('css/componentes/modal-tesoro.css');
 
 /* Libros */
 @import url('css/libros/entidades.css');
@@ -19,6 +20,7 @@
 @import url('css/libros/villanario.css');
 @import url('css/libros/libroJuegos.css');
 @import url('css/libros/cuento.css');
+@import url('css/libros/libroTesorario.css');
 
 /* Juegos */
 @import url('css/juegos/comun.css');

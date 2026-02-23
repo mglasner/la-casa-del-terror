@@ -10,3 +10,8 @@ export function notificarVidaCambio() {
 export function notificarJugadorMuerto() {
     document.dispatchEvent(new Event('jugador-muerto'));
 }
+
+/** Notifica a juego.js que el jugador ganó */
+export function notificarVictoria() {
+    document.dispatchEvent(new Event('juego-victoria'));
+}

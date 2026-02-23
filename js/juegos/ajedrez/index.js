@@ -5,7 +5,7 @@ import { CFG } from './config.js';
 import { crearPantallaJuego } from '../../componentes/pantallaJuego.js';
 import { lanzarToast } from '../../componentes/toast.js';
 import { crearElemento } from '../../utils.js';
-import { notificarVidaCambio } from '../../eventos.js';
+import { notificarVidaCambio, notificarVictoria } from '../../eventos.js';
 import { generarEquipoEnemigo } from './piezas.js';
 import { crearTablero } from './tablero.js';
 import {
@@ -279,6 +279,7 @@ function victoria() {
     const cantidad = Math.floor(Math.random() * (max - min + 1)) + min;
     jugador.vidaActual = Math.min(jugador.vidaActual + cantidad, jugador.vidaMax);
     notificarVidaCambio();
+    notificarVictoria();
 
     lanzarToast(CFG.textos.toastVictoria, '\u2728', 'exito');
 

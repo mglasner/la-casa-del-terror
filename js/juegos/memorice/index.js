@@ -5,7 +5,7 @@ import { CFG } from './config.js';
 import { generarTablero } from './tablero.js';
 import { crearCarta } from './carta.js';
 import { lanzarToast } from '../../componentes/toast.js';
-import { notificarVidaCambio, notificarJugadorMuerto } from '../../eventos.js';
+import { notificarVidaCambio, notificarJugadorMuerto, notificarVictoria } from '../../eventos.js';
 import { crearPantallaJuego } from '../../componentes/pantallaJuego.js';
 import { crearElemento } from '../../utils.js';
 
@@ -172,6 +172,7 @@ function victoria() {
     // Curación bonus por ganar la partida
     curar(CFG.curacion.victoriaMin, CFG.curacion.victoriaMax);
 
+    notificarVictoria();
     lanzarToast(CFG.textos.toastVictoria, '\u2728', 'exito');
 
     setTimeout(function () {

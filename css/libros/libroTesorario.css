@@ -1,0 +1,319 @@
+/* El Tesorario — estilos del libro de tesoros */
+
+/* --- Variables doradas base --- */
+
+.libro-tesorario {
+    --tesorario-dorado: #c8a050;
+    --tesorario-dorado-claro: #f0d8a0;
+}
+
+/* --- Detalle del tesoro --- */
+
+.tesorario-detalle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 16px;
+}
+
+/* --- Tier badge --- */
+
+.tesorario-tier-badge {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 12px;
+    border-radius: 16px;
+}
+
+.tesorario-tier-curioso {
+    color: #d4b878;
+    background: rgb(200 180 120 / 12%);
+    border: 1px solid rgb(200 180 120 / 25%);
+}
+
+.tesorario-tier-raro {
+    color: #70b8ff;
+    background: rgb(80 140 220 / 12%);
+    border: 1px solid rgb(80 140 220 / 25%);
+}
+
+.tesorario-tier-epico {
+    color: #c580ff;
+    background: rgb(160 80 255 / 12%);
+    border: 1px solid rgb(160 80 255 / 25%);
+}
+
+.tesorario-tier-legendario {
+    color: #ffa040;
+    background: rgb(255 160 40 / 12%);
+    border: 1px solid rgb(255 160 40 / 25%);
+}
+
+.tesorario-tier-mitico {
+    color: #ff6080;
+    background: rgb(255 80 100 / 12%);
+    border: 1px solid rgb(255 80 100 / 25%);
+}
+
+/* --- Visual del tesoro (contenedor) --- */
+
+.tesorario-visual {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- Imagen estática --- */
+
+.tesorario-img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    border-radius: 10px;
+    border: 2px solid rgb(200 160 80 / 30%);
+    box-shadow: 0 0 15px rgb(200 160 80 / 15%);
+}
+
+/* =========================================
+   RARO — float + shimmer + glow azul
+   ========================================= */
+
+.tesorario-visual-raro .tesorario-img {
+    animation: tesoro-float 3s ease-in-out infinite;
+    border-color: rgb(80 140 220 / 40%);
+    box-shadow:
+        0 0 20px rgb(80 140 220 / 25%),
+        0 0 40px rgb(80 140 220 / 10%);
+}
+
+/* Shimmer overlay */
+.tesorario-visual-raro::after {
+    content: '';
+    position: absolute;
+    inset: 10px;
+    border-radius: 10px;
+    background: linear-gradient(
+        120deg,
+        transparent 30%,
+        rgb(255 255 255 / 12%) 50%,
+        transparent 70%
+    );
+    animation: tesoro-shimmer 2.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* --- No encontrado (B&W) --- */
+
+.tesorario-visual-bloqueado {
+    opacity: 0.6;
+}
+
+.tesorario-img-bloqueado {
+    filter: grayscale(1) brightness(0.5);
+    border-color: rgb(120 120 120 / 30%);
+    box-shadow: 0 0 10px rgb(0 0 0 / 20%);
+}
+
+.tesorario-candado {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    font-size: 1.4rem;
+    line-height: 1;
+    opacity: 0.7;
+    filter: drop-shadow(0 1px 3px rgb(0 0 0 / 50%));
+}
+
+.tesorario-nombre-bloqueado {
+    opacity: 0.5;
+}
+
+/* --- Sprite animado (épico+) --- */
+
+.tesorario-sprite {
+    width: 120px;
+    height: 120px;
+    background-size: calc(var(--frames) * 100%) 100%;
+    animation: sprite-loop calc(var(--frames) * 0.12s) steps(var(--frames)) infinite;
+    border-radius: 10px;
+    border: 2px solid rgb(200 160 80 / 30%);
+    box-shadow: 0 0 15px rgb(200 160 80 / 15%);
+}
+
+/* --- Aura detrás del sprite --- */
+
+.tesorario-aura {
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
+    animation: tesoro-aura-libro 2.5s ease-in-out infinite;
+}
+
+.tesorario-aura-epico {
+    background: radial-gradient(circle, rgb(160 80 255 / 15%) 0%, transparent 70%);
+}
+
+.tesorario-aura-legendario {
+    background: radial-gradient(circle, rgb(255 160 40 / 18%) 0%, transparent 70%);
+}
+
+.tesorario-aura-mitico {
+    background: radial-gradient(circle, rgb(255 80 100 / 20%) 0%, transparent 70%);
+}
+
+@keyframes tesoro-aura-libro {
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: scale(1.15);
+        opacity: 0.9;
+    }
+}
+
+/* =========================================
+   ÉPICO — sprite + partículas + glow púrpura
+   ========================================= */
+
+.tesorario-visual-epico .tesorario-sprite {
+    border-color: rgb(160 80 255 / 40%);
+    box-shadow:
+        0 0 20px rgb(160 80 255 / 25%),
+        0 0 50px rgb(160 80 255 / 10%);
+}
+
+/* =========================================
+   LEGENDARIO — sprite + ondas + glow naranja
+   ========================================= */
+
+.tesorario-visual-legendario .tesorario-sprite {
+    border-color: rgb(255 160 40 / 45%);
+    box-shadow:
+        0 0 25px rgb(255 160 40 / 30%),
+        0 0 60px rgb(255 160 40 / 12%);
+}
+
+/* Ondas de energía */
+.tesorario-visual-legendario::after {
+    content: '';
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 1px solid rgb(255 160 40 / 25%);
+    animation: tesorario-ondas 2.2s ease-out infinite;
+    pointer-events: none;
+}
+
+@keyframes tesorario-ondas {
+    from {
+        transform: scale(0.5);
+        opacity: 0.7;
+    }
+
+    to {
+        transform: scale(1.4);
+        opacity: 0;
+    }
+}
+
+/* =========================================
+   MÍTICO — sprite + glow rojo intenso
+   ========================================= */
+
+.tesorario-visual-mitico .tesorario-sprite {
+    border-color: rgb(255 80 100 / 45%);
+    box-shadow:
+        0 0 30px rgb(255 80 100 / 35%),
+        0 0 70px rgb(255 80 100 / 15%);
+}
+
+/* =========================================
+   Partículas orbitando (épico+)
+   ========================================= */
+
+.tesorario-particula {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: rgb(200 150 255);
+    box-shadow: 0 0 5px rgb(200 150 255 / 50%);
+    animation: tesoro-orbitar var(--dur) linear infinite;
+    animation-delay: var(--delay);
+}
+
+.tesorario-visual-legendario .tesorario-particula {
+    background: rgb(255 180 80);
+    box-shadow: 0 0 5px rgb(255 180 80 / 50%);
+}
+
+.tesorario-visual-mitico .tesorario-particula {
+    background: rgb(255 120 140);
+    box-shadow: 0 0 6px rgb(255 120 140 / 60%);
+}
+
+/* --- Nombre del tesoro --- */
+
+.tesorario-nombre {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--tesorario-dorado-claro);
+    text-shadow: 0 1px 6px rgb(200 160 80 / 20%);
+    margin: 0;
+}
+
+/* --- Descripción --- */
+
+.tesorario-desc {
+    font-size: 0.82rem;
+    color: rgb(200 190 170 / 75%);
+    line-height: 1.55;
+    text-align: center;
+    max-width: 260px;
+    margin: 0;
+}
+
+/* --- Info de juegos --- */
+
+.tesorario-juegos {
+    font-size: 0.72rem;
+    color: rgb(200 190 170 / 55%);
+    text-align: center;
+    max-width: 260px;
+    margin: 4px 0 0;
+    line-height: 1.5;
+}
+
+/* --- Responsive --- */
+
+@media (width <= 480px) {
+    .tesorario-visual {
+        width: 110px;
+        height: 110px;
+    }
+
+    .tesorario-img,
+    .tesorario-sprite {
+        width: 90px;
+        height: 90px;
+    }
+
+    .tesorario-nombre {
+        font-size: 1.1rem;
+    }
+}

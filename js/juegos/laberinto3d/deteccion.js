@@ -3,6 +3,7 @@
 import { CFG } from './config.js';
 import { est, actualizarHUDInventarioLocal } from './estado.js';
 import { lanzarToast } from '../../componentes/toast.js';
+import { notificarVictoria } from '../../eventos.js';
 
 export function detectarLlave() {
     if (est.tieneLlave) return;
@@ -37,6 +38,7 @@ export function detectarSalida(limpiarLaberinto3d) {
         est.mensajeExito.textContent = CFG.textos.mensajeExito;
         est.mensajeExito.classList.remove('oculto');
         lanzarToast(CFG.textos.mensajeExito, '\uD83D\uDEAA', 'exito');
+        notificarVictoria();
 
         setTimeout(function () {
             limpiarLaberinto3d();

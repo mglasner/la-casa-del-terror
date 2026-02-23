@@ -26,6 +26,8 @@ import {
 } from './componentes/libroVillanos.js';
 import { CUENTOS_ESTANTE, CUENTOS_DATOS } from './cuentos/registro.js';
 import { crearLibroCuento } from './componentes/libroCuento.js';
+import { crearModalTesoro, sortearTesoro } from './componentes/modalTesoro.js';
+import { crearLibroTesorario } from './componentes/libroTesorario.js';
 
 // --- Estados del juego (máquina de estados) ---
 
@@ -51,6 +53,8 @@ const estado = {
     jugadorActual: null, // instancia de Personaje
     juegoActual: null, // id del juego activo ('laberinto', 'laberinto3d', etc.)
     libroActivo: null, // id del libro abierto ('heroario', 'villanario', 'juegos')
+    tesorosEncontrados: new Set(),
+    pendienteVictoria: false,
 };
 
 // --- Crear componentes base ---
@@ -63,6 +67,7 @@ const modalSalir = crearModalSalir(contenedorJuego);
 const transicion = crearTransicion();
 const dpad = crearControlesTouch();
 const toast = crearToast();
+const modalTesoro = crearModalTesoro();
 
 // --- Configuración de libros del estante ---
 
@@ -84,6 +89,12 @@ const LIBROS_ESTANTE = [
         titulo: 'Villanario',
         color: '#8b3a62',
         img: 'assets/img/biblioteca/lomo-villanario.webp',
+    },
+    {
+        id: 'tesorario',
+        titulo: 'El Tesorario',
+        color: '#b8860b',
+        img: 'assets/img/biblioteca/lomo-tesorario.webp',
     },
     ...CUENTOS_ESTANTE,
 ];
@@ -187,10 +198,18 @@ function crearJuegosModal() {
     return modal;
 }
 
+function crearTesorarioModal() {
+    const tesorario = crearLibroTesorario(estado.tesorosEncontrados);
+    const modal = crearModalLibro(tesorario.libro, tesorario.manejarTecladoLibro);
+    contenedorJuego.appendChild(modal.overlay);
+    return modal;
+}
+
 const fabricaModales = {
     heroario: crearHeroarioModal,
     villanario: crearVillanarioModal,
     juegos: crearJuegosModal,
+    tesorario: crearTesorarioModal,
 };
 
 // Registrar factories de cuentos dinámicamente
@@ -207,6 +226,14 @@ CUENTOS_ESTANTE.forEach(function (info) {
 });
 
 function obtenerModalLibro(libroId) {
+    // El tesorario se recrea siempre (depende del estado actual de tesoros)
+    if (libroId === 'tesorario') {
+        if (librosCache.tesorario) {
+            librosCache.tesorario.overlay.remove();
+            delete librosCache.tesorario;
+        }
+    }
+
     if (librosCache[libroId]) return librosCache[libroId];
 
     const crear = fabricaModales[libroId];
@@ -236,6 +263,12 @@ document.addEventListener('jugador-muerto', function () {
     modalDerrota.mostrar(estado.jugadorActual.nombre, contenedorModal);
 });
 
+// --- Escuchar victoria del jugador ---
+
+document.addEventListener('juego-victoria', function () {
+    estado.pendienteVictoria = true;
+});
+
 // --- Máquina de estados: transiciones centralizadas ---
 
 function ejecutarCambioEstado(anterior, nuevo, datos) {
@@ -247,6 +280,7 @@ function ejecutarCambioEstado(anterior, nuevo, datos) {
         dpad.ocultar();
         estado.juegoActual = null;
         estado.jugadorActual = null;
+        estado.pendienteVictoria = false;
         barra.ocultar();
     }
 
@@ -296,8 +330,20 @@ function ejecutarCambioEstado(anterior, nuevo, datos) {
         juegoRegistrado.iniciar(
             estado.jugadorActual,
             function () {
-                // Al salir del juego, volver al Libro de Juegos
+                // Si hubo victoria, sortear tesoro y mostrar modal tras la transición
+                let tesoroSorteado = null;
+                if (estado.pendienteVictoria) {
+                    estado.pendienteVictoria = false;
+                    const nombre = sortearTesoro(estado.tesorosEncontrados);
+                    if (nombre) {
+                        estado.tesorosEncontrados.add(nombre);
+                        tesoroSorteado = nombre;
+                    }
+                }
                 cambiarEstado(ESTADOS.LIBRO, { libroId: 'juegos' });
+                if (tesoroSorteado) {
+                    modalTesoro.mostrar(tesoroSorteado, contenedorJuego);
+                }
             },
             dpad
         );
@@ -330,9 +376,18 @@ modalDerrota.onAceptar(function () {
     cambiarEstado(ESTADOS.LIBRO, { libroId: 'juegos' });
 });
 
+// Callback del modal de tesoro
+modalTesoro.onAceptar(function () {
+    cambiarEstado(ESTADOS.LIBRO, { libroId: 'juegos' });
+});
+
 // --- Controles del teclado ---
 
 document.addEventListener('keydown', function (e) {
+    if (modalTesoro.estaAbierto()) {
+        modalTesoro.manejarTecla(e);
+        return;
+    }
     if (modalDerrota.estaAbierto()) {
         modalDerrota.manejarTecla(e);
         return;

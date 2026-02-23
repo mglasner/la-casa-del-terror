@@ -20,6 +20,7 @@ import { lanzarToast } from '../../componentes/toast.js';
 
 import { crearPantallaJuego } from '../../componentes/pantallaJuego.js';
 import { crearElemento, crearGameLoop } from '../../utils.js';
+import { notificarVictoria } from '../../eventos.js';
 
 // --- Crear pantalla HTML ---
 
@@ -332,6 +333,7 @@ function detectarSalida() {
         est.mensajeExito.classList.remove('oculto');
         lanzarToast(CFG.textos.mensajeExito, '🚪', 'exito');
 
+        notificarVictoria();
         setTimeout(function () {
             limpiarLaberinto();
             est.callbackSalir();

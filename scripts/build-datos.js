@@ -10,6 +10,63 @@ import prettier from 'prettier';
 const CABECERA = '// GENERADO desde datos/*.yaml — no editar directamente\n';
 const IMG_PLACEHOLDER = 'assets/img/placeholder.webp';
 
+// --- Tesoros ---
+
+const TIERS_CON_SPRITE = ['epico', 'legendario', 'mitico'];
+const TIERS_VALIDOS = ['curioso', 'raro', 'epico', 'legendario', 'mitico'];
+
+function validarTesoro(nombre, datos, archivo) {
+    const errores = [];
+    if (!datos.tier || !TIERS_VALIDOS.includes(datos.tier)) {
+        errores.push(`  - tier inválido: "${datos.tier}" (debe ser ${TIERS_VALIDOS.join('/')})`);
+    }
+    if (datos.peso == null) errores.push('  - falta "peso"');
+    if (!datos.img) errores.push('  - falta "img"');
+    if (!datos.clase) errores.push('  - falta "clase"');
+
+    if (TIERS_CON_SPRITE.includes(datos.tier)) {
+        if (!datos.sprite) errores.push(`  - falta "sprite" (requerido para tier ${datos.tier})`);
+        if (!datos.frames) errores.push(`  - falta "frames" (requerido para tier ${datos.tier})`);
+    }
+    if (!Array.isArray(datos.juegos) || datos.juegos.length === 0) {
+        errores.push('  - falta "juegos" (array de slugs de juegos)');
+    }
+
+    if (errores.length > 0) {
+        throw new Error(`${archivo} → ${nombre}:\n${errores.join('\n')}`);
+    }
+}
+
+function generarTesorosJS(datos) {
+    const entradas = Object.entries(datos).map(function ([nombre, d]) {
+        const clave = generarClave(nombre);
+        const desc = (d.descripcion || '').replace(/'/g, "\\'").replace(/\n/g, '\\n').trim();
+        const lineas = [
+            `tier: '${d.tier}',`,
+            `peso: ${d.peso},`,
+            `img: '${d.img}',`,
+            `clase: '${d.clase}',`,
+            `descripcion: '${desc}',`,
+        ];
+        if (d.sprite) lineas.push(`sprite: '${d.sprite}',`);
+        if (d.frames) lineas.push(`frames: ${d.frames},`);
+        if (d.juegos) lineas.push(`juegos: [${d.juegos.map((j) => `'${j}'`).join(', ')}],`);
+        const cuerpo = lineas.map((l) => `        ${l}`).join('\n');
+        return `    ${clave}: {\n${cuerpo}\n    },`;
+    });
+
+    return [
+        CABECERA,
+        'const TESOROS = {',
+        entradas.join('\n\n'),
+        '};',
+        '',
+        'export { TESOROS };',
+    ].join('\n');
+}
+
+// --- Entidades ---
+
 const CAMPOS_ENTIDAD = [
     'vida',
     'clase',
@@ -338,6 +395,17 @@ async function main() {
     const enemigosFmt = await prettier.format(enemigosJS, configPrettier);
     writeFileSync('js/enemigos.js', enemigosFmt);
     console.log('js/enemigos.js generado');
+
+    // Tesoros
+    const tesorosYaml = readFileSync('datos/tesoros.yaml', 'utf-8');
+    const tesorosData = yaml.load(tesorosYaml);
+    for (const [nombre, d] of Object.entries(tesorosData)) {
+        validarTesoro(nombre, d, 'tesoros.yaml');
+    }
+    const tesorosJS = generarTesorosJS(tesorosData);
+    const tesorosFmt = await prettier.format(tesorosJS, configPrettier);
+    writeFileSync('js/tesoros.js', tesorosFmt);
+    console.log('js/tesoros.js generado');
 
     // Juegos
     for (const { slug, schema } of JUEGOS) {

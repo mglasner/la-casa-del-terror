@@ -78,6 +78,7 @@ import {
 } from './particulas.js';
 import { iniciarSpritesJugador, iniciarSpritesEnemigos, limpiarSprites } from './spritesPlat.js';
 import { lanzarToast } from '../../componentes/toast.js';
+import { notificarVictoria } from '../../eventos.js';
 
 import { crearGameLoop } from '../../utils.js';
 
@@ -201,6 +202,7 @@ function verificarVictoria() {
     if (detectarMetaTile()) {
         est.activo = false;
         actualizarHUDInventario(est.jugador.inventario);
+        notificarVictoria();
         lanzarToast('\u00a1Desafío superado! Escapando...', '\u2728', 'exito');
 
         const salir = est.callbackSalir;
