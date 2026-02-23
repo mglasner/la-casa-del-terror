@@ -1,4 +1,5 @@
 node_modules/
 dist/
 assets/img/generadas/
+js/changelog/
 .claude/settings.local.json

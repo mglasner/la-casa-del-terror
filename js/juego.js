@@ -28,6 +28,8 @@ import { CUENTOS_ESTANTE, CUENTOS_DATOS } from './cuentos/registro.js';
 import { crearLibroCuento } from './componentes/libroCuento.js';
 import { crearModalTesoro, sortearTesoro } from './componentes/modalTesoro.js';
 import { crearLibroTesorario, NOMBRES_JUEGOS } from './componentes/libroTesorario.js';
+import { CHANGELOG_ESTANTE, CHANGELOG_DATOS } from './changelog/registro.js';
+import { crearLibroNovedades } from './componentes/libroNovedades.js';
 
 // --- Estados del juego (máquina de estados) ---
 
@@ -69,9 +71,9 @@ const dpad = crearControlesTouch();
 const toast = crearToast();
 const modalTesoro = crearModalTesoro();
 
-// --- Configuración de libros del estante ---
+// --- Configuraci\u00f3n de libros del estante (dos repisas) ---
 
-const LIBROS_ESTANTE = [
+const LIBROS_REPISA_SUPERIOR = [
     {
         id: 'juegos',
         titulo: 'Libro de Juegos',
@@ -96,14 +98,14 @@ const LIBROS_ESTANTE = [
         color: '#b8860b',
         img: 'assets/img/biblioteca/lomo-tesorario.webp',
     },
-    ...CUENTOS_ESTANTE,
 ];
+
+const LIBROS_REPISA_INFERIOR = [CHANGELOG_ESTANTE, ...CUENTOS_ESTANTE];
 
 // --- Estante (homepage) ---
 
-const estante = crearEstante(
-    contenedorBiblioteca,
-    LIBROS_ESTANTE.map(function (cfg) {
+function prepararRepisa(libros) {
+    return libros.map(function (cfg) {
         return {
             id: cfg.id,
             titulo: cfg.titulo,
@@ -113,8 +115,13 @@ const estante = crearEstante(
                 cambiarEstado(ESTADOS.LIBRO, { libroId: cfg.id });
             },
         };
-    })
-);
+    });
+}
+
+const estante = crearEstante(contenedorBiblioteca, [
+    prepararRepisa(LIBROS_REPISA_SUPERIOR),
+    prepararRepisa(LIBROS_REPISA_INFERIOR),
+]);
 
 // --- Cache de modales de libros (se crean on-demand, una vez) ---
 
@@ -205,11 +212,19 @@ function crearTesorarioModal() {
     return modal;
 }
 
+function crearNovedadesModal() {
+    const { libro, manejarTecladoLibro } = crearLibroNovedades(CHANGELOG_DATOS);
+    const modal = crearModalLibro(libro, manejarTecladoLibro);
+    contenedorJuego.appendChild(modal.overlay);
+    return modal;
+}
+
 const fabricaModales = {
     heroario: crearHeroarioModal,
     villanario: crearVillanarioModal,
     juegos: crearJuegosModal,
     tesorario: crearTesorarioModal,
+    novedades: crearNovedadesModal,
 };
 
 // Registrar factories de cuentos dinámicamente

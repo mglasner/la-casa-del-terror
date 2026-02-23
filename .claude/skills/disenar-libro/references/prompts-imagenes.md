@@ -180,3 +180,4 @@ Semi-cartoon style, green and teal palette, no text, no letters, no words.
 | Heroario | `#c8a050` (dorado) | `lomo-heroario.webp` | `portada-heroario.webp` | Espada y bastón cruzados |
 | Villanario | `#8b3a62` (púrpura) | `lomo-villanario.webp` | `portada-villanario.webp` | Ojo púrpura con cadenas |
 | Libro de Juegos | `#4a7c59` (verde) | `lomo-juegos.webp` | `portada-juegos.webp` | Rosa de los vientos con dados |
+| Libro de Novedades | `#5b8a72` (verde-azulado) | `lomo-novedades.webp` | `portada-novedades.webp` | Pluma y pergamino con estrellas |

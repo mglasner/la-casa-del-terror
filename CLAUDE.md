@@ -221,6 +221,7 @@ esbuild genera la carpeta `dist/` con todo optimizado:
 | ------------- | --------------------------------- | ------------------------------------------------------------------ |
 | `build:datos`   | `datos/*.yaml`                    | `js/personajes.js`, `js/enemigos.js`, `js/juegos/*/config.js`       |
 | `build:cuentos` | `cuentos/*/libro.yaml` + `*.md`   | `js/cuentos/registro.js`                                            |
+| `build:changelog` | `git log`                       | `js/changelog/registro.js`                                          |
 | `build:js`      | `js/juego.js` + todos sus imports | `dist/juego.min.js` (1 archivo)                                     |
 | `build:css`     | `estilos.css`                     | `dist/estilos.min.css`                                              |
 | `build:html`    | `index.html`, `assets/`, `sw.js`  | `dist/index.html` (rutas reescritas), `dist/assets/`, `dist/sw.js`  |
@@ -268,3 +269,40 @@ El Abismo es un platformer 2D en canvas 480×270. Personajes y enemigos usan spr
 - **Juegos**: Módulos autocontenidos que crean/destruyen su pantalla al entrar/salir. Se comunican con juego.js mediante callbacks y eventos custom (`document.dispatchEvent`)
 - **Libro de Juegos ↔ Juegos**: El Libro de Juegos (`js/componentes/libroJuegos.js`) contiene descripciones de cada juego en `JUEGOS`. Al modificar la mecánica o contenido de un juego, verificar que las descripciones del Libro de Juegos sigan siendo consistentes
 - **Revisión pre-commit**: Después de escribir o refactorizar código, ejecutar primero los linters (`npm run lint:fix && npm run lint:css:fix && npm run format`) y luego la skill `/review-code` antes de hacer commit
+
+## Convención de commits
+
+El proyecto usa conventional commits. El texto de `feat` y `fix` se muestra
+automáticamente en el **Libro de Novedades** (changelog visible para los jugadores),
+así que las descripciones deben ser claras y comprensibles para un público general.
+
+### Formato
+
+    tipo(scope): descripción en imperativo
+
+### Tipos
+
+| Tipo       | Uso                                      | Visible en Novedades |
+|------------|------------------------------------------|----------------------|
+| `feat`     | Nueva funcionalidad                      | Si                   |
+| `fix`      | Corrección de bug                        | Si                   |
+| `refactor` | Reestructuración interna sin cambio visible | No                |
+| `art`      | Cambios visuales/assets                  | No                   |
+| `docs`     | Documentación                            | No                   |
+| `chore`    | Mantenimiento, deps, CI                  | No                   |
+| `style`    | Formato de código                        | No                   |
+| `rename`   | Renombrado de archivos/variables         | No                   |
+
+### Scope
+
+Nombre del componente o subsistema: `tesorario`, `abismo`, `laberinto3d`,
+`biblioteca`, `build`, `cuentos`, `pwa`, `dpad`, etc. Opcional si el cambio
+es transversal.
+
+### Idioma y tono
+
+- Español, imperativo: "agregar", "corregir", "mejorar"
+  (no "agregado", "corregí", "se mejoró")
+- En `feat` y `fix`: escribir como si le contaras a un jugador qué cambió.
+  Bien: "agregar sistema de tesoros con premios por ganar juegos"
+  Mal: "implementar lógica de dispatch para tesoros en store"

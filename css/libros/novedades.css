@@ -1,0 +1,84 @@
+/* Libro de Novedades — changelog visual */
+
+.libro-novedades {
+    --v-color: rgb(130 180 155 / 90%);
+    --v-oscuro: rgb(91 138 114);
+    --v-glow: rgb(130 180 155 / 25%);
+    --v-tenue: rgb(130 180 155 / 10%);
+}
+
+/* Lista de cambios */
+.libro-novedades-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Cada cambio — dos filas: scope arriba, texto abajo */
+.libro-novedades-cambio {
+    display: flex;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    background: rgb(255 255 255 / 2%);
+    text-align: left;
+}
+
+/* Ícono del tipo — columna izquierda fija */
+.libro-novedades-icono {
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    width: 1.2em;
+    text-align: center;
+}
+
+/* Columna derecha: scope + texto */
+.libro-novedades-cuerpo {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+/* Badge de scope */
+.libro-novedades-scope {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--v-color);
+    letter-spacing: 0.03em;
+}
+
+/* Texto del cambio */
+.libro-novedades-texto {
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: rgb(220 210 195);
+}
+
+/* --- Responsive --- */
+
+@media (width <= 768px) {
+    .libro-novedades-texto {
+        font-size: 0.78rem;
+    }
+}
+
+@media (width <= 480px) {
+    .libro-novedades-cambio {
+        gap: 6px;
+        padding: 5px 6px;
+    }
+
+    .libro-novedades-texto {
+        font-size: 0.75rem;
+    }
+
+    .libro-novedades-scope {
+        font-size: 0.6rem;
+    }
+}

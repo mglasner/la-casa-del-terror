@@ -8,10 +8,10 @@ const TOTAL_PARTICULAS = 20;
 /**
  * Crea el estante de la biblioteca con escena inmersiva.
  * @param {HTMLElement} contenedor - Elemento donde montar el estante
- * @param {Array<{id: string, titulo: string, color: string, img?: string, onClick: Function}>} libros
+ * @param {Array<Array<{id: string, titulo: string, color: string, img?: string, onClick: Function}>>} repisas - Array de repisas (cada repisa es un array de libros)
  * @returns {{ mostrar: Function, ocultar: Function, destruir: Function }}
  */
-export function crearEstante(contenedor, libros) {
+export function crearEstante(contenedor, repisas) {
     const escena = crearElemento('div', 'escena-biblioteca oculto');
 
     // Partículas de polvo flotante
@@ -43,38 +43,74 @@ export function crearEstante(contenedor, libros) {
     encabezado.appendChild(crearElemento('p', 'estante-subtitulo', 'un compendio de relatos'));
     mueble.appendChild(encabezado);
 
-    // Repisa principal con lomos de libro
-    const repisa = crearElemento('nav', 'estante-repisa');
-    repisa.setAttribute('aria-label', 'Libros');
+    // Repisas con lomos de libro
+    let repisaPrimaria = null;
+    const repisasSecundarias = [];
 
-    libros.forEach(function (libro) {
-        // Contenedor: lomo + etiqueta debajo
-        const columna = crearElemento('div', 'estante-libro');
+    repisas.forEach(function (libros, iRepisa) {
+        // Omitir repisas vac\u00edas
+        if (!libros || libros.length === 0) return;
 
-        const lomo = crearElemento('button', 'estante-lomo');
-        lomo.type = 'button';
-        lomo.dataset.libro = libro.id;
-        lomo.style.setProperty('--lomo-color', libro.color);
+        const repisa = crearElemento('nav', 'estante-repisa');
+        if (iRepisa > 0) repisa.classList.add('estante-repisa-secundaria');
+        repisa.setAttribute('aria-label', iRepisa === 0 ? 'Libros' : 'M\u00e1s libros');
 
-        if (libro.img) {
-            const img = crearElemento('img', 'estante-lomo-img');
-            img.src = libro.img;
-            img.alt = libro.titulo;
-            img.draggable = false;
-            lomo.appendChild(img);
+        if (iRepisa === 0) {
+            repisaPrimaria = repisa;
+        } else {
+            repisasSecundarias.push(repisa);
         }
 
-        lomo.addEventListener('click', libro.onClick);
+        libros.forEach(function (libro) {
+            // Contenedor: lomo + etiqueta debajo
+            const columna = crearElemento('div', 'estante-libro');
 
-        columna.appendChild(lomo);
-        columna.appendChild(crearElemento('span', 'estante-lomo-titulo', libro.titulo));
-        repisa.appendChild(columna);
+            const lomo = crearElemento('button', 'estante-lomo');
+            lomo.type = 'button';
+            lomo.dataset.libro = libro.id;
+            lomo.style.setProperty('--lomo-color', libro.color);
+
+            if (libro.img) {
+                const img = crearElemento('img', 'estante-lomo-img');
+                img.src = libro.img;
+                img.alt = libro.titulo;
+                img.draggable = false;
+                lomo.appendChild(img);
+            }
+
+            lomo.addEventListener('click', libro.onClick);
+
+            columna.appendChild(lomo);
+            columna.appendChild(crearElemento('span', 'estante-lomo-titulo', libro.titulo));
+            repisa.appendChild(columna);
+        });
+
+        mueble.appendChild(repisa);
+
+        // Tabla de la repisa (frente visible del estante)
+        mueble.appendChild(crearElemento('div', 'estante-tabla'));
     });
 
-    mueble.appendChild(repisa);
+    // Alinear el primer lomo de las repisas secundarias con el de la primaria
+    function alinearRepisas() {
+        if (!repisaPrimaria || repisasSecundarias.length === 0) return;
+        const lomoRef = repisaPrimaria.querySelector('.estante-lomo');
+        if (!lomoRef) return;
 
-    // Tabla de la repisa (frente visible del estante)
-    mueble.appendChild(crearElemento('div', 'estante-tabla'));
+        const xLomo = lomoRef.getBoundingClientRect().left;
+
+        repisasSecundarias.forEach(function (r) {
+            // Resetear para medir posici\u00f3n natural
+            r.style.paddingLeft = '';
+            const lomoSec = r.querySelector('.estante-lomo');
+            if (!lomoSec) return;
+            const xSec = lomoSec.getBoundingClientRect().left;
+            const correccion = xLomo - xSec;
+            if (Math.abs(correccion) > 0.5) {
+                r.style.paddingLeft = (parseFloat(getComputedStyle(r).paddingLeft) + correccion) + 'px';
+            }
+        });
+    }
 
     // Base del mueble
     mueble.appendChild(crearElemento('div', 'estante-base'));
@@ -95,6 +131,7 @@ export function crearEstante(contenedor, libros) {
             escena.classList.remove('oculto');
             escena.classList.remove('escena-entrada');
             requestAnimationFrame(function () {
+                alinearRepisas();
                 escena.classList.add('escena-entrada');
             });
         },

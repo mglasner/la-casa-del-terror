@@ -282,6 +282,25 @@
         0 0 20px rgb(200 160 80 / 15%);
 }
 
+/* --- Repisa secundaria (libros m\u00e1s peque\u00f1os, discretos) --- */
+
+.estante-repisa-secundaria {
+    justify-content: flex-start;
+    padding-top: 16px;
+    padding-bottom: 12px;
+}
+
+.estante-repisa-secundaria .estante-lomo {
+    width: 58px;
+    height: 110px;
+}
+
+.estante-repisa-secundaria .estante-lomo-titulo {
+    font-size: 0.58rem;
+    max-width: 68px;
+    color: rgb(220 190 130 / 60%);
+}
+
 /* --- Tabla de la repisa (canto frontal) --- */
 
 .estante-tabla {
@@ -330,6 +349,16 @@
         padding: 22px 20px 16px;
     }
 
+    .estante-repisa-secundaria {
+        padding-top: 14px;
+        padding-bottom: 10px;
+    }
+
+    .estante-repisa-secundaria .estante-lomo {
+        width: 54px;
+        height: 100px;
+    }
+
     .estante-lomo {
         width: 90px;
         height: 165px;
@@ -361,6 +390,16 @@
     .estante-repisa {
         gap: 10px;
         padding: 18px 14px 12px;
+    }
+
+    .estante-repisa-secundaria {
+        padding-top: 10px;
+        padding-bottom: 6px;
+    }
+
+    .estante-repisa-secundaria .estante-lomo {
+        width: 44px;
+        height: 82px;
     }
 
     .estante-lomo {

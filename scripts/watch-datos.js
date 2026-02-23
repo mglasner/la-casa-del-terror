@@ -7,6 +7,7 @@ import { execSync } from 'child_process';
 // Build inicial
 execSync('node scripts/build-datos.js', { stdio: 'inherit' });
 execSync('node scripts/build-cuentos.js', { stdio: 'inherit' });
+execSync('node scripts/build-changelog.js', { stdio: 'inherit' });
 console.log('Observando datos/*.yaml y cuentos/...');
 
 let timeoutDatos;
