@@ -299,6 +299,22 @@
     line-height: 1.5;
 }
 
+.tesorario-juego-link {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: var(--tesorario-dorado);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.tesorario-juego-link:hover,
+.tesorario-juego-link:focus-visible {
+    color: var(--tesorario-dorado-claro);
+}
+
 /* --- Responsive --- */
 
 @media (width <= 480px) {

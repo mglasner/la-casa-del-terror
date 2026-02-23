@@ -5,7 +5,7 @@ import { TESOROS } from '../tesoros.js';
 import { crearElemento } from '../utils.js';
 import { crearLibro, generarPortada } from './libro.js';
 
-const NOMBRES_JUEGOS = {
+export const NOMBRES_JUEGOS = {
     laberinto: 'El Laberinto',
     laberinto3d: 'El Laberinto 3D',
     memorice: 'El Memorice',
@@ -42,10 +42,19 @@ function ordenarPorTier(nombres) {
 
 function generarInfoJuegos(juegos) {
     if (!Array.isArray(juegos) || juegos.length === 0) return null;
-    const nombres = juegos.map(function (slug) {
-        return NOMBRES_JUEGOS[slug] || slug;
+    const contenedor = crearElemento('p', 'tesorario-juegos');
+    contenedor.appendChild(document.createTextNode('Se encuentra en: '));
+    juegos.forEach(function (slug, i) {
+        if (i > 0) contenedor.appendChild(document.createTextNode(', '));
+        const nombre = NOMBRES_JUEGOS[slug] || slug;
+        const link = crearElemento('button', 'tesorario-juego-link', nombre);
+        link.type = 'button';
+        link.addEventListener('click', function () {
+            document.dispatchEvent(new CustomEvent('navegar-juego', { detail: { slug: slug } }));
+        });
+        contenedor.appendChild(link);
     });
-    return crearElemento('p', 'tesorario-juegos', 'Se encuentra en: ' + nombres.join(', '));
+    return contenedor;
 }
 
 function generarDetalleTesoro(nombre) {

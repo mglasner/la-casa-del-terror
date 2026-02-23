@@ -27,7 +27,7 @@ import {
 import { CUENTOS_ESTANTE, CUENTOS_DATOS } from './cuentos/registro.js';
 import { crearLibroCuento } from './componentes/libroCuento.js';
 import { crearModalTesoro, sortearTesoro } from './componentes/modalTesoro.js';
-import { crearLibroTesorario } from './componentes/libroTesorario.js';
+import { crearLibroTesorario, NOMBRES_JUEGOS } from './componentes/libroTesorario.js';
 
 // --- Estados del juego (máquina de estados) ---
 
@@ -267,6 +267,31 @@ document.addEventListener('jugador-muerto', function () {
 
 document.addEventListener('juego-victoria', function () {
     estado.pendienteVictoria = true;
+});
+
+// --- Navegar del Tesorario a una página del Libro de Juegos ---
+
+document.addEventListener('navegar-juego', function (e) {
+    if (estado.estadoActual !== ESTADOS.LIBRO) return;
+
+    const slug = e.detail.slug;
+    const nombreJuego = NOMBRES_JUEGOS[slug];
+    if (!nombreJuego) return;
+
+    // Desactivar onCerrar antes de cerrar para que no corrompa el estado
+    const modalActivo = estado.libroActivo ? librosCache[estado.libroActivo] : null;
+    if (modalActivo) {
+        modalActivo.onCerrar(null);
+        modalActivo.cerrar();
+    }
+
+    // Abrir el Libro de Juegos y navegar a la página del juego
+    cambiarEstado(ESTADOS.LIBRO, { libroId: 'juegos' });
+    const juegosModal = librosCache.juegos;
+    if (juegosModal) {
+        const item = juegosModal.overlay.querySelector('[data-nombre="' + nombreJuego + '"]');
+        if (item) item.click();
+    }
 });
 
 // --- Máquina de estados: transiciones centralizadas ---
