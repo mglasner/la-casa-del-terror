@@ -99,7 +99,7 @@ export function renderizarTiles(ctx, camaraX, anchoCanvas, altoCanvas, bossVivo,
     }
 }
 
-// Portal META animado con vortice y glow
+// Portal META animado: glow verde, vortice giratorio y cofre central
 function renderizarPortalMeta(ctx, px, py, tiempo) {
     const cx = px + TAM / 2;
     const cy = py + TAM / 2;
@@ -131,11 +131,26 @@ function renderizarPortalMeta(ctx, px, py, tiempo) {
     ctx.globalCompositeOperation = 'source-over';
     ctx.restore();
 
-    // Simbolo de llave en el centro
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(cx - 1, cy - 2, 2, 4);
-    ctx.fillRect(cx, cy - 3, 1, 1);
-    ctx.fillRect(cx - 1, cy + 1, 1, 1);
+    // Cofre en el centro (pixel art 10×8 centrado)
+    const ox = Math.round(cx - 5);
+    const oy = Math.round(cy - 4);
+
+    // Cuerpo del cofre (marrón oscuro)
+    ctx.fillStyle = '#8b5e3c';
+    ctx.fillRect(ox, oy + 3, 10, 5);
+
+    // Tapa del cofre (marrón claro, con borde superior redondeado)
+    ctx.fillStyle = '#c08050';
+    ctx.fillRect(ox + 2, oy, 6, 1);
+    ctx.fillRect(ox + 1, oy + 1, 8, 3);
+
+    // Cerradura dorada
+    ctx.fillStyle = '#ffd700';
+    ctx.fillRect(ox + 4, oy + 3, 2, 2);
+
+    // Brillo (esquina superior izquierda)
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillRect(ox + 2, oy + 1, 2, 1);
 }
 
 export function renderizarVineta(ctx) {
