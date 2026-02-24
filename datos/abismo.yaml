@@ -66,8 +66,8 @@ render:
 # Ajusta tamaño, velocidad y salto según la estatura del personaje
 escalado:
     estaturaRef: 1.55            # estatura de referencia (Lina = escala 1.0)
-    escalaMin: 0.55              # escala mínima permitida
-    escalaMax: 1.35              # escala máxima permitida
+    escalaMin: 0.45              # escala mínima permitida
+    escalaMax: 1.45              # escala máxima permitida
     hitboxBaseW: 12              # ancho base del hitbox (px)
     hitboxBaseH: 14              # alto base del hitbox (px)
     spriteBaseW: 48              # ancho base del sprite visual (px)

@@ -430,12 +430,18 @@ def recortar_a_contenido(img, padding=2):
 
 
 def calcular_escala_uniforme(frames_recortados):
-    """Calcula UNA sola escala que haga que el frame mas grande quepa en FRAME_WxFRAME_H.
+    """Calcula UNA sola escala basada en los frames del cuerpo (idle, run, jump, fall, hit).
 
+    Los frames de ataque/crouch (11+) pueden tener efectos/proyectiles que agrandan
+    el bbox artificialmente — no deben reducir la escala del personaje.
     Retorna el factor de escala a usar para TODOS los frames."""
+    # Frames 0-10: idle(2) + run(6) + jump + fall + hit = frames del cuerpo
+    FRAMES_CUERPO = 11
+    frames_base = frames_recortados[:min(FRAMES_CUERPO, len(frames_recortados))]
+
     max_w = 0
     max_h = 0
-    for frame in frames_recortados:
+    for frame in frames_base:
         fw, fh = frame.size
         if fw > max_w:
             max_w = fw

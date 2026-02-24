@@ -55,8 +55,8 @@ export const CFG = {
     },
     escalado: {
         estaturaRef: 1.55,
-        escalaMin: 0.55,
-        escalaMax: 1.35,
+        escalaMin: 0.45,
+        escalaMax: 1.45,
         hitboxBaseW: 12,
         hitboxBaseH: 14,
         spriteBaseW: 48,

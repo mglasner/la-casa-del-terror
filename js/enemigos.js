@@ -87,7 +87,7 @@ const ENEMIGOS = {
             edad: 800,
             velocidad: 4,
             velAtaque: 3,
-            estatura: 2.1,
+            estatura: 1.95,
         }
     ),
 
@@ -112,7 +112,7 @@ const ENEMIGOS = {
             edad: 5,
             velocidad: 7,
             velAtaque: 8,
-            estatura: 0.9,
+            estatura: 1.1,
         }
     ),
 
