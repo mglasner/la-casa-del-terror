@@ -19,7 +19,7 @@ tablero:
 
 # --- Intentos del jugador ---
 intentos:
-    max: 30                  # intentos totales permitidos
+    max: 25                  # intentos totales permitidos
     alerta: 5                # umbral para alerta visual (pulsing rojo)
     margenAdvertencia: 3     # margen de turnos sobrantes para lanzar toast
 
@@ -43,3 +43,33 @@ textos:
     toastVictoria: "¡Memorice completado!"
     toastAdvertencia: "¡Quedan pocos turnos!"
     toastCuracion: "+{cantidad} vida"
+    toastRelampago: "¡Relámpago! Las cartas se revelaron"
+    toastBarajar: "¡Las cartas se mezclan!"
+
+# --- Niveles de dificultad ---
+dificultad:
+    opciones:
+        - id: facil
+          nombre: Fácil
+          icono: "\u26A1"
+          descripcion: Los relámpagos revelan las cartas de vez en cuando
+        - id: normal
+          nombre: Normal
+          icono: "\uD83C\uDFAF"
+          descripcion: El desafío clásico sin ayudas
+        - id: dificil
+          nombre: Difícil
+          icono: "\uD83C\uDF00"
+          descripcion: Las cartas se mezclan después de cada par
+    default: 1
+
+# --- Modo fácil: relámpago que revela cartas ---
+relampago:
+    probabilidad: 0.25
+    duracion: 900
+    flash: 150
+
+# --- Modo difícil: barajar cartas restantes ---
+barajar:
+    retraso: 600
+    animacion: 400

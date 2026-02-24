@@ -280,7 +280,18 @@ const SCHEMA_MEMORICE = {
     intentos: ['max', 'alerta', 'margenAdvertencia'],
     curacion: ['parMin', 'parMax', 'victoriaMin', 'victoriaMax'],
     tiempos: ['volteo', 'noMatch'],
-    textos: ['indicador', 'toastMatch', 'toastVictoria', 'toastAdvertencia', 'toastCuracion'],
+    textos: [
+        'indicador',
+        'toastMatch',
+        'toastVictoria',
+        'toastAdvertencia',
+        'toastCuracion',
+        'toastRelampago',
+        'toastBarajar',
+    ],
+    dificultad: ['opciones', 'default'],
+    relampago: ['probabilidad', 'duracion', 'flash'],
+    barajar: ['retraso', 'animacion'],
 };
 
 const SCHEMA_ABISMO = {

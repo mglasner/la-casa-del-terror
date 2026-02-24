@@ -191,15 +191,18 @@ function crearVillanarioModal() {
 }
 
 function crearJuegosModal() {
-    const libJuegos = crearLibroJuegos(contenedorJuego, function (juegoId, nombrePersonaje) {
-        // Desactivar onCerrar antes de cerrar para que no corrompa el estado
-        const modalJuegos = librosCache['juegos'];
-        if (modalJuegos) {
-            modalJuegos.onCerrar(null);
-            modalJuegos.cerrar();
+    const libJuegos = crearLibroJuegos(
+        contenedorJuego,
+        function (juegoId, nombrePersonaje, dificultad) {
+            // Desactivar onCerrar antes de cerrar para que no corrompa el estado
+            const modalJuegos = librosCache['juegos'];
+            if (modalJuegos) {
+                modalJuegos.onCerrar(null);
+                modalJuegos.cerrar();
+            }
+            cambiarEstado(ESTADOS.JUEGO, { juegoId, personaje: nombrePersonaje, dificultad });
         }
-        cambiarEstado(ESTADOS.JUEGO, { juegoId, personaje: nombrePersonaje });
-    });
+    );
     const modal = crearModalLibro(libJuegos.libro, libJuegos.manejarTecladoLibro);
     contenedorJuego.appendChild(modal.overlay);
     return modal;
@@ -385,7 +388,8 @@ function ejecutarCambioEstado(anterior, nuevo, datos) {
                     modalTesoro.mostrar(tesoroSorteado, contenedorJuego);
                 }
             },
-            dpad
+            dpad,
+            { dificultad: datos.dificultad || null }
         );
     }
 }

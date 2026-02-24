@@ -7,14 +7,14 @@
 | 1 | [Cuartos secretos en El Laberinto](#1-cuartos-secretos-en-el-laberinto) | Baja | [ ] |
 | 2 | [Sistema de logros con medallas](#2-sistema-de-logros-con-medallas) | Baja | [ ] |
 | 3 | [Power-ups en El Abismo](#3-power-ups-coleccionables-en-el-abismo) | Media-Baja | [ ] |
-| 4 | [Niveles de dificultad en El Memorice](#4-niveles-de-dificultad-en-el-memorice) | Media-Baja | [ ] |
+| 4 | [Niveles de dificultad en El Memorice](#4-niveles-de-dificultad-en-el-memorice) | Media-Baja | [x] |
 | 5 | [Efectos climaticos en los juegos](#5-efectos-climaticos-en-los-juegos) | Media-Baja | [ ] |
 | 6 | [Diario de aventuras (stats y records)](#6-diario-de-aventuras-stats-y-records) | Media | [ ] |
 | 7 | [Enemigos con habilidades especiales](#7-enemigos-con-habilidades-especiales-en-el-laberinto) | Media | [ ] |
 | 8 | [Modo Boss Rush](#8-modo-boss-rush) | Media | [ ] |
 | 9 | [Mascotas acompanantes](#9-mascotas-acompanantes) | Media-Alta | [ ] |
 | 10 | [Editor de niveles para El Abismo](#10-editor-de-niveles-para-el-abismo) | Alta | [ ] |
-| 11 | [Ajedrez local (heroes vs villanos)](#11-ajedrez-local-heroes-vs-villanos) | Alta | [ ] |
+| 11 | [Ajedrez local (heroes vs villanos)](#11-ajedrez-local-heroes-vs-villanos) | Alta | [x] |
 | 12 | [Modo Historia / Campana](#12-modo-historia-cooperativo-campana) | Muy Alta | [ ] |
 | 13 | [Ajedrez online (multidispositivo)](#13-ajedrez-online-multidispositivo) | Muy Alta | [ ] |
 | 14 | [Sistema de autenticacion y backend](#14-sistema-de-autenticacion-y-backend) | Muy Alta | [ ] |

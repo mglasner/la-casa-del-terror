@@ -4,6 +4,12 @@
 import { crearElemento } from '../utils.js';
 import { PERSONAJES } from '../personajes.js';
 import { crearLibro, generarPortada } from './libro.js';
+import { CFG as CFG_MEMORICE } from '../juegos/memorice/config.js';
+
+// Mapa de juegos que tienen selector de dificultad en el modal de héroe
+const DIFICULTAD_POR_JUEGO = {
+    memorice: CFG_MEMORICE.dificultad,
+};
 
 // Datos de los 4 juegos con descripciones completas
 const JUEGOS = {
@@ -38,7 +44,23 @@ const JUEGOS = {
             'Encuentra todos los pares para desbloquear el pasaje. ¡Pero cuidado! Cada intento fallido despierta la curiosidad de los villanos.',
             '¡Buenas noticias! Cada par que descubras te devuelve un poco de vida. ¡Es el momento perfecto para recuperarte!',
         ],
-        tip: 'Tu mejor arma aquí es la memoria. Concéntrate y recuerda cada carta.',
+        modos: [
+            {
+                icono: '\u26A1',
+                nombre: 'Fácil',
+                desc: 'Los relámpagos iluminan la sala y revelan las cartas por un instante. ¡Aprovecha el destello!',
+            },
+            {
+                icono: '\uD83C\uDFAF',
+                nombre: 'Normal',
+                desc: 'El desafío clásico. Solo cuentas con tu memoria y tus intentos.',
+            },
+            {
+                icono: '\uD83C\uDF00',
+                nombre: 'Difícil',
+                desc: 'Después de cada par encontrado, las cartas restantes se mezclan. ¡La memoria ya no basta!',
+            },
+        ],
     },
     abismo: {
         nombre: 'El Abismo',
@@ -101,10 +123,25 @@ function generarPaginaJuego(juego) {
     });
     contenido.appendChild(desc);
 
-    const tip = crearElemento('div', 'libro-juego-tip');
-    tip.appendChild(crearElemento('span', 'libro-juego-tip-icono', '\uD83D\uDCA1'));
-    tip.appendChild(document.createTextNode(juego.tip));
-    contenido.appendChild(tip);
+    // Sección de modos de dificultad (si el juego los define)
+    if (juego.modos) {
+        const modos = crearElemento('div', 'libro-juego-modos');
+        juego.modos.forEach(function (modo) {
+            const card = crearElemento('div', 'libro-juego-modo');
+            card.appendChild(crearElemento('span', 'libro-juego-modo-icono', modo.icono));
+            card.appendChild(crearElemento('strong', null, modo.nombre));
+            card.appendChild(crearElemento('p', null, modo.desc));
+            modos.appendChild(card);
+        });
+        contenido.appendChild(modos);
+    }
+
+    if (juego.tip) {
+        const tip = crearElemento('div', 'libro-juego-tip');
+        tip.appendChild(crearElemento('span', 'libro-juego-tip-icono', '\uD83D\uDCA1'));
+        tip.appendChild(document.createTextNode(juego.tip));
+        contenido.appendChild(tip);
+    }
 
     return contenido;
 }
@@ -115,7 +152,8 @@ function crearModalHeroe(onConfirmar) {
     const overlay = crearElemento('div', 'modal-heroe-overlay oculto');
 
     const panel = crearElemento('div', 'modal-heroe');
-    panel.appendChild(crearElemento('h3', 'modal-heroe-titulo', 'Elige tu héroe'));
+    const titulo = crearElemento('h3', 'modal-heroe-titulo', 'Elige tu héroe');
+    panel.appendChild(titulo);
     panel.appendChild(crearElemento('div', 'libro-ornamento'));
 
     const selector = crearElemento('div', 'selector-heroe');
@@ -146,11 +184,54 @@ function crearModalHeroe(onConfirmar) {
             });
             btn.classList.add('selector-heroe-activo');
             btnConfirmar.disabled = false;
+            titulo.classList.add('modal-heroe-titulo-listo');
         });
 
         selector.appendChild(btn);
     });
     panel.appendChild(selector);
+
+    // --- Selector de dificultad (oculto por defecto, se muestra si el juego lo requiere) ---
+    const seccionDificultad = crearElemento('div', 'modal-heroe-dificultad oculto');
+    seccionDificultad.appendChild(
+        crearElemento('span', 'modal-heroe-dificultad-titulo', 'Dificultad')
+    );
+    const btnsDificultad = crearElemento('div', 'modal-heroe-dificultad-opciones');
+    seccionDificultad.appendChild(btnsDificultad);
+    panel.appendChild(seccionDificultad);
+
+    let dificultadElegida = null;
+
+    function poblarDificultad(cfg) {
+        btnsDificultad.innerHTML = '';
+        cfg.opciones.forEach(function (opcion, i) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'modal-heroe-dificultad-btn';
+            btn.dataset.id = opcion.id;
+
+            btn.appendChild(crearElemento('span', 'modal-heroe-dificultad-icono', opcion.icono));
+            btn.appendChild(crearElemento('span', null, opcion.nombre));
+
+            btn.addEventListener('click', function () {
+                dificultadElegida = opcion.id;
+                btnsDificultad
+                    .querySelectorAll('.modal-heroe-dificultad-btn')
+                    .forEach(function (b) {
+                        b.classList.remove('modal-heroe-dificultad-activo');
+                    });
+                btn.classList.add('modal-heroe-dificultad-activo');
+            });
+
+            // Preseleccionar el default
+            if (i === cfg.default) {
+                btn.classList.add('modal-heroe-dificultad-activo');
+                dificultadElegida = opcion.id;
+            }
+
+            btnsDificultad.appendChild(btn);
+        });
+    }
 
     const acciones = crearElemento('div', 'modal-heroe-acciones');
 
@@ -166,7 +247,7 @@ function crearModalHeroe(onConfirmar) {
     btnConfirmar.disabled = true;
     btnConfirmar.addEventListener('click', function () {
         if (heroeElegido && juegoIdActual) {
-            onConfirmar(juegoIdActual, heroeElegido);
+            onConfirmar(juegoIdActual, heroeElegido, dificultadElegida);
         }
     });
     acciones.appendChild(btnConfirmar);
@@ -183,12 +264,24 @@ function crearModalHeroe(onConfirmar) {
 
     function abrir(juegoId) {
         juegoIdActual = juegoId;
-        // Resetear selección
+        // Resetear selección de héroe
         heroeElegido = null;
         selector.querySelectorAll('.selector-heroe-btn').forEach(function (b) {
             b.classList.remove('selector-heroe-activo');
         });
         btnConfirmar.disabled = true;
+        titulo.classList.remove('modal-heroe-titulo-listo');
+
+        // Mostrar/ocultar selector de dificultad según el juego
+        const cfgDif = DIFICULTAD_POR_JUEGO[juegoId];
+        if (cfgDif) {
+            poblarDificultad(cfgDif);
+            seccionDificultad.classList.remove('oculto');
+        } else {
+            seccionDificultad.classList.add('oculto');
+            dificultadElegida = null;
+        }
+
         overlay.classList.remove('oculto');
     }
 
@@ -208,13 +301,14 @@ function generarDetalleJuego(nombre, _tabAnterior, abrirModalHeroe) {
 
     const contenido = generarPaginaJuego(juego);
 
-    // Botón Jugar que abre el modal de selección de héroe
+    // Botón Jugar justo debajo del título
     const btnJugar = crearElemento('button', 'libro-juego-btn-jugar', 'Jugar');
     btnJugar.type = 'button';
     btnJugar.addEventListener('click', function () {
         abrirModalHeroe(datos.juegoId);
     });
-    contenido.appendChild(btnJugar);
+    const ornamento = contenido.querySelector('.libro-ornamento');
+    ornamento.after(btnJugar);
 
     return contenido;
 }
@@ -252,7 +346,7 @@ function generarPrologoJuegos() {
 /**
  * Crea el Libro de Juegos.
  * @param {HTMLElement} contenedor - Elemento donde montar
- * @param {Function} onJugar - Callback (juegoId, nombrePersonaje)
+ * @param {Function} onJugar - Callback (juegoId, nombrePersonaje, dificultad)
  * @returns {{ libro: HTMLElement, manejarTecladoLibro: Function, destruir: Function }}
  */
 export function crearLibroJuegos(contenedor, onJugar) {

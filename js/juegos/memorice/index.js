@@ -2,7 +2,7 @@
 // El jugador voltea cartas para encontrar pares de héroes y villanos
 
 import { CFG } from './config.js';
-import { generarTablero } from './tablero.js';
+import { generarTablero, mezclar } from './tablero.js';
 import { crearCarta } from './carta.js';
 import { lanzarToast } from '../../componentes/toast.js';
 import { notificarVidaCambio, notificarJugadorMuerto, notificarVictoria } from '../../eventos.js';
@@ -19,6 +19,8 @@ let indicador = null;
 let indicadorTexto = null;
 let indicadorProgreso = null;
 let cartas = [];
+let dificultad = 'normal';
+let grilla = null;
 
 let primeraCarta = null;
 let bloqueado = false;
@@ -52,8 +54,21 @@ function crearPantalla() {
     indicador.appendChild(barra);
     actualizarIndicador();
 
+    // Badge de dificultad (solo en fácil y difícil)
+    if (dificultad !== 'normal') {
+        const opcion = CFG.dificultad.opciones.find(function (o) {
+            return o.id === dificultad;
+        });
+        if (opcion) {
+            const badge = crearElemento('div', 'memorice-dificultad-badge');
+            badge.appendChild(crearElemento('span', 'memorice-dificultad-icono', opcion.icono));
+            badge.appendChild(crearElemento('span', 'memorice-dificultad-texto', opcion.nombre));
+            indicador.appendChild(badge);
+        }
+    }
+
     // Grilla de cartas
-    const grilla = crearElemento('div', 'memorice-grilla');
+    grilla = crearElemento('div', 'memorice-grilla');
 
     cartas.forEach(function (carta) {
         grilla.appendChild(carta.el);
@@ -147,6 +162,10 @@ function onClickGrilla(e) {
             victoria();
         } else if (derrotaInminente()) {
             derrota();
+        } else {
+            // Mecánicas post-turno: barajar (difícil) o relámpago (fácil)
+            barajarRestantes();
+            intentarRelampago();
         }
     } else {
         // No match — voltear de vuelta después de un delay
@@ -164,9 +183,89 @@ function onClickGrilla(e) {
             // Derrota inminente
             if (derrotaInminente()) {
                 derrota();
+            } else {
+                // Mecánica post-turno: relámpago (fácil)
+                intentarRelampago();
             }
         }, CFG.tiempos.noMatch);
     }
+}
+
+// --- Mecánica: relámpago (modo fácil) ---
+
+function intentarRelampago() {
+    if (dificultad !== 'facil') return;
+    if (Math.random() > CFG.relampago.probabilidad) return;
+
+    bloqueado = true;
+
+    // Flash visual en la grilla
+    grilla.classList.add('memorice-relampago-flash');
+    timeouts.set(function () {
+        grilla.classList.remove('memorice-relampago-flash');
+    }, CFG.relampago.flash);
+
+    // Voltear todas las cartas no encontradas
+    cartas.forEach(function (c) {
+        if (!c.encontrada && !c.volteada) c.voltear();
+    });
+
+    lanzarToast(CFG.textos.toastRelampago, '\u26A1', 'exito');
+
+    // Devolverlas después de la duración
+    timeouts.set(function () {
+        cartas.forEach(function (c) {
+            if (!c.encontrada) c.deshacer();
+        });
+        bloqueado = false;
+    }, CFG.relampago.duracion);
+}
+
+// --- Mecánica: barajar cartas restantes (modo difícil) ---
+
+function barajarRestantes() {
+    if (dificultad !== 'dificil') return;
+    if (paresEncontrados >= totalPares) return;
+
+    bloqueado = true;
+    lanzarToast(CFG.textos.toastBarajar, '\uD83C\uDF00', 'dano');
+
+    // Recoger los hijos de la grilla y las posiciones (índices) de las no encontradas
+    const hijos = Array.from(grilla.children);
+    const posiciones = []; // índices en la grilla donde hay cartas no encontradas
+    const nodos = []; // nodos correspondientes
+
+    hijos.forEach(function (hijo, i) {
+        const carta = cartas.find(function (c) {
+            return c.el === hijo;
+        });
+        if (carta && !carta.encontrada) {
+            posiciones.push(i);
+            nodos.push(hijo);
+            hijo.classList.add('memorice-barajando');
+        }
+    });
+
+    timeouts.set(function () {
+        // Mezclar solo los nodos no encontrados
+        const mezclados = nodos.slice();
+        mezclar(mezclados);
+
+        // Crear placeholder para reconstruir la grilla completa
+        const nuevosHijos = hijos.slice();
+        posiciones.forEach(function (pos, i) {
+            nuevosHijos[pos] = mezclados[i];
+        });
+
+        // Reemplazar contenido de la grilla preservando el orden
+        grilla.innerHTML = '';
+        nuevosHijos.forEach(function (hijo) {
+            hijo.classList.remove('memorice-barajando');
+            grilla.appendChild(hijo);
+        });
+
+        bloqueado = false;
+    }, CFG.barajar.retraso);
 }
 
 function victoria() {
@@ -209,8 +308,9 @@ function onKeyDown(e) {
  * @param {Object} jugadorRef - Personaje seleccionado
  * @param {Function} callback - Callback para volver al Libro de Juegos
  * @param {Object} [dpadRef] - Controles touch D-pad (se oculta en este modo)
+ * @param {Object} [opciones] - Opciones extra ({ dificultad: 'facil'|'normal'|'dificil' })
  */
-export function iniciarMemorice(jugadorRef, callback, dpadRef) {
+export function iniciarMemorice(jugadorRef, callback, dpadRef, opciones) {
     jugador = jugadorRef;
     callbackSalir = callback;
     primeraCarta = null;
@@ -218,6 +318,7 @@ export function iniciarMemorice(jugadorRef, callback, dpadRef) {
     intentosRestantes = CFG.intentos.max;
     paresEncontrados = 0;
     toastAdvertenciaMostrado = false;
+    dificultad = (opciones && opciones.dificultad) || 'normal';
 
     // Ocultar D-pad (no se necesita en el memorice)
     if (dpadRef) {
@@ -253,4 +354,6 @@ export function limpiarMemorice() {
     indicador = null;
     indicadorTexto = null;
     indicadorProgreso = null;
+    grilla = null;
+    dificultad = 'normal';
 }

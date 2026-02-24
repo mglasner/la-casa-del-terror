@@ -71,6 +71,49 @@
     margin-right: 4px;
 }
 
+/* --- Modos de dificultad en página del juego --- */
+
+.libro-juego-modos {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 320px;
+    margin-top: 8px;
+}
+
+.libro-juego-modo {
+    flex: 1 1 90px;
+    min-width: 80px;
+    background: rgb(255 255 255 / 4%);
+    border: 1px solid rgb(255 215 0 / 12%);
+    border-radius: 10px;
+    padding: 10px 8px 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.libro-juego-modo-icono {
+    font-size: 1.5em;
+    line-height: 1;
+}
+
+.libro-juego-modo strong {
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    color: var(--color-dorado);
+}
+
+.libro-juego-modo p {
+    font-size: 0.68rem;
+    line-height: 1.4;
+    color: rgb(220 205 180 / 75%);
+    margin: 0;
+}
+
 /* --- Selector de héroe (fila de avatares) --- */
 
 .selector-heroe {
@@ -133,42 +176,65 @@
 
 .libro-juego-btn-jugar {
     font-family: var(--font-display);
-    font-size: 0.88rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    letter-spacing: 0.06em;
-    color: #1a1209;
-    padding: 8px 32px;
-    border: 1px solid rgb(200 160 80 / 50%);
-    border-radius: 20px;
-    background: linear-gradient(180deg, #d4a84a, #b8903c);
+    letter-spacing: 0.08em;
+    color: var(--color-dorado);
+    padding: 5px 22px;
+    border: 1px solid rgb(255 215 0 / 25%);
+    border-radius: 16px;
+    background: rgb(255 215 0 / 6%);
     cursor: pointer;
-    margin-top: 14px;
-    box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 20%),
-        0 2px 6px rgb(0 0 0 / 30%);
+    margin-bottom: 6px;
     transition:
-        transform 0.15s ease,
-        box-shadow 0.15s ease,
-        opacity 0.2s ease;
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .libro-juego-btn-jugar:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 25%),
-        0 3px 12px rgb(200 160 80 / 35%);
+    background: rgb(255 215 0 / 14%);
+    border-color: rgb(255 215 0 / 50%);
+    box-shadow: 0 0 12px rgb(255 215 0 / 15%);
 }
 
 .libro-juego-btn-jugar:active:not(:disabled) {
-    transform: translateY(0);
-    box-shadow:
-        inset 0 1px 3px rgb(0 0 0 / 20%),
-        0 1px 2px rgb(0 0 0 / 20%);
+    background: rgb(255 215 0 / 20%);
+    box-shadow: none;
 }
 
 .libro-juego-btn-jugar:disabled {
     opacity: 0.4;
     cursor: not-allowed;
+}
+
+/* Botón Jugar dentro del modal: estilo sólido dorado (CTA principal) */
+.modal-heroe-acciones .libro-juego-btn-jugar {
+    font-size: 0.88rem;
+    color: #1a1209;
+    padding: 8px 32px;
+    border: 1px solid rgb(200 160 80 / 50%);
+    border-radius: 20px;
+    background: linear-gradient(180deg, #d4a84a, #b8903c);
+    margin-bottom: 0;
+    box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 20%),
+        0 2px 6px rgb(0 0 0 / 30%);
+}
+
+.modal-heroe-acciones .libro-juego-btn-jugar:hover:not(:disabled) {
+    background: linear-gradient(180deg, #ddb050, #c49a42);
+    box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 25%),
+        0 3px 12px rgb(200 160 80 / 35%);
+}
+
+.modal-heroe-acciones .libro-juego-btn-jugar:active:not(:disabled) {
+    background: linear-gradient(180deg, #c49a42, #a88036);
+    box-shadow:
+        inset 0 1px 3px rgb(0 0 0 / 20%),
+        0 1px 2px rgb(0 0 0 / 20%);
 }
 
 /* --- Modal de selección de héroe --- */
@@ -206,6 +272,24 @@
     font-size: 1.2rem;
     color: var(--color-dorado);
     margin: 0 0 6px;
+    animation: modal-heroe-respirar 2.5s ease-in-out infinite;
+}
+
+.modal-heroe-titulo.modal-heroe-titulo-listo {
+    animation: none;
+}
+
+@keyframes modal-heroe-respirar {
+    0%,
+    100% {
+        opacity: 0.45;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.04);
+    }
 }
 
 .modal-heroe-acciones {
@@ -233,6 +317,67 @@
 .modal-heroe-btn-cancelar:hover {
     background: rgb(255 255 255 / 10%);
     border-color: rgb(255 255 255 / 20%);
+}
+
+/* --- Selector de dificultad en modal de héroe --- */
+
+.modal-heroe-dificultad {
+    margin-top: 12px;
+}
+
+.modal-heroe-dificultad.oculto {
+    display: none;
+}
+
+.modal-heroe-dificultad-titulo {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    color: rgb(220 205 180 / 70%);
+    margin-bottom: 8px;
+    letter-spacing: 0.04em;
+}
+
+.modal-heroe-dificultad-opciones {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.modal-heroe-dificultad-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border: 1px solid rgb(255 255 255 / 10%);
+    border-radius: 20px;
+    background: rgb(255 255 255 / 4%);
+    color: rgb(220 205 180 / 80%);
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition:
+        border-color 0.2s,
+        background 0.2s,
+        box-shadow 0.2s;
+}
+
+.modal-heroe-dificultad-btn:hover {
+    border-color: rgb(255 215 0 / 30%);
+    background: rgb(255 215 0 / 6%);
+}
+
+.modal-heroe-dificultad-btn.modal-heroe-dificultad-activo {
+    border-color: rgb(255 215 0 / 50%);
+    background: rgb(255 215 0 / 12%);
+    box-shadow: 0 0 10px rgb(255 215 0 / 15%);
+    color: var(--color-dorado);
+}
+
+.modal-heroe-dificultad-icono {
+    font-size: 1.2em;
+    line-height: 1;
 }
 
 /* --- Responsive --- */
@@ -264,5 +409,30 @@
     .libro-juego-tip {
         font-size: 0.72rem;
         padding: 6px 10px;
+    }
+
+    .libro-juego-modos {
+        gap: 6px;
+    }
+
+    .libro-juego-modo {
+        padding: 8px 6px 6px;
+    }
+
+    .libro-juego-modo-icono {
+        font-size: 1.2em;
+    }
+
+    .libro-juego-modo strong {
+        font-size: 0.7rem;
+    }
+
+    .libro-juego-modo p {
+        font-size: 0.62rem;
+    }
+
+    .modal-heroe-dificultad-btn {
+        padding: 5px 10px;
+        font-size: 0.75rem;
     }
 }

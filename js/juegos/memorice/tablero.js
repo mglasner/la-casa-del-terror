@@ -4,7 +4,7 @@ import { PERSONAJES } from '../../personajes.js';
 import { ENEMIGOS } from '../../enemigos.js';
 
 // Mezcla Fisher-Yates
-function mezclar(arr) {
+export function mezclar(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         const tmp = arr[i];
