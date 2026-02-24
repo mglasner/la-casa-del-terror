@@ -36,6 +36,12 @@ function calcularEscala(canvas) {
     return Math.max(1, Math.min(escalaX, escalaY));
 }
 
+function calcularDPR(escala) {
+    // DPR basado en escala real de display: min 2 (sprites 2x), max 4 (performance)
+    const escalaFisica = escala * (window.devicePixelRatio || 1);
+    return Math.min(4, Math.max(2, Math.ceil(escalaFisica)));
+}
+
 export function crearPantalla(esTouch, onHuir) {
     const anchoCanvas = CFG.canvas.anchoBase;
     const altoCanvas = CFG.canvas.altoBase;
@@ -51,13 +57,8 @@ export function crearPantalla(esTouch, onHuir) {
     const wrapper = document.createElement('div');
     wrapper.className = 'plat-wrapper';
 
-    // Canvas con DPR para renderizado a resolucion nativa
-    canvasDPR = (window.devicePixelRatio || 1) >= 1.5 ? 2 : 1;
-
     const canvas = document.createElement('canvas');
     canvas.id = 'canvas-platformer';
-    canvas.width = anchoCanvas * canvasDPR;
-    canvas.height = altoCanvas * canvasDPR;
     const ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
@@ -133,6 +134,11 @@ export function crearPantalla(esTouch, onHuir) {
     canvas.style.width = Math.floor(anchoCanvas * escala) + 'px';
     canvas.style.height = Math.floor(altoCanvas * escala) + 'px';
 
+    canvasDPR = calcularDPR(escala);
+    canvas.width = anchoCanvas * canvasDPR;
+    canvas.height = altoCanvas * canvasDPR;
+    ctx.imageSmoothingEnabled = false; // resize resetea el state del context
+
     return { pantalla, canvas, ctx, escala };
 }
 
@@ -173,6 +179,14 @@ export function reescalarCanvas() {
     const escala = calcularEscala(canvasRef);
     canvasRef.style.width = Math.floor(CFG.canvas.anchoBase * escala) + 'px';
     canvasRef.style.height = Math.floor(CFG.canvas.altoBase * escala) + 'px';
+
+    const nuevoDPR = calcularDPR(escala);
+    if (nuevoDPR !== canvasDPR) {
+        canvasDPR = nuevoDPR;
+        canvasRef.width = CFG.canvas.anchoBase * canvasDPR;
+        canvasRef.height = CFG.canvas.altoBase * canvasDPR;
+        canvasRef.getContext('2d').imageSmoothingEnabled = false;
+    }
 }
 
 export function obtenerDPR() {
