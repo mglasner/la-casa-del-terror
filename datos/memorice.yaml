@@ -5,46 +5,46 @@
 
 # --- Información general del juego ---
 meta:
-    titulo: "El Memorice"
-    itemInventario: ""
-    tiempoVictoria: 2000                 # ms antes de volver al pasillo
+    titulo: 'El Memorice'
+    itemInventario: ''
+    tiempoVictoria: 2000 # ms antes de volver al pasillo
 
 # --- Dimensiones del tablero ---
 # filas × columnas debe ser PAR y >= 2*(numHeroes + numVillanos)
 tablero:
-    filas: 4                 # filas de la grilla de cartas
-    columnas: 5              # columnas de la grilla de cartas
-    numHeroes: 5             # cantidad de pares de héroes
-    numVillanos: 5           # cantidad de pares de villanos
+    filas: 4 # filas de la grilla de cartas
+    columnas: 5 # columnas de la grilla de cartas
+    numHeroes: 5 # cantidad de pares de héroes
+    numVillanos: 5 # cantidad de pares de villanos
 
 # --- Intentos del jugador ---
 intentos:
-    max: 25                  # intentos totales permitidos
-    alerta: 5                # umbral para alerta visual (pulsing rojo)
-    margenAdvertencia: 3     # margen de turnos sobrantes para lanzar toast
+    max: 25 # intentos totales permitidos
+    alerta: 5 # umbral para alerta visual (pulsing rojo)
+    margenAdvertencia: 3 # margen de turnos sobrantes para lanzar toast
 
 # --- Curación al encontrar pares ---
 curacion:
-    parMin: 1                # vida mínima al encontrar un par
-    parMax: 3                # vida máxima al encontrar un par
-    victoriaMin: 8           # vida mínima al ganar la partida
-    victoriaMax: 12          # vida máxima al ganar la partida
+    parMin: 1 # vida mínima al encontrar un par
+    parMax: 3 # vida máxima al encontrar un par
+    victoriaMin: 8 # vida mínima al ganar la partida
+    victoriaMax: 12 # vida máxima al ganar la partida
 
 # --- Tiempos de animación (ms) ---
 tiempos:
-    volteo: 500              # ms animación de flip
-    noMatch: 800             # ms antes de voltear de vuelta
+    volteo: 500 # ms animación de flip
+    noMatch: 800 # ms antes de voltear de vuelta
 
 # --- Textos mostrados en pantalla ---
 # {restantes} se interpola en JS con .replace()
 textos:
-    indicador: "Intentos: {restantes}"
-    toastMatch: "¡Par encontrado!"
-    toastVictoria: "¡Memorice completado!"
-    toastAdvertencia: "¡Quedan pocos turnos!"
-    toastCuracion: "+{cantidad} vida"
-    toastRelampago: "¡Relámpago! Las cartas se revelaron"
-    toastBarajar: "¡Las cartas se mezclan!"
+    indicador: 'Intentos: {restantes}'
+    toastMatch: '¡Par encontrado!'
+    toastVictoria: '¡Memorice completado!'
+    toastAdvertencia: '¡Quedan pocos turnos!'
+    toastCuracion: '+{cantidad} vida'
+    toastRelampago: '¡Relámpago! Las cartas se revelaron'
+    toastBarajar: '¡Las cartas se mezclan!'
 
 # --- Niveles de dificultad ---
 dificultad:
