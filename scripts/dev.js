@@ -1,6 +1,6 @@
 // Script de desarrollo: observador YAML + servidor BrowserSync
 
-import { spawn } from 'child_process';
+import { spawn, exec } from 'child_process';
 
 // Observador de datos YAML — regenera JS al cambiar
 const watcher = spawn('node', ['scripts/watch-datos.js'], { stdio: 'inherit' });
@@ -24,9 +24,15 @@ server.stdout.on('data', function (chunk) {
         const match = txt.match(/Local:\s*(https?:\/\/localhost:\d+)/);
         if (match) {
             paginasAbiertas = true;
-            // BrowserSync ya abre index.html (desktop). Abrir mobile y vitrina:
-            abrirUrl(match[1] + '/preview-mobile.html');
-            abrirUrl(match[1] + '/vitrina.html');
+            // BrowserSync ya abre index.html (desktop).
+            // Escalonar para garantizar el orden: mobile → showcase
+            const base = match[1];
+            setTimeout(function () {
+                abrirUrl(base + '/preview-mobile.html');
+            }, 300);
+            setTimeout(function () {
+                abrirUrl(base + '/vitrina.html');
+            }, 600);
         }
     }
 });
@@ -38,7 +44,7 @@ function abrirUrl(url) {
             : process.platform === 'darwin'
               ? 'open'
               : 'xdg-open';
-    spawn(cmd, [url], { shell: true });
+    exec(cmd + ' ' + url);
 }
 
 function salir() {
