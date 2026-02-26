@@ -7,11 +7,12 @@ const watcher = spawn('node', ['scripts/watch-datos.js'], { stdio: 'inherit' });
 
 // Servidor de desarrollo con hot-reload
 // stdout en 'pipe' para detectar cuando esté listo y abrir la vitrina
-const server = spawn(
-    'npx',
-    ['browser-sync', 'start', '--server', '--files', '**/*.html, **/*.css, **/*.js', '--no-notify'],
-    { stdio: ['inherit', 'pipe', 'inherit'], shell: true }
-);
+// Comando como string único + shell:true (necesario en Windows para npx).
+// Evita el DeprecationWarning de Node 24 que afecta a args[] con shell:true.
+const server = spawn('npx browser-sync start --config bs-config.cjs', {
+    stdio: ['inherit', 'pipe', 'inherit'],
+    shell: true,
+});
 
 // Re-imprimir stdout del servidor y detectar la URL local para abrir páginas dev
 let paginasAbiertas = false;

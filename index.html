@@ -92,6 +92,16 @@
         </main>
 
         <script type="module" src="js/juego.js"></script>
+        <!-- Sync dev: solo carga en localhost, no afecta producción -->
+        <script>
+            if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+                document.head.appendChild(
+                    Object.assign(document.createElement('script'), {
+                        src: '/js/dev/sync.js',
+                    })
+                );
+            }
+        </script>
         <script>
             if ('serviceWorker' in navigator) {
                 var refreshing = false;
