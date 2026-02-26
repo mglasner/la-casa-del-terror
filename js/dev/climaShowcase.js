@@ -1,15 +1,22 @@
 // Showcase de climas — herramienta de desarrollo
-// Muestra los 5 estados climáticos del Abismo animados en tiempo real
-// Auto-inyecta una sección al final de vitrina.html
+// Paneles animados para El Abismo y El Laberinto 3D
 
 const W = 480;
 const H = 270;
-const TAM = 16; // tile size (igual que el juego)
-const SUELO_Y = H - 3 * TAM; // y donde empieza el suelo
+const TAM = 16;
+const SUELO_Y = H - 3 * TAM;
 
-// --- Configuración visual por clima ---
+const CLIMAS = [
+    { id: 'ninguno', label: 'Sin clima', sub: '— Sin estación —' },
+    { id: 'invierno', label: 'Invierno', sub: 'La Tormenta Arcana' },
+    { id: 'primavera', label: 'Primavera', sub: 'El Despertar del Bosque' },
+    { id: 'verano', label: 'Verano', sub: 'El Sol Abrasador' },
+    { id: 'otono', label: 'Otoño', sub: 'La Danza de las Hojas' },
+];
 
-const PAL = {
+// ─── Paletas ─────────────────────────────────────────────────────────────────
+
+const PAL_ABISMO = {
     ninguno: {
         dia: false,
         cTop: '#050520',
@@ -67,15 +74,55 @@ const PAL = {
     },
 };
 
-const CLIMAS = [
-    { id: 'ninguno', label: 'Sin clima', sub: '— Noche normal —' },
-    { id: 'invierno', label: 'Invierno', sub: 'La Tormenta Arcana' },
-    { id: 'primavera', label: 'Primavera', sub: 'El Despertar del Bosque' },
-    { id: 'verano', label: 'Verano', sub: 'El Sol Abrasador' },
-    { id: 'otono', label: 'Otoño', sub: 'La Danza de las Hojas' },
-];
+const PAL_3D = {
+    ninguno: {
+        cA: '#0a0804',
+        cB: '#1a1208',
+        sA: '#1a1408',
+        sB: '#0a0804',
+        wNS: { r: 26, g: 62, b: 30 },
+        wEO: { r: 37, g: 85, b: 42 },
+        tinte: null,
+    },
+    invierno: {
+        cA: '#080d18',
+        cB: '#142240',
+        sA: '#0a1428',
+        sB: '#060c18',
+        wNS: { r: 20, g: 40, b: 70 },
+        wEO: { r: 28, g: 55, b: 95 },
+        tinte: 'rgba(30,60,120,0.12)',
+    },
+    primavera: {
+        cA: '#5ba8d4',
+        cB: '#9dd5b0',
+        sA: '#4a9e5c',
+        sB: '#2d6b3a',
+        wNS: { r: 30, g: 80, b: 35 },
+        wEO: { r: 40, g: 110, b: 50 },
+        tinte: 'rgba(100,200,80,0.08)',
+    },
+    verano: {
+        cA: '#c07010',
+        cB: '#e8a020',
+        sA: '#8b5010',
+        sB: '#5a3008',
+        wNS: { r: 80, g: 55, b: 20 },
+        wEO: { r: 110, g: 75, b: 25 },
+        tinte: 'rgba(220,140,20,0.10)',
+    },
+    otono: {
+        cA: '#2a1408',
+        cB: '#5a2c0e',
+        sA: '#6b3810',
+        sB: '#3a1c08',
+        wNS: { r: 60, g: 35, b: 15 },
+        wEO: { r: 80, g: 48, b: 20 },
+        tinte: 'rgba(180,80,20,0.08)',
+    },
+};
 
-// --- Generación de fondo (offscreen, una vez por panel) ---
+// ─── Utilidades ───────────────────────────────────────────────────────────────
 
 function ruido1D(x, seed) {
     return (
@@ -85,32 +132,50 @@ function ruido1D(x, seed) {
     );
 }
 
-function generarBg(id) {
-    const pal = PAL[id];
+function generarVineta() {
+    const c = document.createElement('canvas');
+    c.width = W;
+    c.height = H;
+    const ctx = c.getContext('2d');
+    const g = ctx.createRadialGradient(
+        W / 2,
+        H / 2,
+        Math.min(W, H) * 0.35,
+        W / 2,
+        H / 2,
+        Math.max(W, H) * 0.7
+    );
+    g.addColorStop(0, 'rgba(0,0,0,0)');
+    g.addColorStop(1, 'rgba(0,0,0,0.45)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    return c;
+}
+
+// ─── Fondos offscreen ─────────────────────────────────────────────────────────
+
+function generarBgAbismo(id) {
+    const pal = PAL_ABISMO[id];
     const c = document.createElement('canvas');
     c.width = W;
     c.height = H;
     const ctx = c.getContext('2d');
 
-    // Cielo
-    const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, pal.cTop);
-    grad.addColorStop(0.6, pal.cMid);
-    grad.addColorStop(1, pal.cBot);
-    ctx.fillStyle = grad;
+    const gC = ctx.createLinearGradient(0, 0, 0, H);
+    gC.addColorStop(0, pal.cTop);
+    gC.addColorStop(0.6, pal.cMid);
+    gC.addColorStop(1, pal.cBot);
+    ctx.fillStyle = gC;
     ctx.fillRect(0, 0, W, H);
 
     if (!pal.dia) {
-        // Estrellas
         for (let i = 0; i < 60; i++) {
             const sx = (i * 137 + 51) % W;
             const sy = (i * 89 + 23) % (H - 80);
-            const br = 0.3 + (i % 5) * 0.1;
-            ctx.fillStyle = 'rgba(255,255,255,' + br + ')';
+            ctx.fillStyle = 'rgba(255,255,255,' + (0.3 + (i % 5) * 0.1) + ')';
             ctx.fillRect(sx, sy, i % 3 === 0 ? 2 : 1, i % 3 === 0 ? 2 : 1);
         }
     } else {
-        // Sol
         const solX = id === 'verano' ? W * 0.15 : W * 0.78;
         const solY = H * 0.12;
         const gs = ctx.createRadialGradient(solX, solY, 0, solX, solY, 28);
@@ -121,26 +186,22 @@ function generarBg(id) {
         ctx.fillRect(solX - 30, solY - 30, 60, 60);
     }
 
-    // Montañas lejanas
     ctx.fillStyle = pal.mont;
     ctx.beginPath();
     ctx.moveTo(0, H);
     for (let px = 0; px <= W; px += 2) {
-        const h = ruido1D(px * 0.015, 3.7);
-        ctx.lineTo(px, H * 0.55 + h * H * 0.2);
+        ctx.lineTo(px, H * 0.55 + ruido1D(px * 0.015, 3.7) * H * 0.2);
     }
     ctx.lineTo(W, H);
     ctx.closePath();
     ctx.fill();
 
-    // Riscos (más cercanos)
     ctx.fillStyle = pal.riscos;
     ctx.beginPath();
     ctx.moveTo(0, H);
     for (let px = 0; px <= W; px += 2) {
-        const h = ruido1D(px * 0.025, 7.1);
         const pico = Math.abs(Math.sin(px * 0.05 + 2.3)) * 0.15;
-        ctx.lineTo(px, H * 0.65 + (h - pico) * H * 0.2);
+        ctx.lineTo(px, H * 0.65 + (ruido1D(px * 0.025, 7.1) - pico) * H * 0.2);
     }
     ctx.lineTo(W, H);
     ctx.closePath();
@@ -149,41 +210,94 @@ function generarBg(id) {
     return c;
 }
 
-// Viñeta compartida (generada una vez)
-function generarVineta() {
+function generarBg3D(id) {
+    const pal = PAL_3D[id];
     const c = document.createElement('canvas');
     c.width = W;
     c.height = H;
     const ctx = c.getContext('2d');
-    const grad = ctx.createRadialGradient(
-        W / 2,
-        H / 2,
-        Math.min(W, H) * 0.35,
-        W / 2,
-        H / 2,
-        Math.max(W, H) * 0.7
-    );
-    grad.addColorStop(0, 'rgba(0,0,0,0)');
-    grad.addColorStop(1, 'rgba(0,0,0,0.45)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
+
+    // Cielo
+    const gC = ctx.createLinearGradient(0, 0, 0, H / 2);
+    gC.addColorStop(0, pal.cA);
+    gC.addColorStop(1, pal.cB);
+    ctx.fillStyle = gC;
+    ctx.fillRect(0, 0, W, H / 2);
+
+    // Suelo
+    const gS = ctx.createLinearGradient(0, H / 2, 0, H);
+    gS.addColorStop(0, pal.sA);
+    gS.addColorStop(1, pal.sB);
+    ctx.fillStyle = gS;
+    ctx.fillRect(0, H / 2, W, H / 2);
+
+    // Mini-raycaster: corredor recto (ancho 1 tile, 8 tiles de profundidad)
+    // Cada columna de píxeles = un rayo independiente
+    const FOV_R = Math.PI / 3;
+    const corrH = 0.5; // semiancho del corredor
+    const profMax = 8;
+
+    for (let i = 0; i < W; i++) {
+        const ang = -FOV_R / 2 + (i / W) * FOV_R;
+        const cosA = Math.cos(ang);
+        const sinA = Math.sin(ang);
+
+        const distLado = sinA !== 0 ? Math.abs(corrH / sinA) : Infinity;
+        const distFondo = cosA > 0 ? profMax / cosA : Infinity;
+        const esLado = distLado < distFondo;
+        const dist = Math.min(distLado, distFondo);
+        if (!isFinite(dist) || dist <= 0) continue;
+
+        const wallH = Math.min(H, (H / dist) * 1.2);
+        const yTop = H / 2 - wallH / 2;
+
+        const col = esLado ? pal.wNS : pal.wEO;
+        const niebla = Math.max(0.08, 1 - dist / 14);
+        ctx.fillStyle =
+            'rgb(' +
+            Math.floor(col.r * niebla) +
+            ',' +
+            Math.floor(col.g * niebla) +
+            ',' +
+            Math.floor(col.b * niebla) +
+            ')';
+        ctx.fillRect(i, yTop, 2, wallH);
+    }
+
+    // Antorchas en las paredes laterales
+    for (const ax of [W * 0.28, W * 0.72]) {
+        const gT = ctx.createRadialGradient(ax, H * 0.46, 0, ax, H * 0.46, 22);
+        gT.addColorStop(0, 'rgba(255,160,40,0.30)');
+        gT.addColorStop(1, 'rgba(255,100,10,0)');
+        ctx.fillStyle = gT;
+        ctx.fillRect(ax - 24, H * 0.34, 48, 48);
+        ctx.fillStyle = 'rgba(255,140,20,0.7)';
+        ctx.fillRect(ax - 1, H * 0.45, 2, 4);
+    }
+
+    // Glow del fondo (fondo del corredor)
+    const gF = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, 40);
+    gF.addColorStop(0, 'rgba(255,180,60,0.22)');
+    gF.addColorStop(0.5, 'rgba(255,120,20,0.08)');
+    gF.addColorStop(1, 'rgba(255,60,10,0)');
+    ctx.fillStyle = gF;
+    ctx.fillRect(W / 2 - 44, H / 2 - 44, 88, 88);
+
     return c;
 }
 
-// --- Estado de cada panel ---
+// ─── Estado de panel ──────────────────────────────────────────────────────────
 
 function crearEstado(id) {
     return {
         id,
-        bg: generarBg(id),
+        bg: null, // se asigna desde el llamador
         partic: [],
         t: 0,
-        // Relámpago (invierno)
         relFrames: 0,
         relFade: 0,
         relProx: 280 + Math.floor(Math.random() * 140),
         relCount: 0,
-        // Ráfaga de viento (otoño)
         rafCounter: 0,
         rafProx: 200 + Math.floor(Math.random() * 100),
         rafActiva: false,
@@ -191,13 +305,30 @@ function crearEstado(id) {
     };
 }
 
-// --- Sistema de partículas del showcase ---
+// ─── Sistema de partículas compartido ────────────────────────────────────────
+
+const PALETAS_PETALO = [
+    [255, 185, 215],
+    [255, 175, 200],
+    [225, 185, 245],
+    [255, 215, 175],
+    [185, 225, 250],
+    [255, 240, 175],
+    [195, 240, 190],
+    [255, 205, 225],
+];
+const PALETAS_HOJA = [
+    [210, 80, 30],
+    [230, 150, 40],
+    [140, 50, 20],
+    [180, 100, 20],
+    [200, 120, 50],
+];
 
 function emitir(est) {
     const { id, partic, t } = est;
 
     if (id === 'invierno') {
-        // Lluvia densa
         if (t % 2 === 0) {
             partic.push({
                 x: Math.random() * (W + 40) - 20,
@@ -215,27 +346,16 @@ function emitir(est) {
             });
         }
     } else if (id === 'primavera') {
-        // Pétalos multicolor
         if (t % 4 === 0) {
-            const paletas = [
-                [255, 185, 215],
-                [255, 175, 200],
-                [225, 185, 245],
-                [255, 215, 175],
-                [185, 225, 250],
-                [255, 240, 175],
-                [195, 240, 190],
-                [255, 205, 225],
-            ];
-            const c = paletas[Math.floor(Math.random() * paletas.length)];
-            const vidaMax = 140 + Math.floor(Math.random() * 80);
+            const c = PALETAS_PETALO[Math.floor(Math.random() * PALETAS_PETALO.length)];
+            const vm = 140 + Math.floor(Math.random() * 80);
             partic.push({
                 x: Math.random() * W,
                 y: -5,
                 vx: 0,
                 vy: 0.3 + Math.random() * 0.25,
-                vida: vidaMax,
-                vidaMax,
+                vida: vm,
+                vidaMax: vm,
                 r: c[0],
                 g: c[1],
                 b: c[2],
@@ -244,7 +364,6 @@ function emitir(est) {
                 tam: 3.5 + Math.random() * 2.5,
             });
         }
-        // Destello de luz ocasional
         if (t % 9 === 0 && Math.random() < 0.4) {
             partic.push({
                 x: Math.random() * W,
@@ -262,7 +381,6 @@ function emitir(est) {
             });
         }
     } else if (id === 'verano') {
-        // Motas de polvo flotando
         if (t % 5 === 0) {
             partic.push({
                 x: Math.random() * W,
@@ -280,25 +398,17 @@ function emitir(est) {
             });
         }
     } else if (id === 'otono') {
-        // Hojas con ráfaga
         if (t % 3 === 0) {
-            const palHoja = [
-                [210, 80, 30],
-                [230, 150, 40],
-                [140, 50, 20],
-                [180, 100, 20],
-                [200, 120, 50],
-            ];
-            const c = palHoja[Math.floor(Math.random() * palHoja.length)];
+            const c = PALETAS_HOJA[Math.floor(Math.random() * PALETAS_HOJA.length)];
             const mult = est.rafActiva ? 2.5 : 1;
-            const vidaMax = 90 + Math.floor(Math.random() * 50);
+            const vm = 90 + Math.floor(Math.random() * 50);
             partic.push({
                 x: Math.random() * W,
                 y: -5,
                 vx: (-0.8 - Math.random() * 1.4) * mult,
                 vy: 0.4 + Math.random() * 0.8,
-                vida: vidaMax,
-                vidaMax,
+                vida: vm,
+                vidaMax: vm,
                 r: c[0],
                 g: c[1],
                 b: c[2],
@@ -307,7 +417,6 @@ function emitir(est) {
                 tam: 2 + Math.random() * 2,
             });
         }
-        // Lluvia suave de otoño
         if (t % 4 === 0) {
             partic.push({
                 x: Math.random() * (W + 20),
@@ -328,9 +437,8 @@ function emitir(est) {
 }
 
 function actualizar(est) {
-    const { id } = est;
+    const { id, t } = est;
 
-    // Relámpago (invierno)
     if (id === 'invierno') {
         est.relCount++;
         if (est.relCount >= est.relProx && est.relFrames === 0) {
@@ -343,7 +451,6 @@ function actualizar(est) {
         else if (est.relFade > 0) est.relFade--;
     }
 
-    // Ráfaga de viento (otoño)
     if (id === 'otono') {
         est.rafCounter++;
         if (!est.rafActiva && est.rafCounter >= est.rafProx) {
@@ -352,14 +459,9 @@ function actualizar(est) {
             est.rafProx = 200 + Math.floor(Math.random() * 100);
             est.rafCounter = 0;
         }
-        if (est.rafActiva) {
-            est.rafFrames--;
-            if (est.rafFrames <= 0) est.rafActiva = false;
-        }
+        if (est.rafActiva && --est.rafFrames <= 0) est.rafActiva = false;
     }
 
-    // Actualizar partículas
-    const t = est.t;
     const vivas = [];
     for (const p of est.partic) {
         if (p.tipo === 'petalo') {
@@ -377,56 +479,11 @@ function actualizar(est) {
     est.t++;
 }
 
-function renderPanel(ctx, est, vineta) {
-    const { id, t } = est;
-    const pal = PAL[id];
+function renderParticulas(ctx, partic, t) {
     const pi2 = Math.PI * 2;
-
-    // Fondo (offscreen: cielo + montañas)
-    ctx.drawImage(est.bg, 0, 0);
-
-    // Brillo o parpadeo de ambiente
-    if (pal.dia) {
-        const brillo = 0.05 + Math.sin(t * 0.002) * 0.02;
-        ctx.fillStyle = 'rgba(255,240,180,' + brillo.toFixed(3) + ')';
-        ctx.fillRect(0, 0, W, H * 0.5);
-    } else if (id !== 'otono') {
-        // Parpadeo de estrellas nocturnas
-        const parpadeo = 0.85 + Math.sin(t * 0.003) * 0.15;
-        ctx.globalAlpha = parpadeo;
-        ctx.fillStyle = 'rgba(200,220,255,0.6)';
-        for (let i = 0; i < 5; i++) {
-            const sx = (i * 53 + 17) % W;
-            const sy = (i * 41 + 7) % (H / 2);
-            if (Math.sin(t * 0.005 + i * 1.7) > 0.3) ctx.fillRect(sx, sy, 1, 1);
-        }
-        ctx.globalAlpha = 1;
-    }
-
-    // Suelo sólido (3 filas de tiles)
-    ctx.fillStyle = pal.suelo;
-    ctx.fillRect(0, SUELO_Y, W, H - SUELO_Y);
-
-    // Plataformas en distintas alturas
-    ctx.fillStyle = pal.plat;
-    ctx.fillRect(55, H * 0.625, 5 * TAM, TAM);
-    ctx.fillRect(210, H * 0.53, 5 * TAM, TAM);
-    ctx.fillRect(350, H * 0.66, 4 * TAM, TAM);
-
-    // Hueco de abismo en el suelo
-    ctx.clearRect(290, SUELO_Y, 3 * TAM, H - SUELO_Y);
-    // Glow naranja hacia arriba desde el abismo
-    const glowA = ctx.createLinearGradient(290, SUELO_Y, 290, SUELO_Y - 3 * TAM);
-    glowA.addColorStop(0, 'rgba(255,100,20,0.28)');
-    glowA.addColorStop(1, 'rgba(255,100,20,0)');
-    ctx.fillStyle = glowA;
-    ctx.fillRect(290, SUELO_Y - 3 * TAM, 3 * TAM, 3 * TAM);
-
-    // Partículas
-    for (const p of est.partic) {
-        const vidaRatio = p.vida / p.vidaMax;
-        const alpha = vidaRatio > 0.15 ? p.alpha : (vidaRatio / 0.15) * p.alpha;
-        const a = Math.max(0, Math.min(1, alpha));
+    for (const p of partic) {
+        const vr = p.vida / p.vidaMax;
+        const a = Math.max(0, Math.min(1, vr > 0.15 ? p.alpha : (vr / 0.15) * p.alpha));
         if (a < 0.01) continue;
 
         ctx.fillStyle = 'rgba(' + p.r + ',' + p.g + ',' + p.b + ',' + a.toFixed(2) + ')';
@@ -464,20 +521,23 @@ function renderPanel(ctx, est, vineta) {
         } else if (p.tipo === 'lluvia-suave') {
             ctx.fillRect(p.x, p.y, 0.5, 3);
         } else {
-            // polvo
-            const mitad = p.tam / 2;
-            ctx.fillRect(p.x - mitad, p.y - mitad, p.tam, p.tam);
+            const m = p.tam / 2;
+            ctx.fillRect(p.x - m, p.y - m, p.tam, p.tam);
         }
     }
+}
 
-    // Efectos especiales por clima
+// ─── Efectos especiales de clima ──────────────────────────────────────────────
+
+function renderEfectosClima(ctx, est) {
+    const { id, t } = est;
+
     if (id === 'invierno') {
         if (est.relFrames > 0) {
             ctx.fillStyle = 'rgba(200,170,255,0.70)';
             ctx.fillRect(0, 0, W, H);
         } else if (est.relFade > 0) {
-            const f = est.relFade / 9;
-            ctx.fillStyle = 'rgba(200,170,255,' + (0.7 * f).toFixed(3) + ')';
+            ctx.fillStyle = 'rgba(200,170,255,' + ((0.7 * est.relFade) / 9).toFixed(3) + ')';
             ctx.fillRect(0, 0, W, H);
         }
     } else if (id === 'primavera') {
@@ -495,37 +555,102 @@ function renderPanel(ctx, est, vineta) {
         ctx.fillRect(0, 0, W, H);
     } else if (id === 'otono' && est.rafActiva) {
         ctx.fillStyle = 'rgba(200,160,80,0.08)';
+        for (let i = 0; i < 5; i++) ctx.fillRect(0, H * 0.3 + i * 25, W, 2);
+    }
+}
+
+// ─── Render El Abismo ─────────────────────────────────────────────────────────
+
+function renderPanelAbismo(ctx, est, vineta) {
+    const { id, t } = est;
+    const pal = PAL_ABISMO[id];
+
+    ctx.drawImage(est.bg, 0, 0);
+
+    if (pal.dia) {
+        const b = 0.05 + Math.sin(t * 0.002) * 0.02;
+        ctx.fillStyle = 'rgba(255,240,180,' + b.toFixed(3) + ')';
+        ctx.fillRect(0, 0, W, H * 0.5);
+    } else if (id !== 'otono') {
+        ctx.globalAlpha = 0.85 + Math.sin(t * 0.003) * 0.15;
+        ctx.fillStyle = 'rgba(200,220,255,0.6)';
         for (let i = 0; i < 5; i++) {
-            ctx.fillRect(0, H * 0.3 + i * 25, W, 2);
+            if (Math.sin(t * 0.005 + i * 1.7) > 0.3)
+                ctx.fillRect((i * 53 + 17) % W, (i * 41 + 7) % (H / 2), 1, 1);
         }
+        ctx.globalAlpha = 1;
     }
 
-    // Tinte ambiental
+    // Suelo y plataformas representativas del mapa
+    ctx.fillStyle = pal.suelo;
+    ctx.fillRect(0, SUELO_Y, W, H - SUELO_Y);
+    ctx.fillStyle = pal.plat;
+    ctx.fillRect(55, H * 0.625, 5 * TAM, TAM);
+    ctx.fillRect(210, H * 0.53, 5 * TAM, TAM);
+    ctx.fillRect(350, H * 0.66, 4 * TAM, TAM);
+
+    // Hueco de abismo
+    ctx.clearRect(290, SUELO_Y, 3 * TAM, H - SUELO_Y);
+    const gA = ctx.createLinearGradient(290, SUELO_Y, 290, SUELO_Y - 3 * TAM);
+    gA.addColorStop(0, 'rgba(255,100,20,0.28)');
+    gA.addColorStop(1, 'rgba(255,100,20,0)');
+    ctx.fillStyle = gA;
+    ctx.fillRect(290, SUELO_Y - 3 * TAM, 3 * TAM, 3 * TAM);
+
+    renderParticulas(ctx, est.partic, t);
+    renderEfectosClima(ctx, est);
+
     if (pal.tinte) {
-        const [r, g, b, a2] = pal.tinte;
-        ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + a2 + ')';
+        const [r, g, b, a] = pal.tinte;
+        ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
         ctx.fillRect(0, 0, W, H);
     }
 
-    // Viñeta (offscreen)
     ctx.drawImage(vineta, 0, 0);
 }
 
-// --- Montaje de DOM y loop ---
+// ─── Render El Laberinto 3D ───────────────────────────────────────────────────
 
-function iniciarClimaShowcase() {
-    const contenedor = document.getElementById('climaShowcase');
+function renderPanel3D(ctx, est, vineta) {
+    const { id, t } = est;
+    const pal = PAL_3D[id];
+
+    ctx.drawImage(est.bg, 0, 0);
+
+    // Pulso del glow de antorchas (animado)
+    const pulso = 0.18 + Math.sin(t * 0.06) * 0.07;
+    for (const ax of [W * 0.28, W * 0.72]) {
+        const gT = ctx.createRadialGradient(ax, H * 0.46, 0, ax, H * 0.46, 20);
+        gT.addColorStop(0, 'rgba(255,160,40,' + pulso.toFixed(3) + ')');
+        gT.addColorStop(1, 'rgba(255,100,10,0)');
+        ctx.fillStyle = gT;
+        ctx.fillRect(ax - 24, H * 0.34, 48, 48);
+    }
+
+    renderParticulas(ctx, est.partic, t);
+    renderEfectosClima(ctx, est);
+
+    if (pal.tinte) {
+        ctx.fillStyle = pal.tinte;
+        ctx.fillRect(0, 0, W, H);
+    }
+
+    ctx.drawImage(vineta, 0, 0);
+}
+
+// ─── Montaje de sección ───────────────────────────────────────────────────────
+
+function montarSeccion(contenedorId, renderFn, generarBgFn) {
+    const contenedor = document.getElementById(contenedorId);
     if (!contenedor) return;
 
     const vineta = generarVineta();
     const paneles = [];
 
     for (const clima of CLIMAS) {
-        // Card
         const card = document.createElement('div');
         card.className = 'card';
 
-        // Canvas nativo 480x270, mostrado a 240x135
         const canvas = document.createElement('canvas');
         canvas.width = W;
         canvas.height = H;
@@ -544,23 +669,23 @@ function iniciarClimaShowcase() {
         card.append(canvas, nombre, sub);
         contenedor.appendChild(card);
 
-        paneles.push({
-            ctx: canvas.getContext('2d'),
-            est: crearEstado(clima.id),
-        });
+        const est = crearEstado(clima.id);
+        est.bg = generarBgFn(clima.id);
+        paneles.push({ ctx: canvas.getContext('2d'), est });
     }
 
-    // Loop compartido para todos los paneles
     function loop() {
         for (const { ctx, est } of paneles) {
             emitir(est);
             actualizar(est);
-            renderPanel(ctx, est, vineta);
+            renderFn(ctx, est, vineta);
         }
         requestAnimationFrame(loop);
     }
-
     requestAnimationFrame(loop);
 }
 
-iniciarClimaShowcase();
+// ─── Inicio ───────────────────────────────────────────────────────────────────
+
+montarSeccion('climaShowcaseAbismo', renderPanelAbismo, generarBgAbismo);
+montarSeccion('climaShowcase3D', renderPanel3D, generarBg3D);
