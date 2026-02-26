@@ -72,10 +72,14 @@ function emitirParticulasClimaLab(ancho, alto) {
     } else if (climaEstacion === 'primavera') {
         if (climaFrame % 4 === 0) {
             const paletas = [
-                [230, 80, 130],
-                [220, 60, 110],
-                [200, 80, 160],
-                [245, 110, 150],
+                [230, 80, 130],   // rosa fucsia
+                [220, 60, 110],   // cerezo
+                [200, 80, 200],   // violeta
+                [245, 160, 60],   // naranja durazno
+                [80, 180, 220],   // celeste
+                [255, 220, 60],   // amarillo pollito
+                [160, 220, 80],   // verde lima
+                [240, 130, 180],  // rosa claro
             ];
             const c = paletas[Math.floor(Math.random() * paletas.length)];
             const vidaMax = 140 + Math.floor(Math.random() * 80);

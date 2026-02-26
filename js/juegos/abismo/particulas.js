@@ -440,12 +440,15 @@ export function emitirClima(estacion, anchoCanvas, camaraX, camaraY) {
     } else if (estacion === 'primavera') {
         // Pétalos: cada 4 frames — colores saturados rosados/fucsia, tamaño mayor
         if (frameCount % 4 === 0) {
-            // Alternar entre rosa fucsia, cerezo y lavanda para que se vean claramente como pétalos
             const paletas = [
                 [230, 80, 130],   // rosa fucsia
-                [220, 60, 110],   // cerezo intenso
-                [200, 80, 160],   // magenta-lavanda
-                [245, 110, 150],  // rosa coral
+                [220, 60, 110],   // cerezo
+                [200, 80, 200],   // violeta
+                [245, 160, 60],   // naranja durazno
+                [80, 180, 220],   // celeste
+                [255, 220, 60],   // amarillo pollito
+                [160, 220, 80],   // verde lima
+                [240, 130, 180],  // rosa claro
             ];
             const c = paletas[Math.floor(Math.random() * paletas.length)];
             // vidaMax variable sirve como semilla de fase para la oscilación

@@ -286,11 +286,11 @@ function emitirClima3D(estacion, jugadorX, jugadorY) {
                 p.vida = 120 + Math.floor(Math.random() * 60);
                 p.vidaMax = p.vida;
                 p.tipo = 'petalo-3d';
-                // Colores rosados saturados (no blancos)
-                const pIdx = Math.floor(Math.random() * 4);
-                p.r = [230, 220, 200, 245][pIdx];
-                p.g = [80, 60, 80, 110][pIdx];
-                p.b = [130, 110, 160, 150][pIdx];
+                // Pétalos multicolores
+                const pIdx = Math.floor(Math.random() * 8);
+                p.r = [230, 220, 200, 245, 80,  255, 160, 240][pIdx];
+                p.g = [80,  60,  80,  160, 180, 220, 220, 130][pIdx];
+                p.b = [130, 110, 200, 60,  220, 60,  80,  180][pIdx];
                 p.alpha = 0.85;
                 p.tamano = 3 + Math.random() * 1.5;
             }
