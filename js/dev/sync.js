@@ -1,13 +1,14 @@
 // Dev-only: sincronizar clics entre desktop y mobile preview via BroadcastChannel.
-// Inyectado por BrowserSync en todas las páginas (bs-config.js). No entra en build.
+// Solo carga en localhost (ver index.html). No entra en build de producción.
 //
-// - Ventana principal (desktop): captura clics y los emite al canal
-// - Dentro de iframe (mobile preview): recibe y reproduce los clics
+// Ambas instancias (desktop e iframe) envían y reciben clics.
+// El flag `reproduciendo` evita que los clics reproducidos se re-emitan.
 
 (function () {
     if (!window.BroadcastChannel) return;
 
     const bc = new BroadcastChannel('relatario-dev-sync');
+    let reproduciendo = false;
 
     // Construye un selector CSS estable para el elemento clickeado
     function obtenerSelector(el) {
@@ -30,26 +31,24 @@
         return partes.join(' > ');
     }
 
-    if (window === window.top) {
-        // Ventana principal (desktop): enviar clics al canal
-        document.addEventListener(
-            'click',
-            function (e) {
-                bc.postMessage({ selector: obtenerSelector(e.target) });
-            },
-            true
-        );
-    } else {
-        // Dentro de iframe (mobile): recibir y reproducir clics
-        let reproduciendo = false;
-        bc.onmessage = function (e) {
-            if (reproduciendo || !e.data.selector) return;
-            const el = document.querySelector(e.data.selector);
-            if (el) {
-                reproduciendo = true;
-                el.click();
-                reproduciendo = false;
-            }
-        };
-    }
+    // Enviar clics al canal (ignorar los que son reproducción)
+    document.addEventListener(
+        'click',
+        function (e) {
+            if (reproduciendo) return;
+            bc.postMessage({ selector: obtenerSelector(e.target) });
+        },
+        true
+    );
+
+    // Recibir y reproducir clics del otro lado
+    bc.onmessage = function (e) {
+        if (!e.data.selector) return;
+        const el = document.querySelector(e.data.selector);
+        if (el) {
+            reproduciendo = true;
+            el.click();
+            reproduciendo = false;
+        }
+    };
 })();
