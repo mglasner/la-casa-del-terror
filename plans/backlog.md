@@ -25,6 +25,7 @@
 | 19 | [Rediseno del mapa con rutas alternativas en El Abismo](#19-rediseno-del-mapa-con-rutas-alternativas-en-el-abismo) | Media-Baja | [x] |
 | 20 | [Boss con patrones de ataque en El Abismo](#20-boss-con-patrones-de-ataque-en-el-abismo) | Media | [ ] |
 | 21 | [Generacion procedural de secciones en El Abismo](#21-generacion-procedural-de-secciones-en-el-abismo) | Media | [ ] |
+| 22 | [Archienemigos: rivalidades narrativas en los juegos](#22-archienemigos-rivalidades-narrativas-en-los-juegos) | Media | [ ] |
 
 ---
 
@@ -374,3 +375,77 @@ Reemplazar el mapa hardcodeado por un sistema de secciones modulares que se ensa
 - **Semilla opcional**: guardar la semilla para poder compartir niveles ("prueba la semilla 4521")
 
 **Por que es importante**: Cada partida es un nivel diferente, lo que multiplica la rejugabilidad drasticamente. "A ver que me toca hoy" genera expectativa.
+
+---
+
+## 22. Archienemigos: rivalidades narrativas en los juegos
+
+**Dificultad: Media** | Archivos: `datos/personajes.yaml`, `datos/enemigos.yaml`, `js/juegos/*/`, `css/juegos/comun.css`
+
+Cuando un heroe se encuentra con su archienemigo en cualquier juego, ambos se reconocen con un efecto visual dramatico y el villano gana un buff temporal. Las rivalidades surgen de las historias de los personajes.
+
+### Pares de archienemigos (confirmados por el lore)
+
+Definidos en los YAML con un campo `archienemigo` que referencia al rival:
+
+| Heroe | Villano | Relacion narrativa |
+|-------|---------|-------------------|
+| Rose | La Grotesca | Grotesca era "Bella Estrella" hasta que Rose la vencio en tela aerea. Rivalidad de circo |
+| Lina | El Disonante | El Disonante odia el K-pop y afino su arco al saber que Lina entro a El Relatario. Rivalidad musical |
+| DonBu | Pototo | Padre vs hija rebelde mayor. Travesura vs autoridad |
+| DonBu | Topete | Padre vs hija rebelde menor. Berrinches vs paciencia |
+
+Se pueden agregar mas pares a futuro conforme se creen las historias que los conecten.
+
+### Deteccion del encuentro
+
+Al iniciar cualquier juego, verificar si el heroe elegido tiene archienemigo y si ese enemigo esta presente en la partida (los enemigos se asignan aleatoriamente, asi que el encuentro es un evento raro y especial). Al detectarse:
+
+1. **Toast narrativo**: mensaje tematico del encuentro (ej: "¡La Grotesca reconoce a Rose! Su furia se desata...")
+2. **Efecto visual**: resplandor rojo pulsante en el villano + resplandor verde en el heroe, duracion ~3 segundos
+3. **Buff al villano**: +25% velocidad y +20% dano durante toda la partida (la furia lo potencia)
+4. **Buff al heroe** (opcional): +10% velocidad (la motivacion lo impulsa) o ningun buff (para que el encuentro sea un desafio extra)
+
+### Efectos por juego
+
+- **El Abismo**: al aparecer el esbirro/boss archienemigo, pausa breve + efecto visual + toast. El enemigo tiene aura roja permanente sutil como recordatorio
+- **El Laberinto**: al entrar en rango de vision del archienemigo, efecto visual + toast. El enemigo persigue con mas determinacion (velocidad boosteada)
+- **El Memorice**: al voltear la carta del archienemigo, flash rojo en la carta + toast. Las cartas del archienemigo se mezclan con mas frecuencia (si dificultad dificil) o se revelan menos tiempo (modo relampago)
+- **El Ajedrez**: al capturar una pieza archienemiga, animacion especial de confrontacion. Puramente estetico
+
+### Efecto visual (resplandor)
+
+Aura pulsante usando canvas para los juegos de canvas (Abismo, Laberinto) y CSS `box-shadow` animado para los juegos DOM (Memorice, Ajedrez):
+
+- **Villano**: `box-shadow: 0 0 20px rgba(255, 50, 50, 0.8)` pulsando, color rojo furia
+- **Heroe**: `box-shadow: 0 0 20px rgba(50, 255, 100, 0.8)` pulsando, color verde determinacion
+- En canvas: dibujar circulo con gradiente radial detras del sprite, opacidad oscilante via `Math.sin(frame * 0.1)`
+
+### Datos YAML
+
+```yaml
+# personajes.yaml
+Rose:
+    archienemigo: La Grotesca
+    # ...resto de campos existentes
+
+# enemigos.yaml
+La Grotesca:
+    archienemigo: Rose
+    # ...resto de campos existentes
+```
+
+El campo es bidireccional (ambos referencian al otro) para busquedas rapidas desde cualquier lado. `build-datos.js` valida que las referencias sean consistentes.
+
+### Caso especial: DonBu y sus hijas
+
+DonBu tiene DOS archienemigas (Pototo y Topete). El campo puede ser un array:
+
+```yaml
+DonBu:
+    archienemigo: [Pototo, Topete]
+```
+
+El tono del encuentro es distinto: no es furia sino exasperacion paterna. El toast podria ser: "¡DonBu ve a Pototo! Suspira profundo..." y en vez de aura roja, Pototo/Topete tienen aura morada (travesura). El buff tambien puede ser menor o diferente (las hijas se vuelven mas esquivas en vez de mas fuertes).
+
+**Por que es divertido**: Transforma encuentros aleatorios en momentos narrativos memorables. "¡Me toco La Grotesca jugando con Rose!" genera emocion porque el jugador conoce la historia. Incentiva probar distintos heroes para buscar los encuentros. Y el buff al villano convierte la rivalidad en un desafio real — no es solo cosmetico, cambia la partida.
