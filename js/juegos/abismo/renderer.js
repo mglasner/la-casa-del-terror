@@ -101,18 +101,20 @@ function dibujarFlecha(ctx, x1, y1, x2, y2, x3, y3) {
 
 // --- Funciones publicas ---
 
-export function renderizarTiles(ctx, camaraX, anchoCanvas, bossVivo, tiempo) {
+export function renderizarTiles(ctx, camaraX, camaraY, anchoCanvas, altoCanvas, bossVivo, tiempo) {
     const filas = obtenerFilas();
     const cols = obtenerColumnas();
 
     const colInicio = Math.max(0, Math.floor(camaraX / TAM));
     const colFin = Math.min(cols, Math.ceil((camaraX + anchoCanvas) / TAM));
+    const filaInicio = Math.max(0, Math.floor(camaraY / TAM));
+    const filaFin = Math.min(filas, Math.ceil((camaraY + altoCanvas) / TAM));
 
-    for (let fila = 0; fila < filas; fila++) {
+    for (let fila = filaInicio; fila < filaFin; fila++) {
         for (let col = colInicio; col < colFin; col++) {
             const tipo = obtenerTile(fila, col);
             const px = col * TAM - camaraX;
-            const py = fila * TAM;
+            const py = fila * TAM - camaraY;
 
             if (tipo === T.SUELO) {
                 dibujarTile(ctx, 'SUELO', COL.colorSuelo, fila, col, px, py);

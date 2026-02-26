@@ -263,14 +263,14 @@ export function obtenerEscala() {
     return escalaJugador;
 }
 
-export function renderizarJugador(ctx, camaraX) {
+export function renderizarJugador(ctx, camaraX, camaraY) {
     if (!jugadorRef) return;
 
     // Parpadeo de invulnerabilidad
     if (invulFrames > 0 && Math.floor(invulFrames / 4) % 2 === 0) return;
 
     const drawX = Math.round(x - camaraX);
-    const drawY = Math.round(y);
+    const drawY = Math.round(y - camaraY);
 
     // Intentar usar sprite
     const sprite = obtenerSpriteJugador(estado, frameAnim);

@@ -189,7 +189,7 @@ export function actualizarEnemigos() {
     }
 }
 
-export function renderizarEnemigos(ctx, camaraX) {
+export function renderizarEnemigos(ctx, camaraX, camaraY) {
     for (let i = 0; i < enemigos.length; i++) {
         const e = enemigos[i];
         const sdw = e.spriteDrawW;
@@ -209,11 +209,13 @@ export function renderizarEnemigos(ctx, camaraX) {
                     const sx = Math.round(
                         e.x - camaraX - (sdw - e.ancho) / 2 + (sdw * (1 - escalaMuerte)) / 2
                     );
-                    const sy = Math.round(e.y - (sdh - e.alto) + sdh * (1 - escalaMuerte));
+                    const sy = Math.round(
+                        e.y - camaraY - (sdh - e.alto) + sdh * (1 - escalaMuerte)
+                    );
                     ctx.drawImage(sheetSprite, sx, sy, sw, sh);
                 } else {
                     const drawX = Math.round(e.x - camaraX + (e.ancho * (1 - escalaMuerte)) / 2);
-                    const drawY = Math.round(e.y + e.alto * (1 - escalaMuerte));
+                    const drawY = Math.round(e.y - camaraY + e.alto * (1 - escalaMuerte));
                     const w = Math.round(e.ancho * escalaMuerte);
                     const h = Math.round(e.alto * escalaMuerte);
                     ctx.fillStyle = e.esBoss ? COL.colorBoss : COL.colorEnemigo;
@@ -228,7 +230,7 @@ export function renderizarEnemigos(ctx, camaraX) {
         if (e.invulStomp > 0 && Math.floor(e.invulStomp / 4) % 2 === 0) continue;
 
         const hitboxX = Math.round(e.x - camaraX);
-        const hitboxY = Math.round(e.y);
+        const hitboxY = Math.round(e.y - camaraY);
 
         // Estado de animacion (stun o quieto → idle, moviéndose → patrulla)
         const estadoAnim = e.stunFrames <= 0 && Math.abs(e.vx) > 0.1 ? 'patrulla' : 'idle';

@@ -26,7 +26,7 @@ import {
     iniciarCamara,
     actualizarCamara,
     obtenerCamaraX,
-    obtenerShakeY,
+    obtenerCamaraY,
     estaCongelada,
     sacudir,
     congelar,
@@ -234,21 +234,24 @@ function verificarVictoria() {
 
 // --- Emision de particulas ambientales ---
 
-function emitirParticulasAmbientales(camaraX) {
+function emitirParticulasAmbientales(camaraX, camaraY) {
     const frameNum = obtenerFrameCount();
     const cols = obtenerColumnas();
+    const filas = obtenerFilas();
     const colInicio = Math.max(1, Math.floor(camaraX / TAM));
     const colFin = Math.min(cols - 1, Math.ceil((camaraX + est.anchoCanvas) / TAM));
+    const filaInicio = Math.max(0, Math.floor(camaraY / TAM));
+    const filaFin = Math.min(filas, Math.ceil((camaraY + est.altoCanvas) / TAM));
 
-    // Niebla del abismo: cada 5 frames, emitir a lo largo del subsuelo
-    if (frameNum % 5 === 0 && est.filaNiebla >= 0) {
+    // Niebla del abismo: cada 5 frames (solo si fila visible, con margen para float)
+    if (frameNum % 5 === 0 && est.filaNiebla >= filaInicio - 3 && est.filaNiebla <= filaFin) {
         for (let col = colInicio; col < colFin; col += 3) {
             emitirNieblaAbismo(col * TAM, est.filaNiebla * TAM);
         }
     }
 
-    // Ojos en la oscuridad: cada ~120 frames
-    if (frameNum % 120 === 0 && est.filaOjos >= 0) {
+    // Ojos en la oscuridad: cada ~120 frames (solo si fila visible)
+    if (frameNum % 120 === 0 && est.filaOjos >= filaInicio && est.filaOjos <= filaFin) {
         for (let col = colInicio; col < colFin; col += 5) {
             if (Math.random() < 0.3) {
                 emitirOjosAbismo(col * TAM, est.filaOjos * TAM);
@@ -258,20 +261,21 @@ function emitirParticulasAmbientales(camaraX) {
     }
 
     // Particulas por variante de abismo (fuego, cristales, pantano)
-    const filaSuelo = obtenerFilas() - 3;
     if (frameNum % 3 === 0) {
         const tipoAbis = CFG.tiles.tipos.ABISMO;
         for (let col = colInicio; col < colFin; col += 2) {
-            if (obtenerTile(filaSuelo, col) !== tipoAbis) continue;
-            const va = tipoAbismo(filaSuelo, col);
-            const abX = col * TAM;
-            const abY = filaSuelo * TAM;
-            if (va === 'FUEGO') {
-                emitirChispaFuego(abX, abY);
-            } else if (va === 'CRISTALES') {
-                emitirDestellosCristal(abX, abY);
-            } else if (va === 'PANTANO') {
-                emitirBurbujaPantano(abX, abY);
+            for (let fila = filaInicio; fila < filaFin; fila++) {
+                if (obtenerTile(fila, col) !== tipoAbis) continue;
+                const va = tipoAbismo(fila, col);
+                const abX = col * TAM;
+                const abY = fila * TAM;
+                if (va === 'FUEGO') {
+                    emitirChispaFuego(abX, abY);
+                } else if (va === 'CRISTALES') {
+                    emitirDestellosCristal(abX, abY);
+                } else if (va === 'PANTANO') {
+                    emitirBurbujaPantano(abX, abY);
+                }
             }
         }
     }
@@ -316,7 +320,8 @@ const gameLoop4 = crearGameLoop(function (_tiempo, _dt) {
 
     // Freeze frame: solo renderizar, no actualizar
     if (estaCongelada()) {
-        actualizarCamara(obtenerPosicion().x);
+        const pos = obtenerPosicion();
+        actualizarCamara(pos.x, pos.y);
         renderFrame();
         return;
     }
@@ -332,12 +337,13 @@ const gameLoop4 = crearGameLoop(function (_tiempo, _dt) {
 
     // Camara
     const jug = obtenerPosicion();
-    actualizarCamara(jug.x);
+    actualizarCamara(jug.x, jug.y);
 
     // Particulas
     emitirParticulasJugador();
     const camX = obtenerCamaraX();
-    emitirParticulasAmbientales(camX);
+    const camY = obtenerCamaraY();
+    emitirParticulasAmbientales(camX, camY);
     actualizarParticulas();
 
     // Render
@@ -346,39 +352,31 @@ const gameLoop4 = crearGameLoop(function (_tiempo, _dt) {
 
 function renderFrame() {
     const camX = obtenerCamaraX();
-    const shakeY = obtenerShakeY();
+    const camY = obtenerCamaraY();
     const tiempo = Date.now();
 
     // DPR base transform (coordenadas de juego → pixels de canvas)
     const dpr = obtenerDPR();
     est.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    // Aplicar shake vertical
-    est.ctx.save();
-    if (shakeY !== 0) {
-        est.ctx.translate(0, shakeY);
-    }
-
     // Fondo parallax (reemplaza fillRect solido)
     renderizarParallax(est.ctx, camX, tiempo);
 
     // Tiles con texturas
-    renderizarTiles(est.ctx, camX, est.anchoCanvas, esBossVivo(), tiempo);
+    renderizarTiles(est.ctx, camX, camY, est.anchoCanvas, est.altoCanvas, esBossVivo(), tiempo);
 
     // Particulas detras de personajes (niebla, aura)
-    renderizarParticulas(est.ctx, camX, est.anchoCanvas);
+    renderizarParticulas(est.ctx, camX, camY, est.anchoCanvas, est.altoCanvas);
 
     // Enemigos y jugador
-    renderizarEnemigos(est.ctx, camX);
-    renderizarJugador(est.ctx, camX);
+    renderizarEnemigos(est.ctx, camX, camY);
+    renderizarJugador(est.ctx, camX, camY);
 
     // Vineta
     renderizarVineta(est.ctx);
 
     // Flash blanco
     renderizarFlash(est.ctx, est.anchoCanvas, est.altoCanvas, obtenerFlashAlpha());
-
-    est.ctx.restore();
 
     // HUD jugador via overlay HTML (vida del jugador)
     actualizarHUDJugador(est.jugador.vidaActual, est.jugador.vidaMax);
@@ -459,7 +457,7 @@ export function iniciarAbismo(jugadorRef, callback, dpadArgumento) {
     iniciarSpritesEnemigos();
 
     // Iniciar sistemas de juego
-    iniciarCamara(est.anchoCanvas);
+    iniciarCamara(est.anchoCanvas, est.altoCanvas);
     iniciarJugador(jugadorRef, est.teclasRef);
     iniciarEnemigos(spawns.enemigos, spawns.boss);
 

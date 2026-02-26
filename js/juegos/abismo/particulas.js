@@ -1,5 +1,5 @@
 // Habitacion 4 — El Abismo: Sistema de particulas 2D
-// Pool preallocado de 200 particulas con culling horizontal
+// Pool preallocado de 200 particulas con culling horizontal y vertical
 // Optimizado: puntero circular para busqueda O(1) amortizada y conteo de activas
 
 import { esSolido } from './fisicas.js';
@@ -393,7 +393,7 @@ export function actualizarParticulas() {
     activeCount = vivas;
 }
 
-export function renderizarParticulas(ctx, camaraX, anchoCanvas) {
+export function renderizarParticulas(ctx, camaraX, camaraY, anchoCanvas, altoCanvas) {
     // Early-exit: nada que renderizar
     if (activeCount === 0) return;
 
@@ -406,7 +406,9 @@ export function renderizarParticulas(ctx, camaraX, anchoCanvas) {
         const px = p.x - camaraX;
         if (px < -p.tamano || px > anchoCanvas + p.tamano) continue;
 
-        const py = p.y;
+        // Culling vertical
+        const py = p.y - camaraY;
+        if (py < -p.tamano || py > altoCanvas + p.tamano) continue;
 
         if (p.alpha <= 0.01) continue;
 
