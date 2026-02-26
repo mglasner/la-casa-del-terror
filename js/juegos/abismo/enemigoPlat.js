@@ -3,7 +3,13 @@
 // Boss: multiples stomps, fases de velocidad, barra de vida
 
 import { CFG } from './config.js';
-import { resolverColisionX, resolverColisionY, esSolido, enSuelo } from './fisicas.js';
+import {
+    resolverColisionX,
+    resolverColisionY,
+    esSolido,
+    enSuelo,
+    haySueloDebajo,
+} from './fisicas.js';
 import { ENEMIGOS } from '../../enemigos.js';
 import {
     obtenerSpriteEnemigo,
@@ -126,7 +132,6 @@ export function iniciarEnemigos(spawnsEnemigos, spawnBoss) {
         const patron = patronesBase[i % patronesBase.length];
         enemigos.push(crearEnemigo(spawn.col, spawn.fila, false, esbirrosDisponibles[i], patron));
     }
-
     // Crear boss: elegir un elite aleatorio
     if (spawnBoss) {
         const bossData = ELITES[Math.floor(Math.random() * ELITES.length)];
@@ -186,8 +191,9 @@ export function actualizarEnemigos() {
             }
         }
 
-        // Movimiento segun patron
-        const enPiso = enSuelo(e.x, e.y, e.ancho, e.alto);
+        // Movimiento segun patron (saltarín ignora plataformas como suelo)
+        const ignorarPlat = e.patron === 'saltarin';
+        const enPiso = enSuelo(e.x, e.y, e.ancho, e.alto, ignorarPlat);
 
         if (e.patron === 'centinela') {
             // Centinela: alterna entre marcha y pausa, elige dirección al azar
@@ -215,17 +221,28 @@ export function actualizarEnemigos() {
                 }
             }
         } else if (e.patron === 'saltarin') {
-            // Saltarín: camina en el suelo, salta vertical en el lugar
+            // Saltarín: camina en el suelo, salta avanzando (con protección anti-abismo)
             if (enPiso) {
                 e.vx = vel * e.direccion;
                 moverPatrulla(e, enPiso);
                 e.saltarinTimer--;
                 if (e.saltarinTimer <= 0) {
                     e.vy = PAT.saltarinSalto;
-                    e.saltarinTimer = PAT.saltarinIntervalo;
+                    // Jitter ±25% para evitar resonancia con el ciclo de patrulla
+                    e.saltarinTimer = Math.floor(
+                        PAT.saltarinIntervalo * (0.75 + Math.random() * 0.5)
+                    );
                 }
             } else {
-                e.vx = 0;
+                // En el aire: avanzar solo si hay suelo adelante (no caer en abismos)
+                const bordeX = e.direccion > 0 ? e.x + e.ancho + 2 : e.x - 2;
+                if (haySueloDebajo(bordeX, e.y + e.alto, 5, true)) {
+                    e.vx = vel * e.direccion;
+                    const nuevaX = resolverColisionX(e.x, e.y, e.ancho, e.alto, e.vx, false);
+                    if (nuevaX !== e.x) e.x = nuevaX;
+                } else {
+                    e.vx = 0;
+                }
             }
         } else {
             // Patrullero: movimiento continuo
@@ -237,7 +254,7 @@ export function actualizarEnemigos() {
         e.vy += CFG.fisicas.gravedad;
         if (e.vy > CFG.fisicas.velocidadMaxCaida) e.vy = CFG.fisicas.velocidadMaxCaida;
 
-        const resY = resolverColisionY(e.x, e.y, e.ancho, e.alto, e.vy);
+        const resY = resolverColisionY(e.x, e.y, e.ancho, e.alto, e.vy, ignorarPlat);
         e.y = resY.y;
         e.vy = resY.vy;
 

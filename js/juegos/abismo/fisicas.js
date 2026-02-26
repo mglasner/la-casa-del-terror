@@ -52,9 +52,13 @@ function enPlataforma(px, py) {
 }
 
 // Verifica si hay suelo o plataforma debajo de los pies
-export function enSuelo(x, y, ancho, alto) {
+// ignorarPlataformas: si true, solo cuenta suelo sólido
+export function enSuelo(x, y, ancho, alto, ignorarPlataformas) {
     const py = y + alto;
     const margen = 2;
+    if (ignorarPlataformas) {
+        return esSolido(x + margen, py) || esSolido(x + ancho - margen, py);
+    }
     return (
         esSolido(x + margen, py) ||
         esSolido(x + ancho - margen, py) ||
@@ -109,7 +113,8 @@ export function resolverColisionX(x, y, ancho, alto, dx, estaEnSuelo) {
 }
 
 // Resolver colisión vertical
-export function resolverColisionY(x, y, ancho, alto, vy) {
+// ignorarPlataformas: si true, las plataformas one-way no bloquean la caída
+export function resolverColisionY(x, y, ancho, alto, vy, ignorarPlataformas) {
     if (vy === 0) return { y, vy, enSuelo: enSuelo(x, y, ancho, alto) };
 
     const nuevaY = y + vy;
@@ -127,16 +132,18 @@ export function resolverColisionY(x, y, ancho, alto, vy) {
         }
 
         // Cayendo: revisar plataformas one-way (solo aterrizar si venia de arriba)
-        const pieAnterior = y + alto;
-        for (let i = 0; i < puntos.length; i++) {
-            const col = Math.floor(puntos[i] / TAM);
-            const fila = Math.floor(pie / TAM);
-            if (fila >= 0 && fila < obtenerFilas() && col >= 0 && col < obtenerColumnas()) {
-                if (tileEsPlataforma(obtenerTile(fila, col))) {
-                    const topePlataforma = fila * TAM;
-                    // Solo aterrizar si los pies estaban arriba del borde de la plataforma
-                    if (pieAnterior <= topePlataforma + 1) {
-                        return { y: topePlataforma - alto, vy: 0, enSuelo: true };
+        if (!ignorarPlataformas) {
+            const pieAnterior = y + alto;
+            for (let i = 0; i < puntos.length; i++) {
+                const col = Math.floor(puntos[i] / TAM);
+                const fila = Math.floor(pie / TAM);
+                if (fila >= 0 && fila < obtenerFilas() && col >= 0 && col < obtenerColumnas()) {
+                    if (tileEsPlataforma(obtenerTile(fila, col))) {
+                        const topePlataforma = fila * TAM;
+                        // Solo aterrizar si los pies estaban arriba del borde de la plataforma
+                        if (pieAnterior <= topePlataforma + 1) {
+                            return { y: topePlataforma - alto, vy: 0, enSuelo: true };
+                        }
                     }
                 }
             }
@@ -156,6 +163,23 @@ export function resolverColisionY(x, y, ancho, alto, vy) {
     }
 
     return { y: nuevaY, vy, enSuelo: false };
+}
+
+// Verifica si hay suelo debajo de un punto, buscando maxTiles tiles hacia abajo
+// soloSolido: si true, ignora plataformas (solo cuenta SUELO)
+export function haySueloDebajo(px, py, maxTiles, soloSolido) {
+    const col = Math.floor(px / TAM);
+    const filaInicio = Math.floor(py / TAM);
+    for (let i = 0; i <= maxTiles; i++) {
+        const fila = filaInicio + i;
+        if (col < 0 || col >= obtenerColumnas()) return true; // fuera lateral = seguro
+        if (fila >= obtenerFilas()) return false; // debajo del mapa = sin suelo
+        if (fila < 0) continue;
+        const tile = obtenerTile(fila, col);
+        if (tileEsSolido(tile)) return true;
+        if (!soloSolido && tileEsPlataforma(tile)) return true;
+    }
+    return false;
 }
 
 // Colisión AABB entre dos rectángulos
