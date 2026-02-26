@@ -61,6 +61,7 @@ export const est = {
     canvasMapa: null,
     ctxMapa: null,
     pantalla: null,
+    modoPortrait: null,
     contenedorLaberinto: null,
     elementoJugador: null,
     elementoLlave: null,

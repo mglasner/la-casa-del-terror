@@ -26,6 +26,7 @@ import { iniciarCountdown, actualizarVillanoElite, limpiarVillanoElite } from '.
 import { lanzarToast } from '../../componentes/toast.js';
 
 import { crearPantallaJuego } from '../../componentes/pantallaJuego.js';
+import { crearModoPortrait } from '../../componentes/modoPortrait.js';
 import { crearElemento, crearGameLoop } from '../../utils.js';
 import { notificarVictoria } from '../../eventos.js';
 
@@ -136,6 +137,10 @@ export function iniciarLaberinto(jugadorRef, callback, dpadRef) {
     // Escala visual según estatura (no afecta colisiones)
     est.escalaVisual =
         CFG.jugador.escalaVisualBase * (est.jugador.estatura / CFG.jugador.estaturaReferencia);
+
+    // Activar fullscreen y lock portrait en mobile
+    est.modoPortrait = crearModoPortrait();
+    est.modoPortrait.activar();
 
     // Crear e insertar la pantalla
     crearPantalla(!!dpadRef);
@@ -462,6 +467,11 @@ export function limpiarLaberinto() {
     document.removeEventListener('keyup', onKeyUp);
 
     est.teclas = {};
+
+    if (est.modoPortrait) {
+        est.modoPortrait.desactivar();
+        est.modoPortrait = null;
+    }
 
     if (est.pantalla) {
         est.pantalla.remove();

@@ -7,6 +7,7 @@ import { crearCarta } from './carta.js';
 import { lanzarToast } from '../../componentes/toast.js';
 import { notificarVidaCambio, notificarJugadorMuerto, notificarVictoria } from '../../eventos.js';
 import { crearPantallaJuego } from '../../componentes/pantallaJuego.js';
+import { crearModoPortrait } from '../../componentes/modoPortrait.js';
 import { crearElemento, crearTimeoutTracker } from '../../utils.js';
 
 // --- Estado del módulo ---
@@ -14,6 +15,7 @@ import { crearElemento, crearTimeoutTracker } from '../../utils.js';
 let jugador = null;
 let callbackSalir = null;
 let pantalla = null;
+let modoPortrait = null;
 const timeouts = crearTimeoutTracker();
 let indicador = null;
 let indicadorTexto = null;
@@ -331,6 +333,10 @@ export function iniciarMemorice(jugadorRef, callback, dpadRef, opciones) {
         return crearCarta(data);
     });
 
+    // Activar fullscreen y lock portrait en mobile
+    modoPortrait = crearModoPortrait();
+    modoPortrait.activar();
+
     // Crear pantalla
     crearPantalla();
 
@@ -342,6 +348,11 @@ export function iniciarMemorice(jugadorRef, callback, dpadRef, opciones) {
 export function limpiarMemorice() {
     timeouts.limpiar();
     document.removeEventListener('keydown', onKeyDown);
+
+    if (modoPortrait) {
+        modoPortrait.desactivar();
+        modoPortrait = null;
+    }
 
     if (pantalla) {
         pantalla.remove();
