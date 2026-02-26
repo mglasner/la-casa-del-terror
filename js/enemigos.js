@@ -22,7 +22,7 @@ const ENEMIGOS = {
                 arquetipo: 'aoe',
                 color: '#9b59b6',
                 colorSecundario: '#4a0080',
-                radio: 3,
+                radio: 2.5,
             },
         ],
         {
