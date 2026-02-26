@@ -56,7 +56,7 @@ export const ESTACIONES = {
  * @returns {string|null} Clave de estación ('invierno'|'primavera'|'verano'|'otono') o null (40%)
  */
 export function sortearEstacion() {
-    if (Math.random() < 0.4) return null;
+    if (Math.random() < 0.2) return null;
     const keys = Object.keys(ESTACIONES);
     return keys[Math.floor(Math.random() * keys.length)];
 }
