@@ -380,6 +380,153 @@ export function emitirImpactoSuelo(cx, cy, r, g, b) {
     }
 }
 
+// --- Estado de clima (ráfaga de otoño) ---
+
+let rafagaCounter = 0;
+let rafagaProxFrame = 180 + Math.floor(Math.random() * 120);
+let rafagaActiva = false;
+let rafagaFramesRestantes = 0;
+
+function manejarRafagaOtono() {
+    rafagaCounter++;
+    if (rafagaCounter >= rafagaProxFrame) {
+        rafagaCounter = 0;
+        rafagaProxFrame = 180 + Math.floor(Math.random() * 120);
+        rafagaActiva = true;
+        rafagaFramesRestantes = 30;
+    }
+    if (rafagaActiva) {
+        rafagaFramesRestantes--;
+        if (rafagaFramesRestantes <= 0) rafagaActiva = false;
+    }
+}
+
+// Paletas de colores para hojas de otoño [r, g, b]
+const COLORES_HOJAS = [
+    [210, 80, 30],
+    [230, 150, 40],
+    [140, 50, 20],
+];
+
+/**
+ * Emite partículas climáticas para la estación activa.
+ * Llamar cada frame desde emitirParticulasAmbientales.
+ * @param {string} estacion - Clave de estación ('invierno'|'primavera'|'verano'|'otono')
+ * @param {number} anchoCanvas - Ancho del canvas en píxeles de juego
+ * @param {number} camaraX - Posición X de la cámara en coordenadas de mundo
+ * @param {number} camaraY - Posición Y de la cámara en coordenadas de mundo
+ */
+export function emitirClima(estacion, anchoCanvas, camaraX, camaraY) {
+    if (!estacion) return;
+
+    if (estacion === 'invierno') {
+        // Lluvia: 2-3 gotas por frame desde la parte superior visible
+        const n = 2 + Math.floor(Math.random() * 2);
+        for (let i = 0; i < n; i++) {
+            emitir({
+                x: camaraX + Math.random() * anchoCanvas,
+                y: camaraY - 4,
+                vx: -1.2,
+                vy: 5.5 + Math.random() * 2,
+                vida: 20 + Math.floor(Math.random() * 8),
+                tamano: 2,
+                r: 170,
+                g: 200,
+                b: 255,
+                alpha: 0.6,
+                tipo: 'lluvia-clima',
+            });
+        }
+    } else if (estacion === 'primavera') {
+        // Pétalos: cada 3 frames
+        if (frameCount % 3 === 0) {
+            emitir({
+                x: camaraX + Math.random() * anchoCanvas,
+                y: camaraY - 4,
+                vx: Math.sin(frameCount * 0.03) * 0.6,
+                vy: 0.3 + Math.random() * 0.25,
+                vida: 160 + Math.floor(Math.random() * 80),
+                tamano: 2 + Math.random() * 2,
+                r: 247,
+                g: 197 + Math.floor(Math.random() * 30),
+                b: 213,
+                alpha: 0.7,
+                tipo: 'petalo',
+            });
+        }
+        // Destellos de luz flotantes: cada 7 frames
+        if (frameCount % 7 === 0) {
+            emitir({
+                x: camaraX + Math.random() * anchoCanvas,
+                y: camaraY + Math.random() * 120,
+                vx: 0,
+                vy: 0,
+                vida: 60 + Math.floor(Math.random() * 30),
+                tamano: 1.2,
+                r: 255,
+                g: 255,
+                b: 200,
+                alpha: 0.85,
+                tipo: 'destello-clima',
+            });
+        }
+    } else if (estacion === 'verano') {
+        // Motas de polvo flotante: cada 4 frames
+        if (frameCount % 4 === 0) {
+            emitir({
+                x: camaraX + Math.random() * anchoCanvas,
+                y: camaraY + Math.random() * 90,
+                vx: 0.1 + Math.random() * 0.15,
+                vy: 0,
+                vida: 250 + Math.floor(Math.random() * 100),
+                tamano: 1 + Math.random(),
+                r: 220,
+                g: 190,
+                b: 100,
+                alpha: 0.25 + Math.random() * 0.2,
+                tipo: 'polvo-clima',
+            });
+        }
+    } else if (estacion === 'otono') {
+        manejarRafagaOtono();
+
+        // Hojas: cada 4 frames (vx aumentado durante ráfaga)
+        if (frameCount % 4 === 0) {
+            const c = COLORES_HOJAS[Math.floor(Math.random() * 3)];
+            const baseVx = rafagaActiva ? -2.5 - Math.random() * 0.5 : -0.8 - Math.random() * 1.4;
+            emitir({
+                x: camaraX + Math.random() * anchoCanvas,
+                y: camaraY - 4,
+                vx: baseVx,
+                vy: 0.4 + Math.random() * 0.8,
+                vida: 90 + Math.floor(Math.random() * 50),
+                tamano: 2 + Math.random(),
+                r: c[0],
+                g: c[1],
+                b: c[2],
+                alpha: 0.8,
+                tipo: 'hoja',
+            });
+        }
+        // Lluvia suave de otoño: cada 2 frames
+        if (frameCount % 2 === 0) {
+            emitir({
+                x: camaraX + Math.random() * anchoCanvas,
+                y: camaraY - 4,
+                vx: -0.6,
+                vy: 2.5 + Math.random() * 1,
+                vida: 35 + Math.floor(Math.random() * 10),
+                tamano: 1.5,
+                r: 200,
+                g: 160,
+                b: 80,
+                alpha: 0.28,
+                tipo: 'lluvia-suave',
+            });
+        }
+    }
+}
+
 // --- Actualizar y renderizar ---
 
 export function actualizarParticulas() {
@@ -419,6 +566,13 @@ export function actualizarParticulas() {
             p.vy *= 0.95;
         }
 
+        // Oscilacion horizontal para pétalos y polvo de clima
+        if (p.tipo === 'petalo') {
+            p.vx = Math.sin(frameCount * 0.03 + p.x * 0.01) * 0.6;
+        } else if (p.tipo === 'polvo-clima') {
+            p.vy = Math.sin(frameCount * 0.02 + p.x * 0.05) * 0.15;
+        }
+
         p.vida--;
 
         // Fade out
@@ -441,6 +595,23 @@ export function actualizarParticulas() {
         } else if (p.tipo === 'burbuja') {
             p.vx = Math.sin(frameCount * 0.1 + p.y * 0.2) * 0.1;
             p.alpha = ratio > 0.1 ? ratio * 0.5 : 0;
+        } else if (p.tipo === 'destello-clima') {
+            // Pulso brillante oscilante
+            p.alpha = 0.85 * Math.abs(Math.sin(frameCount * 0.15 + p.x * 0.1));
+        } else if (p.tipo === 'lluvia-clima' || p.tipo === 'lluvia-suave') {
+            // Alfa constante, fade rápido al final
+            p.alpha =
+                ratio > 0.2
+                    ? p.vidaMax > 30
+                        ? 0.6
+                        : 0.28
+                    : (ratio * (p.vidaMax > 30 ? 0.6 : 0.28)) / 0.2;
+        } else if (p.tipo === 'petalo' || p.tipo === 'hoja') {
+            // Fade suave al final
+            p.alpha = ratio > 0.15 ? 0.8 : (ratio / 0.15) * 0.8;
+        } else if (p.tipo === 'polvo-clima') {
+            // Sin fade visible — la alpha base es baja
+            p.alpha = ratio > 0.3 ? p.alpha : (ratio / 0.3) * p.alpha;
         } else {
             p.alpha = ratio;
         }
@@ -481,14 +652,23 @@ export function renderizarParticulas(ctx, camaraX, camaraY, anchoCanvas, altoCan
             p.tipo === 'niebla' ||
             p.tipo === 'aura' ||
             p.tipo === 'afterimage' ||
-            p.tipo === 'burbuja'
+            p.tipo === 'burbuja' ||
+            p.tipo === 'petalo' ||
+            p.tipo === 'hoja' ||
+            p.tipo === 'destello-clima'
         ) {
             // Circulos para efecto suave
             ctx.beginPath();
             ctx.arc(px, py, p.tamano, 0, TAU);
             ctx.fill();
+        } else if (p.tipo === 'lluvia-clima') {
+            // Gota de lluvia: línea vertical delgada
+            ctx.fillRect(px, py, 1, 5);
+        } else if (p.tipo === 'lluvia-suave') {
+            // Llovizna de otoño: línea muy delgada
+            ctx.fillRect(px, py, 0.5, 3);
         } else {
-            // Cuadrados pixelados
+            // Cuadrados pixelados (polvo-clima y resto)
             const mitad = p.tamano / 2;
             ctx.fillRect(px - mitad, py - mitad, p.tamano, p.tamano);
         }
@@ -506,4 +686,7 @@ export function limpiarParticulas() {
     frameCount = 0;
     nextFree = 0;
     activeCount = 0;
+    rafagaCounter = 0;
+    rafagaActiva = false;
+    rafagaFramesRestantes = 0;
 }

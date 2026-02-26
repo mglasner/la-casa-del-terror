@@ -225,9 +225,130 @@ function emitirNiebla(jugadorX, jugadorY) {
     p.tamano = 4 + Math.random() * 2;
 }
 
+// --- Emisores de clima para el motor 3D ---
+
+// Paletas de colores para hojas 3D [r, g, b]
+const COLORES_HOJAS_3D = [
+    [210, 80, 30],
+    [230, 150, 40],
+    [140, 50, 20],
+];
+
+let climaFrame3D = 0;
+
+/**
+ * Emite partículas climáticas en el espacio 3D alrededor del jugador.
+ * @param {string} estacion - Clave de estación
+ * @param {number} jugadorX - Posición X del jugador
+ * @param {number} jugadorY - Posición Y del jugador
+ */
+function emitirClima3D(estacion, jugadorX, jugadorY) {
+    climaFrame3D++;
+
+    if (estacion === 'invierno') {
+        // Lluvia: gotas que caen desde el techo (z=1 → 0), tintadas azul-violeta
+        if (climaFrame3D % 2 === 0) {
+            const p = obtenerLibre();
+            if (p) {
+                const ang = Math.random() * Math.PI * 2;
+                const dist = 0.5 + Math.random() * 2.5;
+                p.activa = true;
+                p.x = jugadorX + Math.cos(ang) * dist;
+                p.y = jugadorY + Math.sin(ang) * dist;
+                p.z = 0.95 + Math.random() * 0.05;
+                p.vx = -0.003;
+                p.vy = 0;
+                p.vz = -0.025; // Cae rápido
+                p.vida = 40;
+                p.vidaMax = 40;
+                p.tipo = 'lluvia-3d';
+                p.r = 170;
+                p.g = 200;
+                p.b = 255;
+                p.alpha = 0.55;
+                p.tamano = 1.5;
+            }
+        }
+    } else if (estacion === 'primavera') {
+        // Pétalos: caen suavemente, oscilan
+        if (climaFrame3D % 4 === 0) {
+            const p = obtenerLibre();
+            if (p) {
+                const ang = Math.random() * Math.PI * 2;
+                const dist = 0.5 + Math.random() * 2;
+                p.activa = true;
+                p.x = jugadorX + Math.cos(ang) * dist;
+                p.y = jugadorY + Math.sin(ang) * dist;
+                p.z = 0.8 + Math.random() * 0.2;
+                p.vx = Math.sin(climaFrame3D * 0.03) * 0.001;
+                p.vy = Math.cos(climaFrame3D * 0.03) * 0.001;
+                p.vz = -0.004; // Cae lentamente
+                p.vida = 120 + Math.floor(Math.random() * 60);
+                p.vidaMax = p.vida;
+                p.tipo = 'petalo-3d';
+                p.r = 247;
+                p.g = 197 + Math.floor(Math.random() * 30);
+                p.b = 213;
+                p.alpha = 0.7;
+                p.tamano = 2 + Math.random() * 1;
+            }
+        }
+    } else if (estacion === 'verano') {
+        // Motas de polvo: flotan a media altura
+        if (climaFrame3D % 5 === 0) {
+            const p = obtenerLibre();
+            if (p) {
+                const ang = Math.random() * Math.PI * 2;
+                const dist = 0.3 + Math.random() * 3;
+                p.activa = true;
+                p.x = jugadorX + Math.cos(ang) * dist;
+                p.y = jugadorY + Math.sin(ang) * dist;
+                p.z = 0.2 + Math.random() * 0.5;
+                p.vx = (Math.random() - 0.5) * 0.001;
+                p.vy = (Math.random() - 0.5) * 0.001;
+                p.vz = 0.0005; // Flota levemente
+                p.vida = 200 + Math.floor(Math.random() * 100);
+                p.vidaMax = p.vida;
+                p.tipo = 'mota-3d';
+                p.r = 220;
+                p.g = 190;
+                p.b = 100;
+                p.alpha = 0.3;
+                p.tamano = 1.5 + Math.random();
+            }
+        }
+    } else if (estacion === 'otono') {
+        // Hojas: caen con oscilación
+        if (climaFrame3D % 3 === 0) {
+            const c = COLORES_HOJAS_3D[Math.floor(Math.random() * 3)];
+            const p = obtenerLibre();
+            if (p) {
+                const ang = Math.random() * Math.PI * 2;
+                const dist = 0.4 + Math.random() * 2.5;
+                p.activa = true;
+                p.x = jugadorX + Math.cos(ang) * dist;
+                p.y = jugadorY + Math.sin(ang) * dist;
+                p.z = 0.7 + Math.random() * 0.3;
+                p.vx = (Math.random() - 0.5) * 0.004;
+                p.vy = (Math.random() - 0.5) * 0.004;
+                p.vz = -0.006 - Math.random() * 0.003;
+                p.vida = 80 + Math.floor(Math.random() * 50);
+                p.vidaMax = p.vida;
+                p.tipo = 'hoja-3d';
+                p.r = c[0];
+                p.g = c[1];
+                p.b = c[2];
+                p.alpha = 0.75;
+                p.tamano = 2 + Math.random();
+            }
+        }
+    }
+}
+
 // Actualiza todas las partículas y emite nuevas
 // zona: zona actual del jugador (0/1/2) para efectos diferenciados
-export function actualizarParticulas(ahora, antorchas, jugadorX, jugadorY, zona) {
+// estacion: estación climática activa (null si no hay)
+export function actualizarParticulas(ahora, antorchas, jugadorX, jugadorY, zona, estacion) {
     // Emitir gotas
     for (const emisor of emisoresGotas) {
         if (ahora - emisor.cooldown > emisor.intervalo) {
@@ -277,10 +398,24 @@ export function actualizarParticulas(ahora, antorchas, jugadorX, jugadorY, zona)
         emitirDestello(jugadorX, jugadorY);
     }
 
+    // Partículas climáticas 3D
+    if (estacion) {
+        emitirClima3D(estacion, jugadorX, jugadorY);
+    }
+
     // Actualizar partículas activas
     for (let i = 0; i < POOL_SIZE; i++) {
         const p = pool[i];
         if (!p.activa) continue;
+
+        // Oscilación horizontal para pétalos y hojas 3D
+        if (p.tipo === 'petalo-3d') {
+            p.vx = Math.sin(climaFrame3D * 0.03 + p.x) * 0.001;
+        } else if (p.tipo === 'hoja-3d') {
+            p.vx = Math.sin(climaFrame3D * 0.04 + p.y) * 0.003;
+        } else if (p.tipo === 'mota-3d') {
+            p.vz = Math.sin(climaFrame3D * 0.02 + p.x * 0.5) * 0.0008;
+        }
 
         p.x += p.vx;
         p.y += p.vy;
@@ -303,6 +438,11 @@ export function actualizarParticulas(ahora, antorchas, jugadorX, jugadorY, zona)
             // Destello: pulso brillante que se desvanece
             const pulso = Math.sin(vidaRatio * Math.PI);
             p.alpha = pulso * 0.7;
+        } else if (p.tipo === 'lluvia-3d' || p.tipo === 'petalo-3d' || p.tipo === 'hoja-3d') {
+            p.alpha = vidaRatio > 0.15 ? p.alpha : (vidaRatio / 0.15) * p.alpha;
+        } else if (p.tipo === 'mota-3d') {
+            // Motas de verano: alpha estable, fade al final
+            p.alpha = vidaRatio > 0.3 ? 0.3 : (vidaRatio / 0.3) * 0.3;
         } else {
             p.alpha = vidaRatio * 0.6;
         }
@@ -315,7 +455,7 @@ export function actualizarParticulas(ahora, antorchas, jugadorX, jugadorY, zona)
         }
 
         // Partícula expirada
-        if (p.vida <= 0 || p.z > 1.1) {
+        if (p.vida <= 0 || p.z > 1.1 || p.z < -0.05) {
             p.activa = false;
         }
     }
@@ -514,4 +654,5 @@ export function limpiarParticulas() {
         pool[i].activa = false;
     }
     emisoresGotas = [];
+    climaFrame3D = 0;
 }

@@ -124,6 +124,17 @@
     filter: drop-shadow(0 0 8px rgb(240 165 0 / 60%));
 }
 
+/* Canvas overlay de partículas climáticas (Laberinto 2D) */
+.clima-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
 /* --- Responsive --- */
 
 @media (pointer: coarse) {

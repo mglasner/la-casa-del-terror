@@ -24,11 +24,257 @@ import {
 import { iniciarTrasgo, actualizarTrasgo, renderizarTrasgo } from './trasgo.js';
 import { iniciarCountdown, actualizarVillanoElite, limpiarVillanoElite } from './villanoElite.js';
 import { lanzarToast } from '../../componentes/toast.js';
+import { sortearEstacion, ESTACIONES } from '../clima.js';
 
 import { crearPantallaJuego } from '../../componentes/pantallaJuego.js';
 import { crearModoPortrait } from '../../componentes/modoPortrait.js';
 import { crearElemento, crearGameLoop } from '../../utils.js';
 import { notificarVictoria } from '../../eventos.js';
+
+// --- Sistema de clima (canvas overlay sobre el laberinto) ---
+
+let climaCanvas = null;
+let climaCtx = null;
+let climaRafId = null;
+let climaEstacion = null;
+let climaParticulas = [];
+let climaFrame = 0;
+let climaRafagaCounter = 0;
+let climaRafagaProx = 200 + Math.floor(Math.random() * 100);
+let climaRafagaActiva = false;
+let climaRafagaFrames = 0;
+
+const COLORES_HOJAS_LAB = [
+    [210, 80, 30],
+    [230, 150, 40],
+    [140, 50, 20],
+];
+
+function emitirParticulasClimaLab(ancho, alto) {
+    if (climaEstacion === 'invierno') {
+        const n = 2 + Math.floor(Math.random() * 2);
+        for (let i = 0; i < n; i++) {
+            climaParticulas.push({
+                x: Math.random() * ancho,
+                y: -5,
+                vx: -1.2,
+                vy: 5.5 + Math.random() * 2,
+                vida: 20 + Math.floor(Math.random() * 8),
+                vidaMax: 28,
+                r: 170,
+                g: 200,
+                b: 255,
+                alpha: 0.6,
+                tipo: 'lluvia',
+                tam: 2,
+            });
+        }
+    } else if (climaEstacion === 'primavera') {
+        if (climaFrame % 3 === 0) {
+            climaParticulas.push({
+                x: Math.random() * ancho,
+                y: -5,
+                vx: Math.sin(climaFrame * 0.03) * 0.6,
+                vy: 0.3 + Math.random() * 0.25,
+                vida: 160 + Math.floor(Math.random() * 80),
+                vidaMax: 240,
+                r: 247,
+                g: 197 + Math.floor(Math.random() * 30),
+                b: 213,
+                alpha: 0.7,
+                tipo: 'petalo',
+                tam: 2 + Math.random() * 2,
+            });
+        }
+        if (climaFrame % 7 === 0) {
+            climaParticulas.push({
+                x: Math.random() * ancho,
+                y: Math.random() * alto * 0.7,
+                vx: 0,
+                vy: 0,
+                vida: 60 + Math.floor(Math.random() * 30),
+                vidaMax: 90,
+                r: 255,
+                g: 255,
+                b: 200,
+                alpha: 0.85,
+                tipo: 'destello-luz',
+                tam: 2,
+            });
+        }
+    } else if (climaEstacion === 'verano') {
+        if (climaFrame % 4 === 0) {
+            climaParticulas.push({
+                x: Math.random() * ancho,
+                y: Math.random() * alto * 0.7,
+                vx: 0.1 + Math.random() * 0.15,
+                vy: 0,
+                vida: 250 + Math.floor(Math.random() * 100),
+                vidaMax: 350,
+                r: 220,
+                g: 190,
+                b: 100,
+                alpha: 0.25 + Math.random() * 0.2,
+                tipo: 'mota',
+                tam: 1 + Math.random(),
+            });
+        }
+    } else if (climaEstacion === 'otono') {
+        climaRafagaCounter++;
+        if (climaRafagaCounter >= climaRafagaProx) {
+            climaRafagaCounter = 0;
+            climaRafagaProx = 180 + Math.floor(Math.random() * 120);
+            climaRafagaActiva = true;
+            climaRafagaFrames = 30;
+        }
+        if (climaRafagaActiva) {
+            climaRafagaFrames--;
+            if (climaRafagaFrames <= 0) climaRafagaActiva = false;
+        }
+        if (climaFrame % 4 === 0) {
+            const c = COLORES_HOJAS_LAB[Math.floor(Math.random() * 3)];
+            const vxHoja = climaRafagaActiva
+                ? -2.5 - Math.random() * 0.5
+                : -0.8 - Math.random() * 1.4;
+            climaParticulas.push({
+                x: ancho + 5,
+                y: Math.random() * alto,
+                vx: vxHoja,
+                vy: 0.4 + Math.random() * 0.8,
+                vida: 90 + Math.floor(Math.random() * 50),
+                vidaMax: 140,
+                r: c[0],
+                g: c[1],
+                b: c[2],
+                alpha: 0.8,
+                tipo: 'hoja',
+                tam: 2 + Math.random(),
+            });
+        }
+        if (climaFrame % 2 === 0) {
+            climaParticulas.push({
+                x: Math.random() * ancho,
+                y: -5,
+                vx: -0.6,
+                vy: 2.5 + Math.random() * 1,
+                vida: 35 + Math.floor(Math.random() * 10),
+                vidaMax: 45,
+                r: 200,
+                g: 160,
+                b: 80,
+                alpha: 0.28,
+                tipo: 'lluvia-suave',
+                tam: 1.5,
+            });
+        }
+    }
+}
+
+function loopClimaLab() {
+    if (!climaCanvas || !climaEstacion) return;
+    climaFrame++;
+
+    const ancho = climaCanvas.width;
+    const alto = climaCanvas.height;
+    climaCtx.clearRect(0, 0, ancho, alto);
+
+    // Emitir (con cap de partículas para performance)
+    if (climaParticulas.length < 150) {
+        emitirParticulasClimaLab(ancho, alto);
+    }
+
+    // Actualizar y renderizar
+    const vivas = [];
+    for (let i = 0; i < climaParticulas.length; i++) {
+        const p = climaParticulas[i];
+
+        // Movimiento especial por tipo
+        if (p.tipo === 'petalo') {
+            p.vx = Math.sin(climaFrame * 0.03 + p.x * 0.01) * 0.6;
+        } else if (p.tipo === 'mota') {
+            p.vy = Math.sin(climaFrame * 0.02 + p.x * 0.05) * 0.15;
+        }
+
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vida--;
+
+        // Descartar si salió de pantalla o expiró
+        if (p.vida <= 0 || p.x < -10 || p.x > ancho + 10 || p.y > alto + 10) continue;
+
+        // Alpha según tipo
+        const ratio = p.vida / p.vidaMax;
+        let alpha = p.alpha;
+        if (p.tipo === 'destello-luz') {
+            alpha = p.alpha * Math.abs(Math.sin(climaFrame * 0.15 + p.x * 0.1));
+        } else if (p.tipo === 'petalo' || p.tipo === 'hoja') {
+            alpha = ratio > 0.15 ? p.alpha : (ratio / 0.15) * p.alpha;
+        } else if (p.tipo === 'lluvia' || p.tipo === 'lluvia-suave') {
+            alpha = ratio > 0.2 ? p.alpha : (ratio / 0.2) * p.alpha;
+        }
+
+        const a = Math.max(0, Math.min(1, alpha));
+        if (a < 0.01) {
+            vivas.push(p);
+            continue;
+        }
+
+        // Renderizar
+        climaCtx.fillStyle = 'rgba(' + p.r + ',' + p.g + ',' + p.b + ',' + a.toFixed(2) + ')';
+        if (p.tipo === 'lluvia') {
+            climaCtx.fillRect(p.x, p.y, 1, 5);
+        } else if (p.tipo === 'lluvia-suave') {
+            climaCtx.fillRect(p.x, p.y, 0.5, 3);
+        } else if (p.tipo === 'petalo' || p.tipo === 'hoja' || p.tipo === 'destello-luz') {
+            climaCtx.beginPath();
+            climaCtx.arc(p.x, p.y, p.tam, 0, Math.PI * 2);
+            climaCtx.fill();
+        } else {
+            // mota
+            const mitad = p.tam / 2;
+            climaCtx.fillRect(p.x - mitad, p.y - mitad, p.tam, p.tam);
+        }
+
+        vivas.push(p);
+    }
+    climaParticulas = vivas;
+
+    climaRafId = requestAnimationFrame(loopClimaLab);
+}
+
+function iniciarClimaLab(estacion) {
+    if (!estacion) return;
+    climaEstacion = estacion;
+    climaParticulas = [];
+    climaFrame = 0;
+    climaRafagaCounter = 0;
+    climaRafagaActiva = false;
+    climaRafagaFrames = 0;
+
+    const ancho = CONFIG.COLS * CONFIG.TAM_CELDA;
+    const alto = CONFIG.FILAS * CONFIG.TAM_CELDA;
+    climaCanvas = document.createElement('canvas');
+    climaCanvas.className = 'clima-overlay';
+    climaCanvas.width = ancho;
+    climaCanvas.height = alto;
+    climaCtx = climaCanvas.getContext('2d');
+
+    // Insertar al final del contenedor (encima de todo excepto el jugador)
+    est.contenedorLaberinto.appendChild(climaCanvas);
+
+    climaRafId = requestAnimationFrame(loopClimaLab);
+}
+
+function limpiarClimaLab() {
+    if (climaRafId) {
+        cancelAnimationFrame(climaRafId);
+        climaRafId = null;
+    }
+    climaCanvas = null;
+    climaCtx = null;
+    climaEstacion = null;
+    climaParticulas = [];
+}
 
 // --- Crear pantalla HTML ---
 
@@ -172,6 +418,21 @@ export function iniciarLaberinto(jugadorRef, callback, dpadRef) {
     if (dpadRef) {
         dpadRef.setTeclasRef(est.teclas);
         dpadRef.mostrar();
+    }
+
+    // Sortear e iniciar clima
+    const estacionLab = sortearEstacion();
+    iniciarClimaLab(estacionLab);
+    if (estacionLab) {
+        setTimeout(function () {
+            if (est.activo) {
+                lanzarToast(
+                    '\u2728 ' + ESTACIONES[estacionLab].nombre,
+                    '\ud83c\udf2c\ufe0f',
+                    'estado'
+                );
+            }
+        }, 800);
     }
 
     // Exploración libre: enemigos aparecen tras el delay configurado
@@ -472,6 +733,8 @@ export function limpiarLaberinto() {
         est.modoPortrait.desactivar();
         est.modoPortrait = null;
     }
+
+    limpiarClimaLab();
 
     if (est.pantalla) {
         est.pantalla.remove();

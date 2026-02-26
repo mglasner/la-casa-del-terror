@@ -39,6 +39,8 @@ import {
     renderizarVineta,
     renderizarFlash,
     renderizarIndicadorBoss,
+    renderizarEfectoClima,
+    reiniciarEstadoClima,
     limpiarRenderer,
     tipoAbismo,
 } from './renderer.js';
@@ -96,11 +98,13 @@ import {
     emitirEstelaBoss,
     emitirTelegrafo,
     emitirProyectilEstela,
+    emitirClima,
     actualizarParticulas,
     renderizarParticulas,
     obtenerFrameCount,
     limpiarParticulas,
 } from './particulas.js';
+import { sortearEstacion, ESTACIONES } from '../clima.js';
 import { iniciarSpritesJugador, iniciarSpritesEnemigos, limpiarSprites } from './spritesPlat.js';
 import { lanzarToast } from '../../componentes/toast.js';
 import { notificarVictoria } from '../../eventos.js';
@@ -108,6 +112,9 @@ import { notificarVictoria } from '../../eventos.js';
 import { crearGameLoop } from '../../utils.js';
 
 const TAM = CFG.tiles.tamano;
+
+// Estación climática activa para esta partida (null = sin clima)
+let estacionActiva = null;
 
 // --- Crear DOM (delegado a domPlat.js) ---
 
@@ -326,6 +333,11 @@ function emitirParticulasAmbientales(camaraX, camaraY) {
         }
     }
 
+    // Particulas climáticas (encima de todo lo ambiental)
+    if (estacionActiva) {
+        emitirClima(estacionActiva, est.anchoCanvas, camaraX, camaraY);
+    }
+
     // Particulas del boss
     const bossInfo = obtenerInfoBoss();
     if (bossInfo) {
@@ -462,6 +474,15 @@ function renderFrame() {
     // Flash blanco
     renderizarFlash(est.ctx, est.anchoCanvas, est.altoCanvas, obtenerFlashAlpha());
 
+    // Efecto climático: tinte ambiental + efecto especial (encima de todo excepto HUD HTML)
+    renderizarEfectoClima(
+        est.ctx,
+        estacionActiva,
+        est.anchoCanvas,
+        est.altoCanvas,
+        obtenerFrameCount()
+    );
+
     // HUD jugador via overlay HTML (vida del jugador)
     actualizarHUDJugador(est.jugador.vidaActual, est.jugador.vidaMax);
 
@@ -545,8 +566,25 @@ export function iniciarAbismo(jugadorRef, callback, dpadArgumento) {
     iniciarJugador(jugadorRef, est.teclasRef);
     iniciarEnemigos(spawns.enemigos, spawns.boss);
 
+    // Sortear estación climática para esta partida
+    estacionActiva = sortearEstacion();
+    reiniciarEstadoClima();
+
     // Toast de inicio
     lanzarToast('El Abismo: \u00a1Cuidado con las ca\u00eddas!', '\ud83c\udf0a', 'estado');
+
+    // Toast de clima (si hay estación, con pequeño delay para no solapar)
+    if (estacionActiva) {
+        timeouts.set(function () {
+            if (est.activo) {
+                lanzarToast(
+                    '\u2728 ' + ESTACIONES[estacionActiva].nombre,
+                    '\ud83c\udf2c\ufe0f',
+                    'estado'
+                );
+            }
+        }, 1200);
+    }
 
     // Mostrar toast del boss
     const bossActual = obtenerInfoBoss();
@@ -616,5 +654,6 @@ export function limpiarAbismo() {
     const juegoEl = document.getElementById('juego');
     if (juegoEl) juegoEl.classList.remove('juego-inmersivo');
 
+    estacionActiva = null;
     resetearEstado();
 }

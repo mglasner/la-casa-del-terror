@@ -3,6 +3,7 @@
 import { CFG } from './config.js';
 import { obtenerTile, obtenerFilas, obtenerColumnas } from './nivel.js';
 import { obtenerTextura, hashVariante, TAM_TEX } from './texturasTiles.js';
+import { ESTACIONES } from '../clima.js';
 
 const T = CFG.tiles.tipos;
 const TAM = CFG.tiles.tamano;
@@ -232,6 +233,89 @@ export function renderizarIndicadorBoss(
     }
 }
 
+// --- Efectos de clima ---
+
+// Estado del relámpago de invierno
+let relampagueoFrames = 0;
+let contadorRelampago = 280 + Math.floor(Math.random() * 140);
+
+export function reiniciarEstadoClima() {
+    relampagueoFrames = 0;
+    contadorRelampago = 280 + Math.floor(Math.random() * 140);
+}
+
+/**
+ * Renderiza el tinte ambiental y efecto especial de la estación activa.
+ * Llamar al final de renderFrame, después del flash de daño.
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {string|null} estacion
+ * @param {number} anchoCanvas
+ * @param {number} altoCanvas
+ * @param {number} frameCount
+ */
+export function renderizarEfectoClima(ctx, estacion, anchoCanvas, altoCanvas, frameCount) {
+    if (!estacion) return;
+    const cfg = ESTACIONES[estacion];
+    const [r, g, b, a] = cfg.tinte;
+
+    // Tinte ambiental sutil sobre toda la pantalla
+    ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+    ctx.fillRect(0, 0, anchoCanvas, altoCanvas);
+
+    if (estacion === 'invierno') {
+        // Relámpago: flash púrpura-blanco cada 280-420 frames
+        contadorRelampago--;
+        if (contadorRelampago <= 0) {
+            relampagueoFrames = 12; // 3 frames llenos + 9 de fade
+            contadorRelampago = 280 + Math.floor(Math.random() * 140);
+        }
+        if (relampagueoFrames > 0) {
+            // Frames 10-12: alpha completo; frames 1-9: fade progresivo
+            const flashAlpha = relampagueoFrames > 9 ? 0.7 : (relampagueoFrames / 9) * 0.7;
+            ctx.fillStyle = 'rgba(200,170,255,' + flashAlpha.toFixed(2) + ')';
+            ctx.fillRect(0, 0, anchoCanvas, altoCanvas);
+            relampagueoFrames--;
+        }
+    } else if (estacion === 'primavera') {
+        // Sol suave en esquina superior derecha
+        const cx = anchoCanvas * 0.88;
+        const radSol = 55 + Math.sin(frameCount * 0.02) * 5;
+        const gradSol = ctx.createRadialGradient(cx, 0, 0, cx, 0, radSol);
+        gradSol.addColorStop(0, 'rgba(255,240,150,0.18)');
+        gradSol.addColorStop(0.6, 'rgba(255,240,150,0.05)');
+        gradSol.addColorStop(1, 'rgba(255,240,150,0)');
+        ctx.fillStyle = gradSol;
+        ctx.fillRect(cx - radSol, 0, radSol * 2, radSol);
+    } else if (estacion === 'verano') {
+        // Sol pulsante en esquina superior izquierda (ciclo de 4 s a 60 fps)
+        const ciclo = (Math.sin(frameCount * (Math.PI / 120)) + 1) / 2;
+        const radioSol = 70 + ciclo * 40;
+        const cx = anchoCanvas * 0.15;
+        const gradSol = ctx.createRadialGradient(cx, 0, 0, cx, 0, radioSol);
+        gradSol.addColorStop(0, 'rgba(255,200,50,0.22)');
+        gradSol.addColorStop(0.5, 'rgba(220,140,20,0.08)');
+        gradSol.addColorStop(1, 'rgba(220,100,10,0)');
+        ctx.fillStyle = gradSol;
+        ctx.fillRect(0, 0, radioSol * 2, radioSol * 1.5);
+    } else if (estacion === 'otono') {
+        // Líneas horizontales de viento ocasionales
+        if (Math.random() < 0.04) {
+            ctx.strokeStyle = 'rgba(200,160,80,0.08)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 4; i++) {
+                const wy = Math.random() * altoCanvas;
+                const wx = Math.random() * anchoCanvas * 0.6;
+                const ww = 20 + Math.random() * 35;
+                ctx.beginPath();
+                ctx.moveTo(wx, wy);
+                ctx.lineTo(wx + ww, wy);
+                ctx.stroke();
+            }
+        }
+    }
+}
+
 export function limpiarRenderer() {
     vinetaCanvas = null;
+    relampagueoFrames = 0;
 }

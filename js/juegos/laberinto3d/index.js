@@ -43,6 +43,8 @@ import { crearBarraVida } from '../../componentes/barraVida.js';
 import { crearInventario } from '../../componentes/inventario.js';
 import { crearPantallaJuego } from '../../componentes/pantallaJuego.js';
 import { crearElemento, crearGameLoop } from '../../utils.js';
+import { lanzarToast } from '../../componentes/toast.js';
+import { sortearEstacion, ESTACIONES } from '../clima.js';
 
 // Pool de sprites preallocado para el loop (cofre + puerta + ~15 decoraciones + ~10 trampas inactivas)
 const MAX_SPRITES_LOOP = 30;
@@ -103,7 +105,8 @@ function reescalarCanvas3D() {
 }
 
 function crearGradientes(zona) {
-    const paleta = zona !== undefined ? COLORES_ZONA[zona] : COLORES;
+    // Si hay estación climática activa, su paleta sobreescribe la de zona
+    const paleta = est.climaPaleta ?? (zona !== undefined ? COLORES_ZONA[zona] : COLORES);
 
     est.gradCielo = est.ctx3D.createLinearGradient(0, 0, 0, canvas.alto / 2);
     est.gradCielo.addColorStop(0, paleta.cieloArriba);
@@ -306,12 +309,17 @@ function loop(ahora, _dt) {
         est.decoraciones ? est.decoraciones.antorchas : [],
         est.posicion.x,
         est.posicion.y,
-        est.zonaActual
+        est.zonaActual,
+        est.estacionClima
     );
     actualizarFuegoTrampas(est.posicion.x, est.posicion.y);
 
-    // Tinte ambiental de la zona actual
-    const tinteZona = est.mapaZonas ? COLORES_ZONA[est.zonaActual].tinte : null;
+    // Tinte ambiental: usa el de la estación si hay clima activo, si no el de la zona
+    const tinteZona = est.climaPaleta
+        ? est.climaPaleta.tinte
+        : est.mapaZonas
+          ? COLORES_ZONA[est.zonaActual].tinte
+          : null;
 
     // Renderizar vista 3D
     const zBuffer = renderizar3D(
@@ -454,6 +462,11 @@ export function iniciarLaberinto3d(jugadorRef, callback, dpadArgumento) {
     est.framesLentos = 0;
     est.flashDano = 0;
 
+    // Sortear estación climática para esta partida
+    const estacionNombre = sortearEstacion();
+    est.climaPaleta = estacionNombre ? ESTACIONES[estacionNombre].cielo3d : null;
+    est.estacionClima = estacionNombre;
+
     // Escalar canvas al viewport
     calcularDimensiones();
 
@@ -550,6 +563,19 @@ export function iniciarLaberinto3d(jugadorRef, callback, dpadArgumento) {
     actualizarHUDVida();
     actualizarHUDInventarioLocal();
 
+    // Toast de clima al inicio
+    if (est.estacionClima) {
+        setTimeout(function () {
+            if (est.activo) {
+                lanzarToast(
+                    '\u2728 ' + ESTACIONES[est.estacionClima].nombre,
+                    '\ud83c\udf2c\ufe0f',
+                    'estado'
+                );
+            }
+        }, 800);
+    }
+
     // Iniciar game loop
     gameLoop2.iniciar();
 }
@@ -585,6 +611,8 @@ export function limpiarLaberinto3d() {
     est.mapaLuz = null;
     est.mapaZonas = null;
     est.zonaActual = 0;
+    est.climaPaleta = null;
+    est.estacionClima = null;
 
     // Limpiar HUD landscape
     est.hudJugadorContenedor = null;
