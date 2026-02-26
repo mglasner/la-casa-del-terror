@@ -132,11 +132,17 @@ async function leerConfigPrettier() {
     return { ...JSON.parse(raw), parser: 'babel' };
 }
 
-// Genera el string de un ataque: { nombre: '...', dano: N, descripcion: '...' }
+// Genera el string de un ataque: { nombre, dano, descripcion, arquetipo?, color?, ... }
 function generarAtaque(ataque) {
     const nombre = ataque.nombre.replace(/'/g, "\\'");
     const desc = ataque.descripcion.replace(/'/g, "\\'");
-    return `{ nombre: '${nombre}', dano: ${ataque.dano}, descripcion: '${desc}' }`;
+    let str = `{ nombre: '${nombre}', dano: ${ataque.dano}, descripcion: '${desc}'`;
+    if (ataque.arquetipo) str += `, arquetipo: '${ataque.arquetipo}'`;
+    if (ataque.color) str += `, color: '${ataque.color}'`;
+    if (ataque.colorSecundario) str += `, colorSecundario: '${ataque.colorSecundario}'`;
+    if (ataque.radio != null) str += `, radio: ${ataque.radio}`;
+    str += ' }';
+    return str;
 }
 
 // Genera el string de un objeto de datos (img, clase, descripcion, etc.)

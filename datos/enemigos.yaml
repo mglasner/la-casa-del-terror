@@ -13,9 +13,16 @@ Siniestra:
         - nombre: Llama negra
           dano: 15
           descripcion: Fuego oscuro que consume todo
+          arquetipo: proyectil
+          color: '#1a0a2e'
+          colorSecundario: '#ff6600'
         - nombre: Grito arcano
           dano: 18
           descripcion: Onda de energía pura
+          arquetipo: aoe
+          color: '#9b59b6'
+          colorSecundario: '#4a0080'
+          radio: 3
 
 Trasgo:
     tier: esbirro
@@ -32,9 +39,16 @@ Trasgo:
         - nombre: Golpe sucio
           dano: 7
           descripcion: Un golpe bajo y traicionero
+          arquetipo: carga
+          color: '#2d5a1e'
+          colorSecundario: '#6b4423'
         - nombre: Trampa
           dano: 10
           descripcion: Trampa escondida en el suelo
+          arquetipo: aoe
+          color: '#6b4423'
+          colorSecundario: '#2d5a1e'
+          radio: 2
 
 El Errante:
     tier: elite
@@ -51,9 +65,15 @@ El Errante:
         - nombre: Mordida tóxica
           dano: 18
           descripcion: Mordida venenosa que infecta
+          arquetipo: carga
+          color: '#00ff88'
+          colorSecundario: '#004d26'
         - nombre: Eco fantasmal
           dano: 12
           descripcion: Aullido paralizante de otro mundo
+          arquetipo: proyectil
+          color: '#b0e0e6'
+          colorSecundario: '#ffffff'
 
 El Profano:
     tier: elite
@@ -70,9 +90,15 @@ El Profano:
         - nombre: Zarpazo sombrío
           dano: 18
           descripcion: Un zarpazo rápido desde las sombras
+          arquetipo: carga
+          color: '#1a1a2e'
+          colorSecundario: '#4a0080'
         - nombre: Emboscada
           dano: 15
           descripcion: Aparece por sorpresa y ataca
+          arquetipo: salto
+          color: '#000000'
+          colorSecundario: '#1a1a2e'
 
 Topete:
     tier: esbirro
@@ -89,9 +115,16 @@ Topete:
         - nombre: Berrinche explosivo
           dano: 6
           descripcion: Rabieta que hace temblar el piso
+          arquetipo: aoe
+          color: '#ff4444'
+          colorSecundario: '#ff8800'
+          radio: 2
         - nombre: Cadenazo
           dano: 10
           descripcion: Golpe con las cadenas rotas
+          arquetipo: carga
+          color: '#aaaaaa'
+          colorSecundario: '#666666'
 
 Pototo:
     tier: esbirro
@@ -108,9 +141,16 @@ Pototo:
         - nombre: Risa burlesca
           dano: 8
           descripcion: Carcajada tan fuerte que aturde
+          arquetipo: aoe
+          color: '#8e44ad'
+          colorSecundario: '#2c003e'
+          radio: 2
         - nombre: Travesura doble
           dano: 12
           descripcion: Plan maestro coordinado con su hermana
+          arquetipo: proyectil
+          color: '#2c003e'
+          colorSecundario: '#8e44ad'
 
 La Grotesca:
     tier: elite
@@ -127,9 +167,15 @@ La Grotesca:
         - nombre: Tela encantada
           dano: 16
           descripcion: Envuelve al rival con telas encantadas
+          arquetipo: proyectil
+          color: '#f0e0f0'
+          colorSecundario: '#cc6699'
         - nombre: Caída vertiginosa
           dano: 20
           descripcion: Se lanza desde lo alto con todo su peso
+          arquetipo: salto
+          color: '#cc6699'
+          colorSecundario: '#880044'
 
 El Disonante:
     tier: elite
@@ -146,9 +192,16 @@ El Disonante:
         - nombre: Nota discordante
           dano: 16
           descripcion: Una nota tan desafinada que hace temblar los huesos
+          arquetipo: proyectil
+          color: '#ffd700'
+          colorSecundario: '#cc8800'
         - nombre: Réquiem arcano
           dano: 20
           descripcion: Melodía arcana que drena la energía vital
+          arquetipo: aoe
+          color: '#4a0080'
+          colorSecundario: '#ffd700'
+          radio: 3
 
 El Monstruo Comelón:
     tier: pesadilla
@@ -165,9 +218,16 @@ El Monstruo Comelón:
         - nombre: Bocado estelar
           dano: 24
           descripcion: Mordisco cósmico que hace temblar el espacio
+          arquetipo: carga
+          color: '#ff4500'
+          colorSecundario: '#8b0000'
         - nombre: Gran Mascada
           dano: 30
           descripcion: Abre sus fauces y tritura todo a su paso
+          arquetipo: aoe
+          color: '#8b0000'
+          colorSecundario: '#ff4500'
+          radio: 4
 
 La Nebulosa:
     tier: pesadilla
@@ -184,6 +244,13 @@ La Nebulosa:
         - nombre: Niebla cósmica
           dano: 20
           descripcion: Envuelve al rival en oscuridad helada
+          arquetipo: aoe
+          color: '#4a0e4e'
+          colorSecundario: '#0a0a3a'
+          radio: 4
         - nombre: Vórtice de sombra
           dano: 26
           descripcion: Remolino de sombras que arrastra todo
+          arquetipo: proyectil
+          color: '#0a0a3a'
+          colorSecundario: '#4a0e4e'

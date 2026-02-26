@@ -19,9 +19,16 @@ Lina:
         - nombre: Nota aguda
           dano: 15
           descripcion: Un agudo que aturde al rival
+          arquetipo: proyectil
+          color: '#d4a0ff'
+          colorSecundario: '#9b59b6'
         - nombre: Encore explosivo
           dano: 25
           descripcion: Actuación final que arrasa el escenario
+          arquetipo: aoe
+          color: '#ffd700'
+          colorSecundario: '#9b59b6'
+          radio: 3
 
 Rosé:
     genero: femenino
@@ -44,9 +51,16 @@ Rosé:
         - nombre: Latigazo de tela
           dano: 20
           descripcion: Un giro envolvente con la tela aérea
+          arquetipo: carga
+          color: '#ffffff'
+          colorSecundario: '#2ecc71'
         - nombre: Giro del cubo
           dano: 10
           descripcion: Atrapa al rival girando desde el cubo
+          arquetipo: aoe
+          color: '#2ecc71'
+          colorSecundario: '#ffffff'
+          radio: 2
 
 PandaJuro:
     genero: masculino
@@ -69,9 +83,15 @@ PandaJuro:
         - nombre: Corte samurái
           dano: 30
           descripcion: Un tajo devastador
+          arquetipo: carga
+          color: '#c0392b'
+          colorSecundario: '#e0e0e0'
         - nombre: Golpe de bambú
           dano: 18
           descripcion: Golpe rápido con bambú
+          arquetipo: proyectil
+          color: '#4a7c3f'
+          colorSecundario: '#c0392b'
 
 Hana:
     genero: femenino
@@ -94,9 +114,16 @@ Hana:
         - nombre: Pirueta fulminante
           dano: 20
           descripcion: Un giro vertiginoso que derriba al rival
+          arquetipo: carga
+          color: '#e91e90'
+          colorSecundario: '#ff69b4'
         - nombre: Coreografía letal
           dano: 22
           descripcion: Movimientos mortales de baile
+          arquetipo: aoe
+          color: '#ff69b4'
+          colorSecundario: '#e91e90'
+          radio: 3
 
 Kira:
     genero: femenino
@@ -119,9 +146,16 @@ Kira:
         - nombre: Disparo certero
           dano: 28
           descripcion: Un tiro preciso que no falla
+          arquetipo: proyectil
+          color: '#2ec4b6'
+          colorSecundario: '#ffffff'
         - nombre: Trampa de luz
           dano: 18
           descripcion: Destello que ciega y daña
+          arquetipo: aoe
+          color: '#ffffff'
+          colorSecundario: '#2ec4b6'
+          radio: 2
 
 DonBu:
     genero: masculino
@@ -144,9 +178,15 @@ DonBu:
         - nombre: Patada de mula
           dano: 35
           descripcion: Una coz devastadora
+          arquetipo: carga
+          color: '#d4a052'
+          colorSecundario: '#8B6914'
         - nombre: Cabezazo terco
           dano: 20
           descripcion: Embiste con toda su terquedad
+          arquetipo: salto
+          color: '#8B6914'
+          colorSecundario: '#d4a052'
 
 PomPom:
     genero: femenino
@@ -169,9 +209,15 @@ PomPom:
         - nombre: Cucharonazo
           dano: 18
           descripcion: Un golpe certero con el cucharón de madera
+          arquetipo: carga
+          color: '#8B4513'
+          colorSecundario: '#f8a5c2'
         - nombre: Abrazo aplastante
           dano: 22
           descripcion: Un abrazo maternal con la fuerza de quien carga 15 hijos
+          arquetipo: salto
+          color: '#f8a5c2'
+          colorSecundario: '#fcc2d7'
 
 Orejas:
     genero: masculino
@@ -194,6 +240,12 @@ Orejas:
         - nombre: Azadonazo
           dano: 25
           descripcion: Un golpe contundente con su azadón de campo
+          arquetipo: carga
+          color: '#808080'
+          colorSecundario: '#e67e22'
         - nombre: Lluvia de zanahorias
           dano: 15
           descripcion: Lanza zanahorias a diestra y siniestra desde su bolsa
+          arquetipo: proyectil
+          color: '#ff8c00'
+          colorSecundario: '#228b22'
