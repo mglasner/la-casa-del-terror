@@ -72,12 +72,6 @@ export function crearOverlayRotar(orientacionDeseada = 'landscape') {
         onChangeCallback = null;
         overlay.classList.add('oculto');
 
-        try {
-            screen.orientation.unlock();
-        } catch {
-            // API no disponible
-        }
-
         // Remover del DOM
         if (overlay.parentNode) {
             overlay.parentNode.removeChild(overlay);
