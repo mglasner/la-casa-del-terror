@@ -157,12 +157,15 @@ function moverPatrulla(e, enPiso) {
     } else {
         const bordeX = e.direccion > 0 ? nuevaX + e.ancho + 2 : nuevaX - 2;
         const pieY = e.y + e.alto + 2;
-        if (!esSolido(bordeX, pieY) && enPiso && e.timerBloqueoInversion <= 0) {
-            // Precipicio adelante y cooldown libre: girar sin mover
-            e.direccion *= -1;
-            e.timerBloqueoInversion = 8;
+        if (!esSolido(bordeX, pieY) && enPiso) {
+            // Precipicio adelante: girar sin mover (con cooldown anti-oscilación)
+            // Con timer activo simplemente no moverse — el saltarín saltará por su
+            // propio timer; el boss nunca arriesga caer al abismo
+            if (e.timerBloqueoInversion <= 0) {
+                e.direccion *= -1;
+                e.timerBloqueoInversion = 8;
+            }
         } else {
-            // Sin precipicio, precipicio con cooldown activo, o en el aire: mover
             e.x = nuevaX;
         }
     }
