@@ -36,7 +36,8 @@
                 font-size: 0.75rem;
             }
 
-            .toolbar select {
+            .toolbar select,
+            .toolbar button {
                 background: #1e1e1e;
                 border: 1px solid #333;
                 color: #aaa;
@@ -44,6 +45,11 @@
                 border-radius: 4px;
                 font-size: 0.75rem;
                 cursor: pointer;
+            }
+
+            .toolbar button {
+                font-size: 1rem;
+                padding: 2px 8px;
             }
 
             .phone {
@@ -76,6 +82,7 @@
                 <option value="412,915">Android L (412×915)</option>
                 <option value="768,1024">iPad (768×1024)</option>
             </select>
+            <button id="rotar" onclick="rotar()" title="Rotar">↻</button>
         </div>
 
         <div class="phone" id="phone">
@@ -85,17 +92,29 @@
         <div class="label" id="label">390 × 844</div>
 
         <script>
+            var landscape = false;
             function cambiarPreset() {
-                const [w, h] = document.getElementById('preset').value.split(',').map(Number);
-                const phone = document.getElementById('phone');
-                const frame = document.getElementById('frame');
+                landscape = false;
+                aplicarTamano();
+            }
+            function rotar() {
+                landscape = !landscape;
+                aplicarTamano();
+            }
+            function aplicarTamano() {
+                var dims = document.getElementById('preset').value.split(',').map(Number);
+                var w = landscape ? dims[1] : dims[0];
+                var h = landscape ? dims[0] : dims[1];
+                var phone = document.getElementById('phone');
+                var frame = document.getElementById('frame');
                 phone.style.width = w + 'px';
                 phone.style.height = h + 'px';
                 frame.style.width = w + 'px';
                 frame.style.height = h + 'px';
-                document.getElementById('label').textContent = w + ' × ' + h;
+                document.getElementById('label').textContent =
+                    w + ' × ' + h + (landscape ? ' (landscape)' : '');
             }
-            cambiarPreset();
+            aplicarTamano();
         </script>
     </body>
 </html>
