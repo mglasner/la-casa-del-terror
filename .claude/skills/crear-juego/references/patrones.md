@@ -557,21 +557,64 @@ Laberinto 3D y Abismo lo usan. El resto no.
 
 ---
 
+## Patrón 19 — Reutilizar componentes y clases utilitarias
+
+Antes de escribir CSS o JS nuevo, verificar si ya existe algo reutilizable.
+Duplicar estilos genera inconsistencias y dificulta el mantenimiento.
+
+### Ejemplo: `.scroll-dorado`
+
+Scrollbar estilizado dorado, definido una sola vez en `css/base.css`:
+
+```css
+/* css/base.css */
+.scroll-dorado {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 215 0 / 25%) transparent;
+}
+.scroll-dorado::-webkit-scrollbar { width: 4px; }
+.scroll-dorado::-webkit-scrollbar-track { background: transparent; }
+.scroll-dorado::-webkit-scrollbar-thumb {
+    background: rgb(255 215 0 / 25%);
+    border-radius: 2px;
+}
+.scroll-dorado::-webkit-scrollbar-thumb:hover { background: rgb(255 215 0 / 40%); }
+```
+
+Uso en cualquier módulo:
+
+```js
+const contenedor = crearElemento('div', 'mi-lista scroll-dorado');
+contenedor.style.maxHeight = '200px';
+contenedor.style.overflowY = 'auto';
+```
+
+Usado en: `libro.js` (detalleWrap), `libroHeroes.js` y `libroVillanos.js` (descripción), `libroJuegos.js` (selector grid del duelo).
+
+### Regla general
+
+Si un patrón visual (scrollbar, animación, layout) ya existe en otro juego o componente:
+1. Extraerlo a una clase utilitaria en `css/base.css`
+2. Aplicar la clase donde se necesite
+3. **No** copiar el CSS al archivo del juego nuevo
+
+---
+
 ## Tabla resumen — decisiones por juego existente
 
-| Patrón | Laberinto | Lab3D | Memorice | Abismo | Ajedrez |
-|---|---|---|---|---|---|
-| Orientación | Portrait | Landscape | Portrait | Landscape | Portrait |
-| D-pad | Centrado | CruzSplit | Oculto | Dividido | Oculto |
-| Canvas | DOM+canvas estático | Canvas 3D animado | DOM puro | Canvas animado | DOM puro |
-| sinBarra | No | No | No | No | **Sí** |
-| Clima | ✓ canvas overlay | ✓ paleta cielo | ✗ | ✓ partículas | ✗ |
-| GameLoop | ✓ | ✓ | ✗ | ✓ | ✗ |
-| notificarJugadorMuerto | ✓ | ✓ | ✓ | ✓ | No (directo) |
-| notificarVictoria | ✓ | ✓ | ✓ | ✓ | ✓ |
-| juego-inmersivo | ✗ | ✓ | ✗ | ✓ | ✗ |
-| crearTimeoutTracker | No | No | ✓ | ✓ | No |
-| Estado | est (submódulo) | est (submódulo) | vars locales | est (submódulo) | vars locales |
+| Patrón | Laberinto | Lab3D | Memorice | Abismo | Ajedrez | Duelo |
+|---|---|---|---|---|---|---|
+| Orientación | Portrait | Landscape | Portrait | Landscape | Portrait | Landscape |
+| D-pad | Centrado | CruzSplit | Oculto | Dividido | Oculto | Dividido |
+| Canvas | DOM+canvas estático | Canvas 3D animado | DOM puro | Canvas animado | DOM puro | Canvas animado |
+| sinBarra | No | No | No | No | **Sí** | **Sí** |
+| Clima | ✓ canvas overlay | ✓ paleta cielo | ✗ | ✓ partículas | ✗ | ✗ |
+| GameLoop | ✓ | ✓ | ✗ | ✓ | ✗ | ✓ |
+| notificarJugadorMuerto | ✓ | ✓ | ✓ | ✓ | No (directo) | ✓ |
+| notificarVictoria | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| juego-inmersivo | ✗ | ✓ | ✗ | ✓ | ✗ | ✗ |
+| crearTimeoutTracker | No | No | ✓ | ✓ | No | ✓ |
+| Estado | est (submódulo) | est (submódulo) | vars locales | est (submódulo) | vars locales | est (submódulo) |
 
 ---
 

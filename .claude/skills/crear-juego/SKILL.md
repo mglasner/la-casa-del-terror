@@ -235,6 +235,41 @@ timeouts.limpiar();  // cancela todos de una vez
 
 ---
 
+## Reutilización de componentes existentes
+
+Antes de crear CSS o JS nuevo, **buscar siempre** si ya existe una clase utilitaria o componente reutilizable en el proyecto. Duplicar código dificulta el mantenimiento y genera inconsistencias visuales.
+
+### Clases CSS utilitarias disponibles
+
+| Clase | Archivo | Uso |
+|-------|---------|-----|
+| `.scroll-dorado` | `css/base.css` | Scrollbar estilizado dorado para contenedores con overflow |
+| `.oculto` | `css/base.css` | `display: none !important` |
+
+Ejemplo — agregar scroll dorado a un contenedor:
+
+```js
+// En JS, al crear el elemento:
+const grid = crearElemento('div', 'mi-selector scroll-dorado');
+grid.style.maxHeight = '200px';
+grid.style.overflowY = 'auto';
+```
+
+### Componentes JS reutilizables
+
+Antes de implementar funcionalidad nueva, verificar estos módulos:
+
+- `componentes/toast.js` → `lanzarToast()` — feedback flotante (no crear alertas propias)
+- `componentes/pantallaJuego.js` → `crearPantallaJuego()` — wrapper con cabecera y botón huir
+- `componentes/libro.js` → `crearCabecera()` — avatar + nombre para detalle de personaje
+- `componentes/stats.js` → `llenarStats()` — panel de habilidades estándar
+- `utils.js` → `crearElemento()`, `crearGameLoop()`, `crearTimeoutTracker()`
+- `eventos.js` → eventos de comunicación juego ↔ juego.js
+
+**Regla**: si necesitas un patrón visual que ya existe en otro juego o componente, extráelo a una clase utilitaria en `base.css` o a un módulo compartido, en vez de copiar el CSS.
+
+---
+
 ## Checklist de integración completa
 
 Antes de dar el juego por terminado, verificar:
@@ -255,6 +290,6 @@ Antes de dar el juego por terminado, verificar:
 
 ## Recursos de referencia
 
-Para ver los 20 patrones en detalle con ejemplos de código de todos los juegos existentes:
+Para ver los 19 patrones en detalle con ejemplos de código de todos los juegos existentes:
 
 - **`references/patrones.md`** — Catálogo completo de patrones con código real
