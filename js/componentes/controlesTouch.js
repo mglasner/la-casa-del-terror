@@ -2,7 +2,7 @@
 // Soporta tres modos:
 // - Centrado (laberinto 2D): 4 botones ▲◀▶▼ centrados abajo
 // - Dividido (platformer): izq ◀▶ movimiento / der botones A (saltar) y B (agacharse)
-// - CruzSplit (laberinto 3D): cruz ▲◀▶▼ a la izquierda + der A/B
+// - CruzSplit: cruz ▲◀▶▼ a la izquierda + der A/B (keys configurables)
 //
 // La cruz soporta diagonales invisibles: tocar entre dos flechas adyacentes
 // activa ambas direcciones simultáneamente (grilla 3x3 con esquinas diagonales).
@@ -17,15 +17,19 @@ export function crearControlesTouch() {
             ocultar() {},
             setModoDividido() {},
             setModoCentrado() {},
-            setModoCruzSplit() {},
+            setModoCruzSplit(_opciones) {},
         };
     }
 
     let teclasRef = {};
     let modo = 'centrado'; // 'centrado' | 'dividido' | 'cruzSplit'
 
-    // Helper: crear boton touch con eventos tactiles (para split y A/B)
-    function crearBoton(clase, key, texto) {
+    // Keys configurables para botones A/B (se leen al momento del touch)
+    let keyA = 'ArrowUp';
+    let keyB = 'ArrowDown';
+
+    // Helper: crear botón touch con key dinámica (lee getKey() al momento del touch)
+    function crearBotonDinamico(clase, texto, getKey) {
         const btn = document.createElement('button');
         btn.className = 'dpad-btn ' + clase;
         btn.textContent = texto;
@@ -33,19 +37,26 @@ export function crearControlesTouch() {
 
         btn.addEventListener('touchstart', function (e) {
             e.preventDefault();
-            teclasRef[key] = true;
+            teclasRef[getKey()] = true;
         });
 
         btn.addEventListener('touchend', function (e) {
             e.preventDefault();
-            delete teclasRef[key];
+            delete teclasRef[getKey()];
         });
 
         btn.addEventListener('touchcancel', function () {
-            delete teclasRef[key];
+            delete teclasRef[getKey()];
         });
 
         return btn;
+    }
+
+    // Helper: crear botón touch con key fija (para split ◀▶)
+    function crearBoton(clase, key, texto) {
+        return crearBotonDinamico(clase, texto, function () {
+            return key;
+        });
     }
 
     // Helper: crear boton visual sin eventos touch (la cruz maneja touch a nivel contenedor)
@@ -140,6 +151,12 @@ export function crearControlesTouch() {
                 touchesCruz.set(touch.identifier, obtenerZona(touch));
             }
         }
+
+        // Seguridad: si no quedan dedos en la cruz, limpiar entradas huérfanas
+        if (esFin && e.targetTouches.length === 0) {
+            touchesCruz.clear();
+        }
+
         recalcularTeclasCruz();
     }
 
@@ -159,11 +176,12 @@ export function crearControlesTouch() {
     const contDer = document.createElement('div');
     contDer.className = 'dpad-der-contenedor';
 
-    // B: agacharse
-    const btnB = crearBoton('dpad-btn-b', 'ArrowDown', '▼');
-
-    // A: saltar (accion principal)
-    const btnA = crearBoton('dpad-btn-a', 'ArrowUp', 'A');
+    const btnB = crearBotonDinamico('dpad-btn-b', '▼', function () {
+        return keyB;
+    });
+    const btnA = crearBotonDinamico('dpad-btn-a', 'A', function () {
+        return keyA;
+    });
 
     contDer.appendChild(btnB);
     contDer.appendChild(btnA);
@@ -205,16 +223,33 @@ export function crearControlesTouch() {
         contDer.classList.add('oculto');
     }
 
+    function resetBotonesAB() {
+        keyA = 'ArrowUp';
+        keyB = 'ArrowDown';
+        btnA.textContent = 'A';
+        btnB.textContent = '▼';
+    }
+
     function setModoDividido() {
         modo = 'dividido';
+        resetBotonesAB();
     }
 
     function setModoCentrado() {
         modo = 'centrado';
+        resetBotonesAB();
     }
 
-    function setModoCruzSplit() {
+    function setModoCruzSplit(opciones) {
         modo = 'cruzSplit';
+        if (opciones) {
+            if (opciones.a) keyA = opciones.a;
+            if (opciones.b) keyB = opciones.b;
+            if (opciones.textoA) btnA.textContent = opciones.textoA;
+            if (opciones.textoB) btnB.textContent = opciones.textoB;
+        } else {
+            resetBotonesAB();
+        }
     }
 
     return { setTeclasRef, mostrar, ocultar, setModoDividido, setModoCentrado, setModoCruzSplit };

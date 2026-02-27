@@ -10,7 +10,6 @@ import {
     actualizarHUDTimer,
     reescalarCanvas,
     obtenerDPR,
-    obtenerBotonesAtaque,
     limpiarDOM,
 } from './domDuelo.js';
 import { crearModoLandscape } from '../../componentes/modoLandscape.js';
@@ -56,8 +55,6 @@ let timerInterval = null;
 let listenerResize = null;
 let listenerKeydown = null;
 let listenerKeyup = null;
-let listenerTouchStart = null;
-let listenerTouchEnd = null;
 
 // --- Crear luchadores desde datos del personaje/enemigo ---
 
@@ -404,31 +401,6 @@ function onKeyup(e) {
     }
 }
 
-// --- Controles touch (botones de ataque) ---
-
-function configurarTouchAtaque() {
-    const btns = obtenerBotonesAtaque();
-    if (!btns) return;
-
-    listenerTouchStart = function (e) {
-        const btn = e.target.closest('.duelo-btn-ataque');
-        if (!btn) return;
-        e.preventDefault();
-        if (btn.dataset.ataque === 'rapido') est.teclasRef.a = true;
-        if (btn.dataset.ataque === 'fuerte') est.teclasRef.s = true;
-    };
-
-    listenerTouchEnd = function (e) {
-        const btn = e.target.closest('.duelo-btn-ataque');
-        if (!btn) return;
-        if (btn.dataset.ataque === 'rapido') est.teclasRef.a = false;
-        if (btn.dataset.ataque === 'fuerte') est.teclasRef.s = false;
-    };
-
-    btns.addEventListener('touchstart', listenerTouchStart, { passive: false });
-    btns.addEventListener('touchend', listenerTouchEnd);
-}
-
 // --- API pública ---
 
 /**
@@ -443,10 +415,8 @@ export function iniciarDuelo(jugador, onSalir, dpad, opciones) {
     est.callbackSalir = onSalir;
     est.dpadRef = dpad;
 
-    const esTouch = 'ontouchstart' in window;
-
     // DOM
-    const dom = crearPantalla(esTouch, function () {
+    const dom = crearPantalla(function () {
         const salir = est.callbackSalir;
         limpiarDuelo();
         salir();
@@ -456,11 +426,11 @@ export function iniciarDuelo(jugador, onSalir, dpad, opciones) {
 
     if (!est.ctx) return;
 
-    // D-pad (modo dividido: izq movimiento, der salto/agacharse)
+    // D-pad (cruzSplit: izq cruz ▲◀▶▼ con diagonales, der A/B → ataque)
     est.dpadRef = dpad;
     if (est.dpadRef) {
         est.dpadRef.setTeclasRef(est.teclasRef);
-        est.dpadRef.setModoDividido();
+        est.dpadRef.setModoCruzSplit({ a: 'a', b: 's', textoA: 'A', textoB: 'B' });
         est.dpadRef.mostrar();
     }
 
@@ -502,9 +472,6 @@ export function iniciarDuelo(jugador, onSalir, dpad, opciones) {
     listenerKeyup = onKeyup;
     document.addEventListener('keydown', listenerKeydown);
     document.addEventListener('keyup', listenerKeyup);
-
-    // Controles touch
-    configurarTouchAtaque();
 
     // Resize
     listenerResize = reescalarCanvas;
@@ -553,14 +520,6 @@ export function limpiarDuelo() {
         window.removeEventListener('resize', listenerResize);
         listenerResize = null;
     }
-
-    const btns = obtenerBotonesAtaque();
-    if (btns && listenerTouchStart) {
-        btns.removeEventListener('touchstart', listenerTouchStart);
-        btns.removeEventListener('touchend', listenerTouchEnd);
-    }
-    listenerTouchStart = null;
-    listenerTouchEnd = null;
 
     if (est.dpadRef) {
         est.dpadRef.setModoCentrado();

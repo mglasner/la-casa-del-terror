@@ -1,4 +1,4 @@
-// El Duelo: Creación del DOM (pantalla, canvas, HUD dual, botones ataque móvil)
+// El Duelo: Creación del DOM (pantalla, canvas, HUD dual)
 
 import { CFG } from './config.js';
 import { crearPantallaJuego } from '../../componentes/pantallaJuego.js';
@@ -12,7 +12,6 @@ let hudEnemigoBarra = null;
 let hudJugadorNombre = null;
 let hudEnemigoNombre = null;
 let hudTimer = null;
-let botonesAtaque = null;
 
 function calcularEscala(canvas) {
     const rect = canvas.getBoundingClientRect();
@@ -34,7 +33,7 @@ function calcularDPR(escala) {
     return Math.min(4, Math.max(2, Math.ceil(escalaFisica)));
 }
 
-export function crearPantalla(esTouch, onHuir) {
+export function crearPantalla(onHuir) {
     const anchoCanvas = CFG.canvas.anchoBase;
     const altoCanvas = CFG.canvas.altoBase;
 
@@ -93,28 +92,10 @@ export function crearPantalla(esTouch, onHuir) {
 
     wrapper.appendChild(canvas);
     wrapper.appendChild(hud);
-
-    // Botones de ataque (solo mobile)
-    if (esTouch) {
-        botonesAtaque = document.createElement('div');
-        botonesAtaque.className = 'duelo-btns-ataque';
-
-        const btnRapido = crearElemento('button', 'duelo-btn-ataque duelo-btn-rapido', 'A');
-        btnRapido.type = 'button';
-        btnRapido.dataset.ataque = 'rapido';
-
-        const btnFuerte = crearElemento('button', 'duelo-btn-ataque duelo-btn-fuerte', 'B');
-        btnFuerte.type = 'button';
-        btnFuerte.dataset.ataque = 'fuerte';
-
-        botonesAtaque.appendChild(btnRapido);
-        botonesAtaque.appendChild(btnFuerte);
-        wrapper.appendChild(botonesAtaque);
-    }
-
     pantalla.appendChild(wrapper);
 
     // Hint de controles (solo desktop)
+    const esTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     if (!esTouch) {
         pantalla.appendChild(
             crearElemento(
@@ -183,10 +164,6 @@ export function obtenerDPR() {
     return canvasDPR;
 }
 
-export function obtenerBotonesAtaque() {
-    return botonesAtaque;
-}
-
 export function limpiarDOM() {
     canvasRef = null;
     canvasDPR = 1;
@@ -195,5 +172,4 @@ export function limpiarDOM() {
     hudJugadorNombre = null;
     hudEnemigoNombre = null;
     hudTimer = null;
-    botonesAtaque = null;
 }
