@@ -48,7 +48,7 @@ const PERSONAJES = {
         [
             {
                 nombre: 'Latigazo de tela',
-                dano: 20,
+                dano: 25,
                 descripcion: 'Un giro envolvente con la tela aérea',
                 arquetipo: 'carga',
                 color: '#ffffff',
@@ -56,7 +56,7 @@ const PERSONAJES = {
             },
             {
                 nombre: 'Giro del cubo',
-                dano: 10,
+                dano: 15,
                 descripcion: 'Atrapa al rival girando desde el cubo',
                 arquetipo: 'aoe',
                 color: '#2ecc71',
@@ -87,7 +87,7 @@ const PERSONAJES = {
         [
             {
                 nombre: 'Corte samurái',
-                dano: 30,
+                dano: 24,
                 descripcion: 'Un tajo devastador',
                 arquetipo: 'carga',
                 color: '#c0392b',
@@ -95,7 +95,7 @@ const PERSONAJES = {
             },
             {
                 nombre: 'Golpe de bambú',
-                dano: 18,
+                dano: 14,
                 descripcion: 'Golpe rápido con bambú',
                 arquetipo: 'proyectil',
                 color: '#4a7c3f',
@@ -125,7 +125,7 @@ const PERSONAJES = {
         [
             {
                 nombre: 'Pirueta fulminante',
-                dano: 20,
+                dano: 22,
                 descripcion: 'Un giro vertiginoso que derriba al rival',
                 arquetipo: 'carga',
                 color: '#e91e90',
@@ -164,7 +164,7 @@ const PERSONAJES = {
         [
             {
                 nombre: 'Disparo certero',
-                dano: 28,
+                dano: 21,
                 descripcion: 'Un tiro preciso que no falla',
                 arquetipo: 'proyectil',
                 color: '#2ec4b6',
@@ -172,7 +172,7 @@ const PERSONAJES = {
             },
             {
                 nombre: 'Trampa de luz',
-                dano: 18,
+                dano: 13,
                 descripcion: 'Destello que ciega y daña',
                 arquetipo: 'aoe',
                 color: '#ffffff',
@@ -203,7 +203,7 @@ const PERSONAJES = {
         [
             {
                 nombre: 'Patada de mula',
-                dano: 35,
+                dano: 24,
                 descripcion: 'Una coz devastadora',
                 arquetipo: 'carga',
                 color: '#d4a052',
@@ -211,7 +211,7 @@ const PERSONAJES = {
             },
             {
                 nombre: 'Cabezazo terco',
-                dano: 20,
+                dano: 11,
                 descripcion: 'Embiste con toda su terquedad',
                 arquetipo: 'salto',
                 color: '#8B6914',
@@ -241,7 +241,7 @@ const PERSONAJES = {
         [
             {
                 nombre: 'Cucharonazo',
-                dano: 18,
+                dano: 22,
                 descripcion: 'Un golpe certero con el cucharón de madera',
                 arquetipo: 'carga',
                 color: '#8B4513',
@@ -249,7 +249,7 @@ const PERSONAJES = {
             },
             {
                 nombre: 'Abrazo aplastante',
-                dano: 22,
+                dano: 28,
                 descripcion: 'Un abrazo maternal con la fuerza de quien carga 15 hijos',
                 arquetipo: 'salto',
                 color: '#f8a5c2',
@@ -279,7 +279,7 @@ const PERSONAJES = {
         [
             {
                 nombre: 'Azadonazo',
-                dano: 25,
+                dano: 20,
                 descripcion: 'Un golpe contundente con su azadón de campo',
                 arquetipo: 'carga',
                 color: '#808080',
@@ -287,7 +287,7 @@ const PERSONAJES = {
             },
             {
                 nombre: 'Lluvia de zanahorias',
-                dano: 15,
+                dano: 10,
                 descripcion: 'Lanza zanahorias a diestra y siniestra desde su bolsa',
                 arquetipo: 'proyectil',
                 color: '#ff8c00',

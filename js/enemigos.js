@@ -9,7 +9,7 @@ const ENEMIGOS = {
         [
             {
                 nombre: 'Llama negra',
-                dano: 15,
+                dano: 12,
                 descripcion: 'Fuego oscuro que consume todo',
                 arquetipo: 'proyectil',
                 color: '#1a0a2e',
@@ -17,7 +17,7 @@ const ENEMIGOS = {
             },
             {
                 nombre: 'Grito arcano',
-                dano: 18,
+                dano: 14,
                 descripcion: 'Onda de energía pura',
                 arquetipo: 'aoe',
                 color: '#9b59b6',
@@ -81,7 +81,7 @@ const ENEMIGOS = {
         [
             {
                 nombre: 'Mordida tóxica',
-                dano: 18,
+                dano: 22,
                 descripcion: 'Mordida venenosa que infecta',
                 arquetipo: 'carga',
                 color: '#00ff88',
@@ -89,7 +89,7 @@ const ENEMIGOS = {
             },
             {
                 nombre: 'Eco fantasmal',
-                dano: 12,
+                dano: 17,
                 descripcion: 'Aullido paralizante de otro mundo',
                 arquetipo: 'proyectil',
                 color: '#b0e0e6',
@@ -116,7 +116,7 @@ const ENEMIGOS = {
         [
             {
                 nombre: 'Zarpazo sombrío',
-                dano: 18,
+                dano: 16,
                 descripcion: 'Un zarpazo rápido desde las sombras',
                 arquetipo: 'carga',
                 color: '#1a1a2e',
@@ -124,7 +124,7 @@ const ENEMIGOS = {
             },
             {
                 nombre: 'Emboscada',
-                dano: 15,
+                dano: 13,
                 descripcion: 'Aparece por sorpresa y ataca',
                 arquetipo: 'salto',
                 color: '#000000',
@@ -231,7 +231,7 @@ const ENEMIGOS = {
             },
             {
                 nombre: 'Caída vertiginosa',
-                dano: 20,
+                dano: 18,
                 descripcion: 'Se lanza desde lo alto con todo su peso',
                 arquetipo: 'salto',
                 color: '#cc6699',
@@ -258,7 +258,7 @@ const ENEMIGOS = {
         [
             {
                 nombre: 'Nota discordante',
-                dano: 16,
+                dano: 12,
                 descripcion: 'Una nota tan desafinada que hace temblar los huesos',
                 arquetipo: 'proyectil',
                 color: '#ffd700',
@@ -266,7 +266,7 @@ const ENEMIGOS = {
             },
             {
                 nombre: 'Réquiem arcano',
-                dano: 20,
+                dano: 15,
                 descripcion: 'Melodía arcana que drena la energía vital',
                 arquetipo: 'aoe',
                 color: '#4a0080',
@@ -294,7 +294,7 @@ const ENEMIGOS = {
         [
             {
                 nombre: 'Bocado estelar',
-                dano: 24,
+                dano: 18,
                 descripcion: 'Mordisco cósmico que hace temblar el espacio',
                 arquetipo: 'carga',
                 color: '#ff4500',
@@ -302,7 +302,7 @@ const ENEMIGOS = {
             },
             {
                 nombre: 'Gran Mascada',
-                dano: 30,
+                dano: 24,
                 descripcion: 'Abre sus fauces y tritura todo a su paso',
                 arquetipo: 'aoe',
                 color: '#8b0000',
@@ -330,7 +330,7 @@ const ENEMIGOS = {
         [
             {
                 nombre: 'Niebla cósmica',
-                dano: 20,
+                dano: 14,
                 descripcion: 'Envuelve al rival en oscuridad helada',
                 arquetipo: 'aoe',
                 color: '#4a0e4e',
@@ -339,7 +339,7 @@ const ENEMIGOS = {
             },
             {
                 nombre: 'Vórtice de sombra',
-                dano: 26,
+                dano: 19,
                 descripcion: 'Remolino de sombras que arrastra todo',
                 arquetipo: 'proyectil',
                 color: '#0a0a3a',

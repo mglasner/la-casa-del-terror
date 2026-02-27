@@ -49,13 +49,13 @@ Rosé:
     emojiHud: "\u2728"
     ataques:
         - nombre: Latigazo de tela
-          dano: 20
+          dano: 25
           descripcion: Un giro envolvente con la tela aérea
           arquetipo: carga
           color: '#ffffff'
           colorSecundario: '#2ecc71'
         - nombre: Giro del cubo
-          dano: 10
+          dano: 15
           descripcion: Atrapa al rival girando desde el cubo
           arquetipo: aoe
           color: '#2ecc71'
@@ -81,13 +81,13 @@ PandaJuro:
     emojiHud: "\u2694\uFE0F"
     ataques:
         - nombre: Corte samurái
-          dano: 30
+          dano: 24
           descripcion: Un tajo devastador
           arquetipo: carga
           color: '#c0392b'
           colorSecundario: '#e0e0e0'
         - nombre: Golpe de bambú
-          dano: 18
+          dano: 14
           descripcion: Golpe rápido con bambú
           arquetipo: proyectil
           color: '#4a7c3f'
@@ -112,7 +112,7 @@ Hana:
     emojiHud: "\U0001F338"
     ataques:
         - nombre: Pirueta fulminante
-          dano: 20
+          dano: 22
           descripcion: Un giro vertiginoso que derriba al rival
           arquetipo: carga
           color: '#e91e90'
@@ -144,13 +144,13 @@ Kira:
     emojiHud: "\U0001F526"
     ataques:
         - nombre: Disparo certero
-          dano: 28
+          dano: 21
           descripcion: Un tiro preciso que no falla
           arquetipo: proyectil
           color: '#2ec4b6'
           colorSecundario: '#ffffff'
         - nombre: Trampa de luz
-          dano: 18
+          dano: 13
           descripcion: Destello que ciega y daña
           arquetipo: aoe
           color: '#ffffff'
@@ -176,13 +176,13 @@ DonBu:
     emojiHud: "\U0001F6E1\uFE0F"
     ataques:
         - nombre: Patada de mula
-          dano: 35
+          dano: 24
           descripcion: Una coz devastadora
           arquetipo: carga
           color: '#d4a052'
           colorSecundario: '#8B6914'
         - nombre: Cabezazo terco
-          dano: 20
+          dano: 11
           descripcion: Embiste con toda su terquedad
           arquetipo: salto
           color: '#8B6914'
@@ -207,13 +207,13 @@ PomPom:
     emojiHud: "\U0001F944"
     ataques:
         - nombre: Cucharonazo
-          dano: 18
+          dano: 22
           descripcion: Un golpe certero con el cucharón de madera
           arquetipo: carga
           color: '#8B4513'
           colorSecundario: '#f8a5c2'
         - nombre: Abrazo aplastante
-          dano: 22
+          dano: 28
           descripcion: Un abrazo maternal con la fuerza de quien carga 15 hijos
           arquetipo: salto
           color: '#f8a5c2'
@@ -238,13 +238,13 @@ Orejas:
     emojiHud: "\U0001F955"
     ataques:
         - nombre: Azadonazo
-          dano: 25
+          dano: 20
           descripcion: Un golpe contundente con su azadón de campo
           arquetipo: carga
           color: '#808080'
           colorSecundario: '#e67e22'
         - nombre: Lluvia de zanahorias
-          dano: 15
+          dano: 10
           descripcion: Lanza zanahorias a diestra y siniestra desde su bolsa
           arquetipo: proyectil
           color: '#ff8c00'
