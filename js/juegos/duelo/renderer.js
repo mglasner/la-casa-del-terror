@@ -3,17 +3,58 @@
 
 import { CFG } from './config.js';
 import { obtenerSprite } from './spritesDuelo.js';
+import { ESTACIONES } from '../clima.js';
+import { renderizarGradas } from './gradas.js';
+import { hexARgb } from './utilsDuelo.js';
 
 const RND = CFG.render;
 const ARENA = CFG.arena;
 
-function hexARgb(hex) {
-    if (!hex || hex.length < 7) return { r: 200, g: 100, b: 255 };
-    return {
-        r: parseInt(hex.slice(1, 3), 16),
-        g: parseInt(hex.slice(3, 5), 16),
-        b: parseInt(hex.slice(5, 7), 16),
-    };
+// --- Paletas de fondo por estación (día vs noche) ---
+
+const PALETA_NOCHE = {
+    cieloTop: RND.colorFondo,
+    cieloMid: '#1a0d2a',
+    cieloBot: RND.colorSuelo,
+    suelo: RND.colorSuelo,
+    borde: RND.colorArenaClaro || '#3d2560',
+};
+
+const PALETA_PRIMAVERA = {
+    cieloTop: '#4a9ed4',
+    cieloMid: '#7ec8e8',
+    cieloBot: '#c8b890',
+    suelo: '#8b7355',
+    borde: '#a08060',
+};
+
+const PALETA_VERANO = {
+    cieloTop: '#1a5fa8',
+    cieloMid: '#3a8fd4',
+    cieloBot: '#c8a040',
+    suelo: '#9a7a40',
+    borde: '#b89050',
+};
+
+function obtenerPaleta(estacion) {
+    if (estacion === 'primavera') return PALETA_PRIMAVERA;
+    if (estacion === 'verano') return PALETA_VERANO;
+    return PALETA_NOCHE;
+}
+
+// --- Estado de clima del renderer ---
+
+let relampagueoFrames = 0;
+let contadorRelampago = 280 + Math.floor(Math.random() * 140);
+let frameClimaRenderer = 0;
+
+/**
+ * Resetea contadores internos de clima del renderer
+ */
+export function reiniciarClimaRenderer() {
+    relampagueoFrames = 0;
+    contadorRelampago = 280 + Math.floor(Math.random() * 140);
+    frameClimaRenderer = 0;
 }
 
 // --- Aura radial detrás de cada luchador ---
@@ -69,21 +110,33 @@ function renderizarFlash(ctx, ancho, alto, flashAlpha) {
 
 // --- Fondo y arena ---
 
-function renderizarArena(ctx, ancho, alto) {
-    // Fondo degradado
+function renderizarArena(ctx, ancho, alto, estacion) {
+    const pal = obtenerPaleta(estacion);
+
+    // Fondo degradado (cielo)
     const grad = ctx.createLinearGradient(0, 0, 0, alto);
-    grad.addColorStop(0, RND.colorFondo);
-    grad.addColorStop(0.7, '#1a0d2a');
-    grad.addColorStop(1, RND.colorSuelo);
+    grad.addColorStop(0, pal.cieloTop);
+    grad.addColorStop(0.7, pal.cieloMid);
+    grad.addColorStop(1, pal.cieloBot);
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, ancho, alto);
 
+    // Gradas con espectadores (detrás del suelo)
+    renderizarGradas(ctx, ancho, estacion);
+
     // Suelo
-    ctx.fillStyle = RND.colorSuelo;
+    ctx.fillStyle = pal.suelo;
     ctx.fillRect(0, ARENA.sueloY, ancho, alto - ARENA.sueloY);
 
+    // Tinte sutil de estación sobre el suelo
+    if (estacion) {
+        const [r, g, b] = ESTACIONES[estacion].tinte;
+        ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',0.12)';
+        ctx.fillRect(0, ARENA.sueloY, ancho, alto - ARENA.sueloY);
+    }
+
     // Línea de borde superior del suelo
-    ctx.fillStyle = RND.colorArenaClaro || '#3d2560';
+    ctx.fillStyle = pal.borde;
     ctx.fillRect(0, ARENA.sueloY, ancho, 2);
 
     // Marcas decorativas del suelo
@@ -262,22 +315,97 @@ function renderizarResultado(ctx, ancho, alto, est) {
     ctx.restore();
 }
 
+// --- Efecto clima overlay ---
+
+/**
+ * Renderiza tinte ambiental y efecto especial de la estación activa.
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {string|null} estacion
+ * @param {number} ancho
+ * @param {number} alto
+ */
+export function renderizarEfectoClima(ctx, estacion, ancho, alto) {
+    if (!estacion) return;
+    frameClimaRenderer++;
+
+    const [r, g, b, a] = ESTACIONES[estacion].tinte;
+
+    // Tinte ambiental sutil
+    ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+    ctx.fillRect(0, 0, ancho, alto);
+
+    if (estacion === 'invierno') {
+        // Relámpago púrpura-blanco cada 280-420 frames
+        contadorRelampago--;
+        if (contadorRelampago <= 0) {
+            relampagueoFrames = 12;
+            contadorRelampago = 280 + Math.floor(Math.random() * 140);
+        }
+        if (relampagueoFrames > 0) {
+            const flashAlpha = relampagueoFrames > 9 ? 0.7 : (relampagueoFrames / 9) * 0.7;
+            ctx.fillStyle = 'rgba(200,170,255,' + flashAlpha.toFixed(2) + ')';
+            ctx.fillRect(0, 0, ancho, alto);
+            relampagueoFrames--;
+        }
+    } else if (estacion === 'primavera') {
+        // Sol suave esquina superior derecha
+        const cx = ancho * 0.88;
+        const radSol = 55 + Math.sin(frameClimaRenderer * 0.02) * 5;
+        const gradSol = ctx.createRadialGradient(cx, 0, 0, cx, 0, radSol);
+        gradSol.addColorStop(0, 'rgba(255,240,150,0.18)');
+        gradSol.addColorStop(0.6, 'rgba(255,240,150,0.05)');
+        gradSol.addColorStop(1, 'rgba(255,240,150,0)');
+        ctx.fillStyle = gradSol;
+        ctx.fillRect(cx - radSol, 0, radSol * 2, radSol);
+    } else if (estacion === 'verano') {
+        // Sol intenso esquina superior izquierda (ciclo 4s)
+        const ciclo = (Math.sin(frameClimaRenderer * (Math.PI / 120)) + 1) / 2;
+        const radioSol = 70 + ciclo * 40;
+        const cx = ancho * 0.15;
+        const gradSol = ctx.createRadialGradient(cx, 0, 0, cx, 0, radioSol);
+        gradSol.addColorStop(0, 'rgba(255,200,50,0.22)');
+        gradSol.addColorStop(0.5, 'rgba(220,140,20,0.08)');
+        gradSol.addColorStop(1, 'rgba(220,100,10,0)');
+        ctx.fillStyle = gradSol;
+        ctx.fillRect(0, 0, radioSol * 2, radioSol * 1.5);
+    } else if (estacion === 'otono') {
+        // Líneas horizontales de viento ocasionales
+        if (Math.random() < 0.04) {
+            ctx.strokeStyle = 'rgba(200,160,80,0.08)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 4; i++) {
+                const wy = Math.random() * alto;
+                const wx = Math.random() * ancho * 0.6;
+                const ww = 20 + Math.random() * 35;
+                ctx.beginPath();
+                ctx.moveTo(wx, wy);
+                ctx.lineTo(wx + ww, wy);
+                ctx.stroke();
+            }
+        }
+    }
+}
+
 // --- Escena completa ---
 
 export function renderizarEscena(ctx, ancho, alto, est) {
     // Limpiar
     ctx.clearRect(0, 0, ancho, alto);
 
-    // Arena y luchadores siempre visibles
-    renderizarArena(ctx, ancho, alto);
+    // Arena (con tinte de estación)
+    renderizarArena(ctx, ancho, alto, est.estacion);
 
+    // Luchadores
     if (est.luchador1) renderizarLuchador(ctx, est.luchador1);
     if (est.luchador2) renderizarLuchador(ctx, est.luchador2);
 
-    // Flash de impacto (entre luchadores y overlays)
+    // Flash de impacto
     if (est.flashAlpha > 0) {
         renderizarFlash(ctx, ancho, alto, est.flashAlpha);
     }
+
+    // Overlay de clima (después de flash, antes de overlays de fase)
+    renderizarEfectoClima(ctx, est.estacion, ancho, alto);
 
     // Overlays según fase
     if (est.fase === 'countdown') {

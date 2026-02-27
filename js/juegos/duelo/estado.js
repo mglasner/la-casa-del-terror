@@ -26,6 +26,8 @@ const valoresIniciales = {
     // Ronda
     tiempoRestante: CFG.combate.tiempoRonda,
     ganador: null, // 'jugador' | 'enemigo' | 'empate'
+    // Clima estacional (puramente visual)
+    estacion: null,
     // Efectos visuales
     flashAlpha: 0,
 };

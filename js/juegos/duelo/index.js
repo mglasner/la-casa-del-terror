@@ -17,11 +17,12 @@ import { crearModoLandscape } from '../../componentes/modoLandscape.js';
 import { crearGameLoop } from '../../utils.js';
 import { notificarVictoria, notificarJugadorMuerto } from '../../eventos.js';
 import { crearLuchador, actualizarLuchador, aplicarGravedad } from './luchador.js';
-import { renderizarEscena } from './renderer.js';
+import { renderizarEscena, reiniciarClimaRenderer } from './renderer.js';
 import { procesarAtaque, verificarColisiones } from './combate.js';
 import { actualizarIA, resetearIA } from './ia.js';
 import {
     emitirAura,
+    emitirClima,
     emitirImpacto,
     emitirBloqueo,
     emitirKO,
@@ -30,9 +31,13 @@ import {
     actualizarProyectiles,
     renderizarParticulas,
     renderizarProyectiles,
+    reiniciarClimaParticulas,
     limpiarParticulas,
 } from './particulas.js';
 import { cargarSpritesLuchador, limpiarSprites } from './spritesDuelo.js';
+import { inicializarGradas, actualizarGradas, limpiarGradas } from './gradas.js';
+import { sortearEstacion, ESTACIONES } from '../clima.js';
+import { lanzarToast } from '../../componentes/toast.js';
 
 const ANCHO = CFG.canvas.anchoBase;
 const ALTO = CFG.canvas.altoBase;
@@ -217,6 +222,9 @@ function actualizar(_tiempo, dt) {
         emitirAura(l1);
         emitirAura(l2);
 
+        // Partículas de clima
+        if (est.estacion) emitirClima(est.estacion, ANCHO);
+
         // Emitir proyectiles al iniciar ataque a distancia
         if (l1.estado === 'atacando' && l1.esProyectil && !l1.proyectilEmitido) {
             emitirProyectil(l1, l2);
@@ -268,6 +276,9 @@ function actualizar(_tiempo, dt) {
 
     // Decay del flash
     est.flashAlpha *= 0.88;
+
+    // Gradas (espectadores animados)
+    actualizarGradas(est);
 
     // Partículas y proyectiles (siempre)
     actualizarParticulas(dt);
@@ -380,9 +391,18 @@ export function iniciarDuelo(jugador, onSalir, dpad, opciones) {
     });
     est.modoLandscape.activar();
 
-    // Crear luchadores y resetear IA
+    // Crear luchadores, resetear IA y sortear clima
     resetearIA();
+    est.estacion = sortearEstacion();
+    reiniciarClimaParticulas();
+    reiniciarClimaRenderer();
     crearLuchadores(jugador, opciones || {});
+    inicializarGradas(
+        est.luchador1.nombre,
+        est.luchador1.esVillano,
+        est.luchador2.nombre,
+        est.luchador2.esVillano
+    );
 
     // Cargar sprites
     cargarSpritesLuchador(est.luchador1);
@@ -414,6 +434,13 @@ export function iniciarDuelo(jugador, onSalir, dpad, opciones) {
     // Iniciar countdown directo
     est.activo = true;
     iniciarFaseCountdown();
+
+    // Toast de clima estacional
+    if (est.estacion) {
+        timeouts.set(function () {
+            if (est.activo) lanzarToast(ESTACIONES[est.estacion].nombre, '🌪️', 'estado');
+        }, 1200);
+    }
 
     // Game loop
     gameLoop = crearGameLoop(actualizar);
@@ -465,6 +492,7 @@ export function limpiarDuelo() {
     }
 
     limpiarParticulas();
+    limpiarGradas();
     limpiarSprites();
 
     // Quitar modo inmersivo

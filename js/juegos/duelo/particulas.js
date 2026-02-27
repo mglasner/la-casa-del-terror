@@ -1,37 +1,42 @@
 // El Duelo — Sistema de partículas
 // Emisores para impacto de golpe, bloqueo, KO, aura y clima estacional
+// Las funciones de clima aceptan un estado externo opcional para reusar
+// la lógica en showcases sin duplicar código.
 
 import { CFG } from './config.js';
 import { PALETAS_PETALO, PALETAS_HOJA, PARTICULAS_2D } from '../clima.js';
+import { hexARgb } from './utilsDuelo.js';
 
 const SUELO_Y = CFG.arena.sueloY;
+const MAX_PARTICULAS = 350;
 
-function hexARgb(hex) {
-    if (!hex || hex.length < 7) return { r: 200, g: 100, b: 255 };
+// --- Estado de partículas climáticas ---
+
+/**
+ * Crea un estado aislado de partículas climáticas.
+ * Útil para showcases con múltiples paneles independientes.
+ * @returns {{ partic: Array, t: number, rafCounter: number, rafProx: number, rafActiva: boolean, rafFrames: number }}
+ */
+export function crearEstadoClima() {
+    const raf = PARTICULAS_2D.otono.rafaga;
     return {
-        r: parseInt(hex.slice(1, 3), 16),
-        g: parseInt(hex.slice(3, 5), 16),
-        b: parseInt(hex.slice(5, 7), 16),
+        partic: [],
+        t: 0,
+        rafCounter: 0,
+        rafProx: raf.intervaloMin + Math.floor(Math.random() * raf.intervaloRand),
+        rafActiva: false,
+        rafFrames: 0,
     };
 }
 
-// --- Partículas ---
+// Estado global por defecto (usado por el juego)
+const _defecto = crearEstadoClima();
 
-const particulas = [];
-const MAX_PARTICULAS = 350;
+// Alias al array global — las funciones de combate (emitir, emitirAura, etc.)
+// siempre operan sobre este array compartido.
+const particulas = _defecto.partic;
 
-// Estado de clima
-let frameClima = 0;
-let rafagaCounter = 0;
-let rafagaProxFrame = 0;
-let rafagaActiva = false;
-let rafagaFramesRestantes = 0;
-
-function resetRafaga() {
-    const raf = PARTICULAS_2D.otono.rafaga;
-    rafagaProxFrame = raf.intervaloMin + Math.floor(Math.random() * raf.intervaloRand);
-}
-resetRafaga();
+// --- Partículas de combate (siempre globales) ---
 
 function emitir(x, y, cantidad, cfg) {
     for (let i = 0; i < cantidad && particulas.length < MAX_PARTICULAS; i++) {
@@ -190,34 +195,38 @@ export function emitirKO(x, y) {
 
 // --- Clima estacional ---
 
-function manejarRafagaOtono() {
-    rafagaCounter++;
-    if (rafagaCounter >= rafagaProxFrame) {
-        rafagaCounter = 0;
-        resetRafaga();
-        rafagaActiva = true;
-        rafagaFramesRestantes = PARTICULAS_2D.otono.rafaga.duracion;
+function manejarRafagaOtono(est) {
+    est.rafCounter++;
+    if (est.rafCounter >= est.rafProx) {
+        est.rafCounter = 0;
+        const raf = PARTICULAS_2D.otono.rafaga;
+        est.rafProx = raf.intervaloMin + Math.floor(Math.random() * raf.intervaloRand);
+        est.rafActiva = true;
+        est.rafFrames = raf.duracion;
     }
-    if (rafagaActiva) {
-        rafagaFramesRestantes--;
-        if (rafagaFramesRestantes <= 0) rafagaActiva = false;
+    if (est.rafActiva) {
+        est.rafFrames--;
+        if (est.rafFrames <= 0) est.rafActiva = false;
     }
 }
 
 /**
  * Emite partículas climáticas para la estación activa.
- * Llamar cada frame desde la fase de pelea.
  * @param {string} estacion - 'invierno'|'primavera'|'verano'|'otono'
  * @param {number} ancho - Ancho del canvas
+ * @param {Object} [est] - Estado externo (si se omite, usa el global)
  */
-export function emitirClima(estacion, ancho) {
+export function emitirClima(estacion, ancho, est = _defecto) {
     if (!estacion) return;
+
+    const arr = est.partic;
+    const t = est.t;
 
     if (estacion === 'invierno') {
         const ll = PARTICULAS_2D.invierno.lluvia;
         const n = ll.cantidad + Math.floor(Math.random() * ll.cantidadRand);
-        for (let i = 0; i < n && particulas.length < MAX_PARTICULAS; i++) {
-            particulas.push({
+        for (let i = 0; i < n && arr.length < MAX_PARTICULAS; i++) {
+            arr.push({
                 x: Math.random() * ancho,
                 y: -4,
                 vx: ll.vx,
@@ -235,10 +244,10 @@ export function emitirClima(estacion, ancho) {
         }
     } else if (estacion === 'primavera') {
         const pet = PARTICULAS_2D.primavera.petalos;
-        if (frameClima % pet.intervalo === 0 && particulas.length < MAX_PARTICULAS) {
+        if (t % pet.intervalo === 0 && arr.length < MAX_PARTICULAS) {
             const c = PALETAS_PETALO[Math.floor(Math.random() * PALETAS_PETALO.length)];
             const vidaMax = pet.vidaBase + Math.floor(Math.random() * pet.vidaRand);
-            particulas.push({
+            arr.push({
                 x: Math.random() * ancho,
                 y: -4,
                 vx: (Math.random() - 0.5) * pet.vxRand,
@@ -255,8 +264,8 @@ export function emitirClima(estacion, ancho) {
             });
         }
         const dest = PARTICULAS_2D.primavera.destellos;
-        if (frameClima % dest.intervalo === 0 && particulas.length < MAX_PARTICULAS) {
-            particulas.push({
+        if (t % dest.intervalo === 0 && arr.length < MAX_PARTICULAS) {
+            arr.push({
                 x: Math.random() * ancho,
                 y: Math.random() * 120,
                 vx: 0,
@@ -274,8 +283,8 @@ export function emitirClima(estacion, ancho) {
         }
     } else if (estacion === 'verano') {
         const pol = PARTICULAS_2D.verano.polvo;
-        if (frameClima % pol.intervalo === 0 && particulas.length < MAX_PARTICULAS) {
-            particulas.push({
+        if (t % pol.intervalo === 0 && arr.length < MAX_PARTICULAS) {
+            arr.push({
                 x: Math.random() * ancho,
                 y: Math.random() * 90,
                 vx: pol.vxBase + Math.random() * pol.vxRand,
@@ -292,16 +301,16 @@ export function emitirClima(estacion, ancho) {
             });
         }
     } else if (estacion === 'otono') {
-        manejarRafagaOtono();
+        manejarRafagaOtono(est);
 
         const hoj = PARTICULAS_2D.otono.hojas;
         const raf = PARTICULAS_2D.otono.rafaga;
-        if (frameClima % hoj.intervalo === 0 && particulas.length < MAX_PARTICULAS) {
+        if (t % hoj.intervalo === 0 && arr.length < MAX_PARTICULAS) {
             const c = PALETAS_HOJA[Math.floor(Math.random() * PALETAS_HOJA.length)];
-            const baseVx = rafagaActiva
+            const baseVx = est.rafActiva
                 ? raf.vxBase - Math.random() * raf.vxRand
                 : hoj.vxBase - Math.random() * hoj.vxRand;
-            particulas.push({
+            arr.push({
                 x: Math.random() * ancho,
                 y: -4,
                 vx: baseVx,
@@ -318,8 +327,8 @@ export function emitirClima(estacion, ancho) {
             });
         }
         const lls = PARTICULAS_2D.otono.lluviaSuave;
-        if (frameClima % lls.intervalo === 0 && particulas.length < MAX_PARTICULAS) {
-            particulas.push({
+        if (t % lls.intervalo === 0 && arr.length < MAX_PARTICULAS) {
+            arr.push({
                 x: Math.random() * ancho,
                 y: -4,
                 vx: lls.vx,
@@ -339,59 +348,69 @@ export function emitirClima(estacion, ancho) {
 }
 
 /**
- * Resetea el estado de clima de partículas
+ * Resetea el estado de clima del estado global
  */
 export function reiniciarClimaParticulas() {
-    frameClima = 0;
-    rafagaCounter = 0;
-    rafagaActiva = false;
-    rafagaFramesRestantes = 0;
-    resetRafaga();
+    _defecto.t = 0;
+    _defecto.rafCounter = 0;
+    _defecto.rafActiva = false;
+    _defecto.rafFrames = 0;
+    const raf = PARTICULAS_2D.otono.rafaga;
+    _defecto.rafProx = raf.intervaloMin + Math.floor(Math.random() * raf.intervaloRand);
 }
 
 /**
- * Actualiza todas las partículas
+ * Actualiza todas las partículas.
+ * @param {number} dt - Delta time
+ * @param {Object} [est] - Estado externo (si se omite, usa el global)
  */
-export function actualizarParticulas(dt) {
-    frameClima++;
+export function actualizarParticulas(dt, est = _defecto) {
+    est.t++;
 
-    for (let i = particulas.length - 1; i >= 0; i--) {
-        const p = particulas[i];
+    const arr = est.partic;
+    const t = est.t;
+
+    for (let i = arr.length - 1; i >= 0; i--) {
+        const p = arr[i];
         p.vx *= p.friccion;
         p.vy *= p.friccion;
         p.vy += p.gravedad * dt;
 
         // Oscilación horizontal para pétalos
         if (p.tipo === 'petalo') {
-            p.vx = Math.sin(frameClima * 0.04 + p.vidaMax * 0.27) * 1.1;
+            p.vx = Math.sin(t * 0.04 + p.vidaMax * 0.27) * 1.1;
         } else if (p.tipo === 'polvo-clima') {
-            p.vy = Math.sin(frameClima * 0.02 + p.x * 0.05) * 0.15;
+            p.vy = Math.sin(t * 0.02 + p.x * 0.05) * 0.15;
         }
 
         p.x += p.vx * dt;
         p.y += p.vy * dt;
         p.vida -= dt;
 
-        // Rebote en el suelo
+        // Rebote en el suelo (solo partículas con gravedad, ej: chispa)
         if (p.gravedad > 0 && p.y >= SUELO_Y && p.vy > 0) {
             p.y = SUELO_Y;
             p.vy *= -0.4;
         }
 
         if (p.vida <= 0) {
-            particulas.splice(i, 1);
+            arr.splice(i, 1);
         }
     }
 }
 
 /**
- * Renderiza todas las partículas en el canvas
+ * Renderiza todas las partículas en el canvas.
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {Object} [est] - Estado externo (si se omite, usa el global)
  */
-export function renderizarParticulas(ctx) {
+export function renderizarParticulas(ctx, est = _defecto) {
     const TAU = Math.PI * 2;
+    const arr = est.partic;
+    const t = est.t;
 
-    for (let i = 0; i < particulas.length; i++) {
-        const p = particulas[i];
+    for (let i = 0; i < arr.length; i++) {
+        const p = arr[i];
         const ratio = Math.max(0, p.vida / p.vidaMax);
         const px = Math.round(p.x);
         const py = Math.round(p.y);
@@ -408,7 +427,7 @@ export function renderizarParticulas(ctx) {
             const baseAlpha = 0.25 + (p.tam - 1) * 0.1;
             alpha = ratio > 0.3 ? baseAlpha : (ratio / 0.3) * baseAlpha;
         } else if (p.tipo === 'destello-clima') {
-            alpha = 0.85 * Math.abs(Math.sin(frameClima * 0.15 + p.x * 0.1));
+            alpha = 0.85 * Math.abs(Math.sin(t * 0.15 + p.x * 0.1));
         } else {
             alpha = ratio;
         }

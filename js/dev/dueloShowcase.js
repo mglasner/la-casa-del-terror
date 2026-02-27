@@ -1,19 +1,28 @@
 // Showcase del Duelo — herramienta de desarrollo
-// Canvas animado con arena y 2 luchadores en estados controlables
+// 5 paneles: arena base (sin clima) + 4 estaciones, mismo tamaño que clima showcase
+// Usa crearEstadoClima() para tener partículas independientes por panel.
 
 import { renderizarEscena } from '../juegos/duelo/renderer.js';
 import { crearLuchador } from '../juegos/duelo/luchador.js';
 import { cargarSpritesLuchador } from '../juegos/duelo/spritesDuelo.js';
 import {
-    emitirAura,
+    crearEstadoClima,
+    emitirClima,
     actualizarParticulas,
     renderizarParticulas,
 } from '../juegos/duelo/particulas.js';
+import { inicializarGradas, actualizarGradas } from '../juegos/duelo/gradas.js';
 
 const W = 480;
 const H = 270;
 
-const ESTADOS = ['idle', 'caminar', 'saltar', 'atacando', 'golpeado', 'agachado', 'bloquear'];
+const CASOS = [
+    { label: 'Sin clima', sub: '— Noche por defecto —', estacion: null },
+    { label: 'Invierno', sub: 'La Tormenta Arcana', estacion: 'invierno' },
+    { label: 'Primavera', sub: 'El Despertar del Bosque', estacion: 'primavera' },
+    { label: 'Verano', sub: 'El Sol Abrasador', estacion: 'verano' },
+    { label: 'Otoño', sub: 'La Danza de las Hojas', estacion: 'otono' },
+];
 
 // --- Luchadores mock ---
 
@@ -44,80 +53,6 @@ function crearMocks() {
     return { l1, l2 };
 }
 
-// --- Aplicar estado visual a un luchador ---
-
-function aplicarEstado(l, estado) {
-    // Reset
-    l.bloqueando = false;
-    l.agachado = false;
-    l.vx = 0;
-    l.vy = 0;
-    l.enSuelo = true;
-    l.ataqueTimer = 0;
-    l.invulFrames = 0;
-
-    switch (estado) {
-        case 'caminar':
-            l.vx = l.vel * l.direccion;
-            break;
-        case 'saltar':
-            l.vy = -3;
-            l.enSuelo = false;
-            break;
-        case 'atacando':
-            l.ataqueTimer = 999;
-            l.tipoAtaque = 'rapido';
-            break;
-        case 'golpeado':
-            l.invulFrames = 999;
-            break;
-        case 'agachado':
-            l.agachado = true;
-            break;
-        case 'bloquear':
-            l.bloqueando = true;
-            break;
-    }
-    l.estado = estado;
-}
-
-// --- Toolbar con botones de estado ---
-
-function crearToolbar(contenedor, label, estadoActual, onChange) {
-    const fila = document.createElement('div');
-    fila.className = 'toolbar';
-    fila.style.marginBottom = '8px';
-
-    const nombre = document.createElement('span');
-    nombre.className = 'state-indicator';
-    nombre.textContent = label;
-    fila.appendChild(nombre);
-
-    const sep = document.createElement('div');
-    sep.className = 'sep';
-    fila.appendChild(sep);
-
-    const grupo = document.createElement('div');
-    grupo.className = 'btn-group';
-
-    const botones = [];
-    for (const est of ESTADOS) {
-        const btn = document.createElement('button');
-        btn.className = 'state-btn' + (est === estadoActual ? ' active' : '');
-        btn.textContent = est;
-        btn.addEventListener('click', function () {
-            for (const b of botones) b.classList.remove('active');
-            btn.classList.add('active');
-            onChange(est);
-        });
-        botones.push(btn);
-        grupo.appendChild(btn);
-    }
-
-    fila.appendChild(grupo);
-    contenedor.appendChild(fila);
-}
-
 // --- Montaje ---
 
 function montar() {
@@ -125,8 +60,10 @@ function montar() {
     if (!contenedor) return;
 
     const { l1, l2 } = crearMocks();
+    inicializarGradas('donbu', false, 'siniestra', true);
 
-    const estMock = {
+    // Estado mock base
+    const estBase = {
         fase: 'pelea',
         luchador1: l1,
         luchador2: l2,
@@ -134,31 +71,39 @@ function montar() {
         ganador: null,
         tiempoRestante: 90,
         flashAlpha: 0,
+        estacion: null,
     };
 
-    // Canvas
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.style.minWidth = 'auto';
+    // Crear un panel por cada caso (mismo formato que climaShowcase)
+    const paneles = [];
+    for (const caso of CASOS) {
+        const card = document.createElement('div');
+        card.className = 'card';
 
-    const canvas = document.createElement('canvas');
-    canvas.width = W;
-    canvas.height = H;
-    canvas.style.width = '480px';
-    canvas.style.height = '270px';
-    card.appendChild(canvas);
+        const canvas = document.createElement('canvas');
+        canvas.width = W;
+        canvas.height = H;
+        canvas.style.width = '240px';
+        canvas.style.height = '135px';
 
-    // Toolbars dentro del card
-    crearToolbar(card, 'Jugador:', 'idle', function (est) {
-        aplicarEstado(l1, est);
-    });
-    crearToolbar(card, 'Rival:', 'idle', function (est) {
-        aplicarEstado(l2, est);
-    });
+        const nombre = document.createElement('span');
+        nombre.className = 'name';
+        nombre.textContent = caso.label;
 
-    contenedor.appendChild(card);
+        const sub = document.createElement('span');
+        sub.style.cssText =
+            'display:block;font-size:0.65em;color:#888;margin-top:2px;line-height:1.2;min-height:2em';
+        sub.textContent = caso.sub;
 
-    const ctx = canvas.getContext('2d');
+        card.append(canvas, nombre, sub);
+        contenedor.appendChild(card);
+
+        paneles.push({
+            ctx: canvas.getContext('2d'),
+            estacion: caso.estacion,
+            ep: crearEstadoClima(),
+        });
+    }
 
     // Loop de animación
     function loop() {
@@ -175,13 +120,22 @@ function montar() {
             l2.frameAnim++;
         }
 
-        // Partículas de aura orbitando
-        emitirAura(l1);
-        emitirAura(l2);
-        actualizarParticulas(1);
+        actualizarGradas(estBase);
 
-        renderizarEscena(ctx, W, H, estMock);
-        renderizarParticulas(ctx);
+        for (const panel of paneles) {
+            estBase.estacion = panel.estacion;
+
+            // Emitir y actualizar partículas con estado local del panel
+            emitirClima(panel.estacion, W, panel.ep);
+            actualizarParticulas(1, panel.ep);
+
+            // Renderizar escena (arena + gradas + luchadores)
+            renderizarEscena(panel.ctx, W, H, estBase);
+
+            // Renderizar partículas locales encima
+            renderizarParticulas(panel.ctx, panel.ep);
+        }
+
         requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
