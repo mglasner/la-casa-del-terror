@@ -21,11 +21,15 @@ import { renderizarEscena } from './renderer.js';
 import { procesarAtaque, verificarColisiones } from './combate.js';
 import { actualizarIA, resetearIA } from './ia.js';
 import {
+    emitirAura,
     emitirImpacto,
     emitirBloqueo,
     emitirKO,
+    emitirProyectil,
     actualizarParticulas,
+    actualizarProyectiles,
     renderizarParticulas,
+    renderizarProyectiles,
     limpiarParticulas,
 } from './particulas.js';
 import { cargarSpritesLuchador, limpiarSprites } from './spritesDuelo.js';
@@ -125,11 +129,6 @@ function procesarInput(l, _dt) {
 
 // --- Fases del juego ---
 
-function iniciarFaseVS() {
-    est.fase = 'vs';
-    est.faseTimer = CFG.pantallas.vsSegundos * 60;
-}
-
 function iniciarFaseCountdown() {
     est.fase = 'countdown';
     est.faseTimer = CFG.pantallas.countdownSegundos * 60;
@@ -198,10 +197,7 @@ function actualizar(_tiempo, dt) {
     const l1 = est.luchador1;
     const l2 = est.luchador2;
 
-    if (est.fase === 'vs') {
-        est.faseTimer -= dt;
-        if (est.faseTimer <= 0) iniciarFaseCountdown();
-    } else if (est.fase === 'countdown') {
+    if (est.fase === 'countdown') {
         est.faseTimer -= dt;
         if (est.faseTimer <= 0) iniciarFasePelea();
     } else if (est.fase === 'pelea') {
@@ -217,22 +213,34 @@ function actualizar(_tiempo, dt) {
         actualizarLuchador(l1, dt);
         actualizarLuchador(l2, dt);
 
+        // Partículas de aura orbitando luchadores
+        emitirAura(l1);
+        emitirAura(l2);
+
+        // Emitir proyectiles al iniciar ataque a distancia
+        if (l1.estado === 'atacando' && l1.esProyectil && !l1.proyectilEmitido) {
+            emitirProyectil(l1, l2);
+            l1.proyectilEmitido = true;
+        }
+        if (l2.estado === 'atacando' && l2.esProyectil && !l2.proyectilEmitido) {
+            emitirProyectil(l2, l1);
+            l2.proyectilEmitido = true;
+        }
+
         // Colisiones ataque → daño
         const resultado = verificarColisiones(l1, l2);
         if (resultado) {
             if (resultado.tipo === 'impacto') {
                 emitirImpacto(resultado.x, resultado.y, resultado.r, resultado.g, resultado.b);
+                est.flashAlpha = resultado.fuerte ? 0.4 : 0.25;
             } else if (resultado.tipo === 'bloqueo') {
                 emitirBloqueo(resultado.x, resultado.y);
             }
         }
 
-        // Orientar luchadores: si caminan, miran hacia donde van;
-        // si están quietos, encaran al rival
-        const haciaRivalL1 = l2.x > l1.x ? 1 : -1;
-        const haciaRivalL2 = l1.x > l2.x ? 1 : -1;
-        l1.direccion = Math.abs(l1.vx) > 0.1 ? Math.sign(l1.vx) : haciaRivalL1;
-        l2.direccion = Math.abs(l2.vx) > 0.1 ? Math.sign(l2.vx) : haciaRivalL2;
+        // Orientar luchadores: siempre encaran al rival (estilo juego de pelea)
+        l1.direccion = l2.x > l1.x ? 1 : -1;
+        l2.direccion = l1.x > l2.x ? 1 : -1;
 
         // HUD
         actualizarHUDVida(l1.vidaActual, l1.vidaMax, l2.vidaActual, l2.vidaMax);
@@ -240,9 +248,11 @@ function actualizar(_tiempo, dt) {
         // Verificar KO
         if (l1.vidaActual <= 0) {
             emitirKO(l1.x, l1.y + l1.alto / 2);
+            est.flashAlpha = 0.6;
             finalizarPelea('ko-jugador');
         } else if (l2.vidaActual <= 0) {
             emitirKO(l2.x, l2.y + l2.alto / 2);
+            est.flashAlpha = 0.6;
             finalizarPelea('ko-enemigo');
         }
     } else if (est.fase === 'resultado') {
@@ -256,8 +266,12 @@ function actualizar(_tiempo, dt) {
         }
     }
 
-    // Partículas (siempre)
+    // Decay del flash
+    est.flashAlpha *= 0.88;
+
+    // Partículas y proyectiles (siempre)
     actualizarParticulas(dt);
+    actualizarProyectiles(dt);
 
     // Renderizado
     const ctx = est.ctx;
@@ -265,6 +279,7 @@ function actualizar(_tiempo, dt) {
     ctx.save();
     ctx.scale(dpr, dpr);
     renderizarEscena(ctx, ANCHO, ALTO, est);
+    renderizarProyectiles(ctx);
     renderizarParticulas(ctx);
     ctx.restore();
 }
@@ -396,9 +411,9 @@ export function iniciarDuelo(jugador, onSalir, dpad, opciones) {
     listenerResize = reescalarCanvas;
     window.addEventListener('resize', listenerResize);
 
-    // Iniciar fase VS
+    // Iniciar countdown directo
     est.activo = true;
-    iniciarFaseVS();
+    iniciarFaseCountdown();
 
     // Game loop
     gameLoop = crearGameLoop(actualizar);

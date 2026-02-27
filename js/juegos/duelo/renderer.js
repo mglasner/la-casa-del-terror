@@ -7,6 +7,66 @@ import { obtenerSprite } from './spritesDuelo.js';
 const RND = CFG.render;
 const ARENA = CFG.arena;
 
+function hexARgb(hex) {
+    if (!hex || hex.length < 7) return { r: 200, g: 100, b: 255 };
+    return {
+        r: parseInt(hex.slice(1, 3), 16),
+        g: parseInt(hex.slice(3, 5), 16),
+        b: parseInt(hex.slice(5, 7), 16),
+    };
+}
+
+// --- Aura radial detrás de cada luchador ---
+
+function renderizarAura(ctx, l) {
+    const cx = l.x + l.ancho / 2;
+    const cy = l.y + l.alto * 0.5;
+    const pulso = 1 + 0.15 * Math.sin(Date.now() * 0.004);
+    const radio = l.alto * 0.6 * pulso;
+    const { r, g, b } = hexARgb(l.colorHud);
+
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radio);
+    grad.addColorStop(0, 'rgba(' + r + ',' + g + ',' + b + ',0.15)');
+    grad.addColorStop(1, 'rgba(' + r + ',' + g + ',' + b + ',0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, radio, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+// --- Efecto visual del arco de ataque ---
+
+function renderizarAtaque(ctx, l) {
+    if (l.estado !== 'atacando' || !l.tipoAtaque) return;
+    const duracion =
+        l.tipoAtaque === 'rapido'
+            ? CFG.combate.ataqueRapidoDuracion
+            : CFG.combate.ataqueFuerteDuracion;
+    const progreso = 1 - l.ataqueTimer / duracion;
+    if (progreso < 0.2 || progreso > 0.8) return;
+
+    const radio = l.tipoAtaque === 'rapido' ? 20 : 28;
+    const alpha = 0.25 * (1 - progreso);
+    const { r, g, b } = hexARgb(l.colorHud);
+
+    // Centro del arco: frente al luchador (ya está flippeado por el ctx)
+    const ax = l.x + l.ancho;
+    const ay = l.y + l.alto * 0.4;
+
+    ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+    ctx.beginPath();
+    ctx.arc(ax, ay, radio, -Math.PI / 2, Math.PI / 2);
+    ctx.fill();
+}
+
+// --- Flash de pantalla al golpear ---
+
+function renderizarFlash(ctx, ancho, alto, flashAlpha) {
+    if (flashAlpha <= 0.01) return;
+    ctx.fillStyle = 'rgba(255,255,255,' + flashAlpha + ')';
+    ctx.fillRect(0, 0, ancho, alto);
+}
+
 // --- Fondo y arena ---
 
 function renderizarArena(ctx, ancho, alto) {
@@ -33,10 +93,46 @@ function renderizarArena(ctx, ancho, alto) {
     }
 }
 
+// --- Escudo de bloqueo ---
+
+function renderizarEscudo(ctx, l) {
+    const rx = l.alto * 0.22; // estrecho: pasa cerca del cuerpo
+    const ry = l.alto * 0.5; // alto: cubre bien verticalmente
+    // Frente del luchador (tras el flip del ctx, siempre queda hacia el rival)
+    const ex = l.x + l.ancho;
+    const ey = l.y + l.alto * 0.5;
+    const pulso = 0.7 + 0.3 * Math.sin(Date.now() * 0.008);
+    const color = l.colorHud || '#5eeadb';
+
+    ctx.save();
+    ctx.globalAlpha = pulso;
+
+    // Relleno con gradiente radial (elíptico via escala)
+    const grad = ctx.createRadialGradient(ex, ey, 0, ex, ey, ry);
+    grad.addColorStop(0, color + '2E'); // alpha ~0.18
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.ellipse(ex, ey, rx, ry, 0, -Math.PI / 2, Math.PI / 2);
+    ctx.fill();
+
+    // Borde
+    ctx.strokeStyle = color + '66'; // alpha ~0.4
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.ellipse(ex, ey, rx, ry, 0, -Math.PI / 2, Math.PI / 2);
+    ctx.stroke();
+
+    ctx.restore();
+}
+
 // --- Luchador ---
 
 function renderizarLuchador(ctx, l) {
     const sprite = obtenerSprite(l);
+
+    // Aura radial siempre visible (detrás del sprite)
+    renderizarAura(ctx, l);
 
     // Parpadeo de invulnerabilidad
     if (l.invulFrames > 0 && Math.floor(l.invulFrames) % 4 < 2) return;
@@ -58,6 +154,8 @@ function renderizarLuchador(ctx, l) {
         ctx.scale(l.direccion, 1);
         ctx.translate(-cx, 0);
         ctx.drawImage(sprite, dx, dy, sw, sh);
+        if (l.bloqueando) renderizarEscudo(ctx, l);
+        renderizarAtaque(ctx, l);
     } else {
         // Fallback procedural: rectángulo coloreado
         const color = l.colorHud || (l.esVillano ? '#e94560' : '#5eeadb');
@@ -87,13 +185,8 @@ function renderizarLuchador(ctx, l) {
             ctx.fillStyle = color;
             ctx.fillRect(brazoX, l.y + l.alto * 0.3, 8, 4);
         }
-        if (l.estado === 'bloquear') {
-            // Escudo sencillo
-            ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-            ctx.lineWidth = 2;
-            const shieldX = l.direccion > 0 ? l.x - 4 : l.x + l.ancho + 2;
-            ctx.strokeRect(shieldX, l.y + 4, 4, l.alto - 8);
-        }
+        if (l.bloqueando) renderizarEscudo(ctx, l);
+        renderizarAtaque(ctx, l);
     }
 
     ctx.restore();
@@ -104,31 +197,6 @@ function renderizarLuchador(ctx, l) {
     ctx.beginPath();
     ctx.ellipse(cx, ARENA.sueloY + 2, sombra / 2, 3, 0, 0, Math.PI * 2);
     ctx.fill();
-}
-
-// --- Pantalla VS ---
-
-function renderizarVS(ctx, ancho, alto, est) {
-    ctx.fillStyle = 'rgba(0,0,0,0.7)';
-    ctx.fillRect(0, 0, ancho, alto);
-
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    // Nombre jugador (izquierda)
-    ctx.fillStyle = est.luchador1.colorHud || '#5eeadb';
-    ctx.font = 'bold 16px sans-serif';
-    ctx.fillText(est.luchador1.nombre, ancho * 0.25, alto * 0.45);
-
-    // VS
-    ctx.fillStyle = '#f0e6d3';
-    ctx.font = 'bold 32px sans-serif';
-    ctx.fillText(CFG.textos.vs, ancho / 2, alto / 2);
-
-    // Nombre enemigo (derecha)
-    ctx.fillStyle = est.luchador2.colorHud || '#e94560';
-    ctx.font = 'bold 16px sans-serif';
-    ctx.fillText(est.luchador2.nombre, ancho * 0.75, alto * 0.45);
 }
 
 // --- Countdown ---
@@ -206,10 +274,13 @@ export function renderizarEscena(ctx, ancho, alto, est) {
     if (est.luchador1) renderizarLuchador(ctx, est.luchador1);
     if (est.luchador2) renderizarLuchador(ctx, est.luchador2);
 
+    // Flash de impacto (entre luchadores y overlays)
+    if (est.flashAlpha > 0) {
+        renderizarFlash(ctx, ancho, alto, est.flashAlpha);
+    }
+
     // Overlays según fase
-    if (est.fase === 'vs') {
-        renderizarVS(ctx, ancho, alto, est);
-    } else if (est.fase === 'countdown') {
+    if (est.fase === 'countdown') {
         renderizarCountdown(ctx, ancho, alto, est.faseTimer);
     } else if (est.fase === 'resultado') {
         renderizarResultado(ctx, ancho, alto, est);

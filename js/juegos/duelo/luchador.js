@@ -127,13 +127,14 @@ export function actualizarLuchador(l, dt) {
     }
 
     // Determinar estado de animación
+    const estadoPrev = l.estado;
     if (l.ataqueTimer > 0) {
         l.estado = 'atacando';
     } else if (l.invulFrames > CMB.invulnerabilidad * 0.7) {
         l.estado = 'golpeado';
     } else if (l.agachado) {
         l.estado = 'agachado';
-    } else if (l.bloqueando) {
+    } else if (l.bloqueando && Math.abs(l.vx) < 0.1) {
         l.estado = 'bloquear';
     } else if (!l.enSuelo && l.vy < 0) {
         l.estado = 'saltar';
@@ -143,6 +144,12 @@ export function actualizarLuchador(l, dt) {
         l.estado = 'caminar';
     } else {
         l.estado = 'idle';
+    }
+
+    // Reset de animación al cambiar de estado (igual que El Abismo)
+    if (l.estado !== estadoPrev) {
+        l.frameAnim = 0;
+        l.frameTimer = 0;
     }
 
     // Animación

@@ -75,19 +75,17 @@ export const CFG = {
         colorTimer: '#f0e6d3',
     },
     sprites: {
-        idleVel: 20,
+        idleVel: 30,
         correrVel: 6,
         ataqueVel: 6,
-        agacharseVel: 8,
+        agacharseVel: 6,
         golpeadoVel: 15,
     },
     pantallas: {
-        vsSegundos: 2,
         countdownSegundos: 3,
         resultadoSegundos: 3,
     },
     textos: {
-        vs: 'VS',
         pelea: '¡Pelea!',
         victoria: '¡Victoria!',
         derrota: '¡Derrota!',

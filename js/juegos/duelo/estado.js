@@ -17,7 +17,7 @@ const valoresIniciales = {
     altoCanvas: CFG.canvas.altoBase,
     modoLandscape: null,
     dpadRef: null,
-    // Fase del juego: 'vs' | 'countdown' | 'pelea' | 'resultado'
+    // Fase del juego: 'countdown' | 'pelea' | 'resultado'
     fase: null,
     faseTimer: 0,
     // Luchadores
@@ -26,6 +26,8 @@ const valoresIniciales = {
     // Ronda
     tiempoRestante: CFG.combate.tiempoRonda,
     ganador: null, // 'jugador' | 'enemigo' | 'empate'
+    // Efectos visuales
+    flashAlpha: 0,
 };
 
 // Estado mutable (teclasRef se excluye para no romper refs compartidas)

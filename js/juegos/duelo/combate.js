@@ -29,6 +29,13 @@ export function procesarAtaque(atacante, _defensor, tipo) {
         atacante.ataqueTimer = CMB.ataqueFuerteDuracion;
         atacante.cooldownAtaque = CMB.ataqueFuerteCooldown;
     }
+
+    // Determinar si es ataque con proyectil
+    const esRapido = tipo === 'rapido';
+    const ataqueIdx = esRapido ? 0 : Math.min(1, atacante.ataquesDatos.length - 1);
+    const datosAtaque = atacante.ataquesDatos[ataqueIdx];
+    atacante.esProyectil = !!(datosAtaque && datosAtaque.arquetipo === 'proyectil');
+    atacante.proyectilEmitido = false;
 }
 
 /**
@@ -150,6 +157,7 @@ function verificarAtaque(atacante, defensor) {
     const { r, g, b } = hexARgb(atacante.colorHud);
     return {
         tipo: 'impacto',
+        fuerte: esFuerte,
         x: impactoX,
         y: impactoY,
         r,

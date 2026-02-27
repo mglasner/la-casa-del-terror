@@ -87,21 +87,19 @@ render:
 
 # --- Sprites ---
 sprites:
-    idleVel: 20 # frames entre cada frame de idle
+    idleVel: 30 # frames entre cada frame de idle (igual que Abismo)
     correrVel: 6 # frames entre cada frame de correr
     ataqueVel: 6 # frames entre cada frame de ataque
-    agacharseVel: 8 # frames entre cada frame de agacharse
+    agacharseVel: 6 # frames entre cada frame de agacharse (igual que Abismo)
     golpeadoVel: 15 # frames del estado golpeado
 
 # --- Pantallas ---
 pantallas:
-    vsSegundos: 2 # duración de la pantalla VS
     countdownSegundos: 3 # cuenta regresiva antes de pelear
     resultadoSegundos: 3 # duración de la pantalla de resultado
 
 # --- Textos ---
 textos:
-    vs: 'VS'
     pelea: '¡Pelea!'
     victoria: '¡Victoria!'
     derrota: '¡Derrota!'
