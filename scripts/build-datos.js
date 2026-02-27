@@ -393,27 +393,32 @@ const SCHEMA_ABISMO = {
 
 const SCHEMA_AJEDREZ = {
     meta: ['titulo', 'tiempoVictoria'],
-    modo: ['opciones', 'default'],
     dificultad: ['opciones', 'default'],
     color: ['opciones', 'default'],
     ia: ['retardoMovimiento', 'retardoJaque'],
     tablero: ['tamCelda', 'tamCeldaMobile'],
+    textos: ['eligeColor', 'toastJaque', 'toastTablas', 'toastVictoria', 'toastDerrota'],
+    curacion: ['victoriaMin', 'victoriaMax'],
+};
+
+const SCHEMA_DUELO_AJEDREZ = {
+    meta: ['titulo', 'tiempoVictoria'],
+    tablero: ['tamCelda', 'tamCeldaMobile'],
     textos: [
-        'eligeColor',
         'toastJaque',
         'toastTablas',
-        'toastVictoria',
-        'toastDerrota',
         'toastVictoriaHeroes',
         'toastVictoriaVillanos',
-        'eligeModo',
         'ofrecerTablas',
         'heroesOfrecenTablas',
         'villanosOfrecenTablas',
         'aceptarTablas',
         'rechazarTablas',
+        'rendirse',
+        'heroesSeRinden',
+        'villanosSeRinden',
+        'confirmarRendicion',
     ],
-    curacion: ['victoriaMin', 'victoriaMax'],
 };
 
 const SCHEMA_DUELO = {
@@ -476,8 +481,8 @@ const SCHEMA_DUELO = {
         'colorTimer',
     ],
     sprites: ['idleVel', 'correrVel', 'ataqueVel', 'agacharseVel', 'golpeadoVel'],
-    pantallas: ['vsSegundos', 'countdownSegundos', 'resultadoSegundos'],
-    textos: ['vs', 'pelea', 'victoria', 'derrota', 'tiempoAgotado', 'ko'],
+    pantallas: ['countdownSegundos', 'resultadoSegundos'],
+    textos: ['pelea', 'victoria', 'derrota', 'tiempoAgotado', 'ko'],
 };
 
 // Tabla de juegos: slug → schema de validación
@@ -487,6 +492,7 @@ const JUEGOS = [
     { slug: 'memorice', schema: SCHEMA_MEMORICE },
     { slug: 'abismo', schema: SCHEMA_ABISMO },
     { slug: 'ajedrez', schema: SCHEMA_AJEDREZ },
+    { slug: 'dueloAjedrez', schema: SCHEMA_DUELO_AJEDREZ },
     { slug: 'duelo', schema: SCHEMA_DUELO },
 ];
 
