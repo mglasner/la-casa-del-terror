@@ -189,35 +189,74 @@ function generarPaginaJuego(juego) {
     return contenido;
 }
 
-// --- Grilla reutilizable de avatares ---
+// Tiers de enemigos para agrupar en el selector
+const TIERS = [
+    { id: 'esbirro', nombre: 'Esbirros', emoji: '👹' },
+    { id: 'elite', nombre: 'Élite', emoji: '⚔️' },
+    { id: 'pesadilla', nombre: 'Pesadillas', emoji: '💀' },
+];
+
+// --- Grilla reutilizable de avatares (con agrupación automática por tier) ---
+
+function crearBotonEntidad(nombre, entidad, onClickInterno) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'selector-heroe-btn';
+    btn.title = nombre;
+
+    const avatar = document.createElement('img');
+    avatar.src = entidad.img;
+    avatar.alt = nombre;
+    avatar.className = 'selector-heroe-avatar';
+    avatar.loading = 'lazy';
+    btn.appendChild(avatar);
+    btn.appendChild(crearElemento('span', 'selector-heroe-nombre', nombre));
+
+    btn.addEventListener('click', function () {
+        onClickInterno(nombre, btn);
+    });
+    return btn;
+}
 
 function crearSelectorEntidades(contenedor, entidades, onSeleccionar) {
     contenedor.innerHTML = '';
-    Object.keys(entidades).forEach(function (nombre) {
-        const ent = entidades[nombre];
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'selector-heroe-btn';
-        btn.title = nombre;
-
-        const avatar = document.createElement('img');
-        avatar.src = ent.img;
-        avatar.alt = nombre;
-        avatar.className = 'selector-heroe-avatar';
-        avatar.loading = 'lazy';
-        btn.appendChild(avatar);
-        btn.appendChild(crearElemento('span', 'selector-heroe-nombre', nombre));
-
-        btn.addEventListener('click', function () {
-            contenedor.querySelectorAll('.selector-heroe-btn').forEach(function (b) {
-                b.classList.remove('selector-heroe-activo');
-            });
-            btn.classList.add('selector-heroe-activo');
-            onSeleccionar(nombre);
-        });
-
-        contenedor.appendChild(btn);
+    const nombres = Object.keys(entidades);
+    const tieneTiers = nombres.some(function (n) {
+        return entidades[n].tier;
     });
+
+    function seleccionar(nombre, btn) {
+        contenedor.querySelectorAll('.selector-heroe-btn').forEach(function (b) {
+            b.classList.remove('selector-heroe-activo');
+        });
+        btn.classList.add('selector-heroe-activo');
+        onSeleccionar(nombre);
+    }
+
+    if (tieneTiers) {
+        TIERS.forEach(function (tier) {
+            const miembros = nombres.filter(function (n) {
+                return entidades[n].tier === tier.id;
+            });
+            if (miembros.length === 0) return;
+
+            const grupo = crearElemento('div', 'selector-tier-grupo');
+            const label = crearElemento('div', 'selector-tier-label');
+            label.textContent = tier.emoji + ' ' + tier.nombre;
+            grupo.appendChild(label);
+
+            const grilla = crearElemento('div', 'selector-tier-grilla');
+            miembros.forEach(function (nombre) {
+                grilla.appendChild(crearBotonEntidad(nombre, entidades[nombre], seleccionar));
+            });
+            grupo.appendChild(grilla);
+            contenedor.appendChild(grupo);
+        });
+    } else {
+        nombres.forEach(function (nombre) {
+            contenedor.appendChild(crearBotonEntidad(nombre, entidades[nombre], seleccionar));
+        });
+    }
 }
 
 // --- Modal de selección de héroe ---

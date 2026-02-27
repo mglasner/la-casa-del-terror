@@ -172,6 +172,31 @@
     color: #5a3a1a;
 }
 
+/* --- Agrupación por tier (automática cuando las entidades tienen .tier) --- */
+
+.selector-tier-grupo {
+    margin-bottom: 8px;
+}
+
+.selector-tier-label {
+    font-family: var(--font-display, sans-serif);
+    font-size: 0.8rem;
+    color: rgb(240 230 211 / 70%);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 4px 6px 2px;
+    border-bottom: 1px solid rgb(255 255 255 / 10%);
+    margin-bottom: 6px;
+}
+
+.selector-tier-grilla {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    padding: 4px 0;
+}
+
 /* --- Botón Jugar en Libro de Juegos --- */
 
 .libro-juego-btn-jugar {
